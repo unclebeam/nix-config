@@ -1,0 +1,9 @@
+# Build outputs: `nix build` / `nixos-rebuild build` drop a ./result symlink
+result
+result-*
+
+# VM disk images created by `nixos-rebuild build-vm` (run from the repo dir)
+*.qcow2
+
+# Direnv, if you ever adopt it
+.direnv/
