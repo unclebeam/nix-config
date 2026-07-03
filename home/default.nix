@@ -25,9 +25,10 @@
 
   programs.git = {
     enable = true;
-    userName = "unclebeam";
-    userEmail = "patompong.beam@gmail.com";
-    extraConfig = {
+    # `settings` is written to ~/.config/git/config verbatim (sections.keys).
+    settings = {
+      user.name = "unclebeam";
+      user.email = "patompong.beam@gmail.com";
       init.defaultBranch = "main";
       pull.rebase = true;
     };

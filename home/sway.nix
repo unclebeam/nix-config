@@ -136,8 +136,9 @@ in
   # ── swayidle — lock, screen off, and lock-before-sleep ──────────────────
   services.swayidle = {
     enable = true;
-    # Lock BEFORE the system suspends (lid close, systemctl suspend…)
-    events."before-sleep".command = "${pkgs.swaylock}/bin/swaylock -f";
+    # Lock BEFORE the system suspends (lid close, systemctl suspend…).
+    # Each event maps to its command string directly.
+    events."before-sleep" = "${pkgs.swaylock}/bin/swaylock -f";
     timeouts = [
       # 5 min idle → lock
       { timeout = 300; command = "${pkgs.swaylock}/bin/swaylock -f"; }
