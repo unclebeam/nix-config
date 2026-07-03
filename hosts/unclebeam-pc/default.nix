@@ -6,7 +6,8 @@
 
 {
   imports = [
-    ./hardware-configuration.nix # machine-generated; see the placeholder note
+    ./hardware-configuration.nix # machine-generated; filesystems moved to disko.nix
+    ./disko.nix                  # declarative disk layout (partitions, btrfs, mounts)
     ../../modules/core.nix       # users, nix settings, boot loader, networking…
     ../../modules/sway.nix       # sway session, greetd, portals
     ../../modules/audio.nix      # pipewire
@@ -26,6 +27,11 @@
 
   # CPU microcode security/stability updates for the Ryzen.
   hardware.cpu.amd.updateMicrocode = true;
+
+  # The disk layout (disko.nix) has no swap partition. Instead, use zram:
+  # a compressed block device in RAM used as swap. Cheap insurance against
+  # memory pressure with no disk wear and nothing to partition.
+  zramSwap.enable = true;
 
   # Version of NixOS this machine was FIRST installed with. It gates stateful
   # migration defaults — set once, then never change it, even on upgrades.

@@ -16,9 +16,19 @@
       # one package set, no version skew, smaller closure.
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # disko — declarative disk partitioning. A host describes its disks as
+    # Nix (hosts/<name>/disko.nix) and disko turns that into the actual
+    # partitioning/formatting commands. nixos-anywhere uses it to wipe and
+    # install a machine over SSH in one shot, and NixOS reuses the same
+    # declaration to generate the fileSystems.* mount config.
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, disko, ... }@inputs:
     let
       # Small helper so each host is a one-liner below.
       # `nixosSystem` evaluates a list of modules into a bootable system.
@@ -31,6 +41,12 @@
           # The per-host entrypoint. Everything else is imported from there —
           # this keeps the flake itself boring and the hosts/ dirs in charge.
           ./hosts/${hostName}
+
+          # disko's NixOS module. Loading it only ADDS the `disko.devices`
+          # option — it does nothing until a host actually declares disks.
+          # Today only unclebeam-pc does (hosts/unclebeam-pc/disko.nix);
+          # the thinkpad is unaffected until it gets a disko.nix of its own.
+          disko.nixosModules.disko
 
           # Wire home-manager in as a NixOS module: `nixos-rebuild switch`
           # builds system AND user config in one transaction.

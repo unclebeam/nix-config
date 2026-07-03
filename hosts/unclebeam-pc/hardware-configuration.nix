@@ -13,23 +13,10 @@
   boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/6362035a-bc5b-4a09-a710-430f44f71951";
-      fsType = "btrfs";
-      options = [ "subvol=@" ];
-    };
-
-  fileSystems."/home" =
-    { device = "/dev/disk/by-uuid/6362035a-bc5b-4a09-a710-430f44f71951";
-      fsType = "btrfs";
-      options = [ "subvol=@home" ];
-    };
-
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/40B7-9EF5";
-      fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
-    };
+  # NOTE: the fileSystems."/", "/home" and "/boot" entries that
+  # nixos-generate-config wrote here have been removed. The disk layout is
+  # now declared in ./disko.nix, and disko generates the fileSystems.*
+  # config from it — defining them in both places would conflict.
 
   swapDevices = [ ];
 
