@@ -24,8 +24,8 @@ let
   #   - NOT the nvme-eui.* alias (same disk, opaque name)
   #   - NO -part1/-part2 suffix (those are partitions, we want the whole disk)
   #
-  # <<< PLACEHOLDER — PASTE THE REAL DISK ID BELOW BEFORE INSTALLING >>>
-  targetDisk = "/dev/disk/by-id/PASTE_DISK_ID_HERE";
+  # The 931.5G Samsung 9100 PRO (verified from the by-id listing on the PC).
+  targetDisk = "/dev/disk/by-id/nvme-Samsung_SSD_9100_PRO_1TB_S7YDNJ0Y613593X";
 in
 {
   disko.devices.disk.main = {
