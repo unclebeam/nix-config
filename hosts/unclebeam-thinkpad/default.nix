@@ -5,6 +5,7 @@
 {
   imports = [
     ./hardware-configuration.nix # machine-generated; see the placeholder note
+    ./disko.nix                  # declarative disk layout (partitions, btrfs, mounts)
     ../../modules/core.nix
     ../../modules/sway.nix
     ../../modules/audio.nix

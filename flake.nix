@@ -44,8 +44,7 @@
 
           # disko's NixOS module. Loading it only ADDS the `disko.devices`
           # option — it does nothing until a host actually declares disks.
-          # Today only unclebeam-pc does (hosts/unclebeam-pc/disko.nix);
-          # the thinkpad is unaffected until it gets a disko.nix of its own.
+          # Both hosts do, in hosts/<name>/disko.nix.
           disko.nixosModules.disko
 
           # Wire home-manager in as a NixOS module: `nixos-rebuild switch`
