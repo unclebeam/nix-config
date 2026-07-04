@@ -63,10 +63,13 @@
   # System-wide CLI + the browser. Desktop apps with per-user *config*
   # (alacritty, waybar…) live in home/ instead; these are config-less here.
   environment.systemPackages = with pkgs; [
+    fastfetch
+    lazygit
     git
     neovim # package only — config/plugins/LSPs are managed by hand, not Nix
     brave  # Chromium-based; runs native Wayland via NIXOS_OZONE_WL (modules/sway.nix)
     wget
     curl
+    firefox
   ];
 }

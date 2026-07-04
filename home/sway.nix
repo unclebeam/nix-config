@@ -39,6 +39,13 @@ in
       # No wallpaper manager, just a solid melange background everywhere.
       output."*".bg = "${colors.a.bg} solid_color";
 
+      output = {
+      	"Dell Inc. DELL U3225QE 27D4834" = {
+	  mode = "3840x2160@120Hz";
+	  scale = "1.5";
+	};
+      };
+
       # Window borders, straight from the palette:
       # focused = warm comment-beige, everything else fades into the bg.
       colors = {
