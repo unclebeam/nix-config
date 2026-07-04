@@ -75,8 +75,7 @@
     wget
     curl
     firefox
-    # Both Electron (native Wayland via NIXOS_OZONE_WL) and both unfree.
-    todoist-electron # Todoist task manager — signs into the cloud account, no local config to manage
-    obsidian         # markdown notes — vaults live in $HOME, nothing for Nix to configure
+    # Electron (native Wayland via NIXOS_OZONE_WL) and unfree.
+    obsidian # markdown notes — vaults live in $HOME, nothing for Nix to configure
   ];
 }
