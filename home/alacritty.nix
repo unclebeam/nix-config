@@ -43,7 +43,7 @@ in
       };
 
       font = {
-        normal.family = "JetBrainsMono Nerd Font";
+        normal.family = "IosevkaTerm Nerd Font Mono";
         size = 11.0;
       };
 

@@ -46,9 +46,12 @@
   };
 
   # ── Fonts ──────────────────────────────────────────────────────────────
-  # One good mono font (terminal, waybar) + Noto for everything else.
+  # Mono fonts (JetBrainsMono for the UI, IosevkaTerm for the terminal),
+  # Sarabun for Thai text, Noto for everything else.
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
+    nerd-fonts.iosevka-term # alacritty's terminal font (home/alacritty.nix)
+    sarabun-font # Thai text font
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
