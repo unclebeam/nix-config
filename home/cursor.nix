@@ -11,9 +11,9 @@
     enable = true;
     package = pkgs.adwaita-icon-theme; # plain GNOME cursor — matches the minimal look
     name = "Adwaita";
-    size = 32; # logical px; sway multiplies by the output scale (1.5) on screen
+    size = 24; # logical px; sway multiplies by the output scale (1.5) on screen
 
-    # Writes `seat * xcursor_theme Adwaita 32` into the sway config so the
+    # Writes `seat * xcursor_theme Adwaita 24` into the sway config so the
     # compositor-drawn cursor (desktop, window borders) matches the apps.
     sway.enable = true;
 
