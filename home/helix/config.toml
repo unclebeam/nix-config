@@ -1,0 +1,13 @@
+# Helix config — plain file, symlinked into place by home/helix.nix.
+# Edit directly; changes apply on the next rebuild (or `:config-reload`).
+
+# Helix ships no melange theme; gruvbox-material is the closest bundled
+# warm dark. Referencing a built-in by name keeps hex colors out of here.
+theme = "gruvbox-material"
+
+[editor]
+line-number = "relative"
+bufferline = "multiple" # show open buffers as tabs (only when >1)
+
+[editor.cursor-shape]
+insert = "bar" # thin cursor in insert mode, block elsewhere

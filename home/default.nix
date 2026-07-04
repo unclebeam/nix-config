@@ -11,6 +11,7 @@
     ./mako.nix      # notifications
     ./alacritty.nix # terminal
     ./fish.nix      # shell + prompt
+    ./helix.nix     # editor + language servers
   ];
 
   home.username = "unclebeam";

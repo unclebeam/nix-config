@@ -67,6 +67,10 @@
     lazygit
     git
     neovim # package only — config/plugins/LSPs are managed by hand, not Nix
+    # Unfree (covered by allowUnfree above). Its built-in auto-updater can't
+    # write into the read-only Nix store — new versions arrive via
+    # `nix flake update` + rebuild instead.
+    claude-code
     brave  # Chromium-based; runs native Wayland via NIXOS_OZONE_WL (modules/sway.nix)
     wget
     curl

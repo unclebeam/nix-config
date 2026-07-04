@@ -1,0 +1,8 @@
+# Language-specific settings — plain file, symlinked by home/helix.nix.
+# The LSP/formatter binaries come from home/helix.nix (Nix packages, no Mason).
+# nil (the Nix LSP) needs no entry — helix uses it for .nix files by default.
+
+[[language]]
+name = "nix"
+formatter = { command = "nixfmt" }
+auto-format = true
