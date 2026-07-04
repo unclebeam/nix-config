@@ -62,7 +62,14 @@
   # Two rules because apps reach Thai glyphs by two different paths:
   # lang-tagged queries (pango/harfbuzz, pages with lang="th") and raw
   # per-character charset fallback (Chromium on pages without lang="th").
+  # NB: localConf becomes /etc/fonts/local.conf verbatim, so it must be a
+  # complete XML document — one <fontconfig> root. Multiple top-level
+  # elements are "junk after document element" and fontconfig silently
+  # drops the WHOLE file.
   fonts.fontconfig.localConf = ''
+    <?xml version="1.0"?>
+    <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+    <fontconfig>
     <!-- binding="strong" is load-bearing: NixOS's generated default-fonts
          conf prefers DejaVu with strong binding, and a strong family match
          outranks a lang match — a weak prepend here silently loses and
@@ -84,5 +91,6 @@
         <pattern><patelt name="family"><string>FreeMono</string></patelt></pattern>
       </rejectfont>
     </selectfont>
+    </fontconfig>
   '';
 }
