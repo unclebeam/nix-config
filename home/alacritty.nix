@@ -44,7 +44,7 @@ in
 
       font = {
         normal.family = "IosevkaTerm Nerd Font Mono";
-        size = 11.0;
+        size = 12.0;
       };
 
       window.padding = {
