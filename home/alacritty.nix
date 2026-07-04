@@ -51,6 +51,24 @@ in
         x = 6;
         y = 6;
       };
+
+      # Shift+Enter normally sends the exact same bytes as plain Enter, so
+      # TUI apps (Claude Code) can't tell them apart and submit the prompt
+      # instead of inserting a newline. Send ESC+CR instead — the alt+enter
+      # sequence, which Claude Code (and most readline-style inputs) treat
+      # as "newline, don't submit".
+      #
+      # The string must contain the LITERAL ESC character (home-manager's
+      # TOML writer then escapes it correctly); Nix has no \u escape, so we
+      # conjure ESC via fromJSON. Writing "\\u001b" here would make the key
+      # type the six characters \u001b instead.
+      keyboard.bindings = [
+        {
+          key = "Return";
+          mods = "Shift";
+          chars = (builtins.fromJSON ''"\u001b"'') + "\r";
+        }
+      ];
     };
   };
 }
