@@ -11,6 +11,7 @@
     ../../modules/core.nix       # users, nix settings, boot loader, networking…
     ../../modules/sway.nix       # sway session, greetd, portals
     ../../modules/audio.nix      # pipewire
+    ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
     ../../modules/gaming.nix     # steam + gamemode (importing it = enabling it)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
   ];
