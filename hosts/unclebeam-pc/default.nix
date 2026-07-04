@@ -13,6 +13,7 @@
     ../../modules/audio.nix      # pipewire
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
     ../../modules/gaming.nix     # steam + gamemode (importing it = enabling it)
+    ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
   ];
 
