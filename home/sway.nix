@@ -43,11 +43,27 @@ in
       # No wallpaper manager, just a solid melange background everywhere.
       output."*".bg = "${colors.a.bg} solid_color";
 
+      # Outputs are matched by "make model serial" (from `swaymsg -t get_outputs`),
+      # never by connector name — entries that don't match a plugged-in monitor
+      # are silently ignored, which is what lets both hosts share this file.
       output = {
       	"Dell Inc. DELL U3225QE 27D4834" = {
 	  mode = "3840x2160@120Hz";
 	  scale = "1.5";
 	};
+
+        # The thinkpad's built-in OLED panel. Without this entry sway picks
+        # 60Hz (the panel's first mode) and scale 2.0 — pinning gets us the
+        # 120Hz the panel supports and 1.5 (logical 1920x1200, more real
+        # estate than 2.0's 1440x900). adaptive_sync stays off on purpose:
+        # VRR on OLED panels commonly causes brightness flicker.
+        # ⚠ The double space before "Unknown" is real: the EDID model string
+        # is "ATNA40HQ02-0 " with a trailing space. Don't "fix" it, or the
+        # entry stops matching.
+        "Samsung Display Corp. ATNA40HQ02-0  Unknown" = {
+          mode = "2880x1800@120Hz";
+          scale = "1.5";
+        };
       };
 
       # Window borders, straight from the palette:
