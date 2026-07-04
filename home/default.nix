@@ -12,6 +12,7 @@
     ./alacritty.nix # terminal
     ./fish.nix      # shell + prompt
     ./helix.nix     # editor + language servers
+    ./zellij.nix    # terminal multiplexer
   ];
 
   home.username = "unclebeam";
