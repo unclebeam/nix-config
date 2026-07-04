@@ -26,6 +26,10 @@ in
       terminal = term;
       menu = "fuzzel"; # launched by $mod+d below (sway's default menu bind)
 
+      # Start on workspace 1 — without this sway can land on an arbitrary
+      # workspace at launch (it was coming up on 10).
+      defaultWorkspace = "workspace number 1";
+
       # Waybar runs as a systemd user service (home/waybar.nix), so sway's
       # built-in bar is disabled entirely.
       bars = [ ];
