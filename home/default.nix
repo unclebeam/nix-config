@@ -13,6 +13,7 @@
     ./fish.nix      # shell + prompt
     ./helix.nix     # editor + language servers
     ./zellij.nix    # terminal multiplexer
+    ./cursor.nix    # mouse cursor theme + size (HiDPI)
   ];
 
   home.username = "unclebeam";
