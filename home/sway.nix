@@ -102,6 +102,14 @@ in
       window.titlebar = false; # borders only; titles waste vertical space
       window.border = 2;
 
+      # Bind by physical keycode (--to-code), resolved against the FIRST
+      # xkb layout (us). Without this, bindsym matches the keysym the active
+      # layout produces — under the Thai layout $mod+1 emits "ๅ", not "1",
+      # so workspace/letter shortcuts silently stop working. Keysyms that
+      # don't translate to a code (the XF86 media keys) fall back to plain
+      # keysym matching, so they keep working too.
+      bindkeysToCode = true;
+
       # mkOptionDefault MERGES these into sway's default keybindings
       # ($mod+Return terminal, $mod+d menu, $mod+1..0 workspaces, etc.)
       # instead of replacing them wholesale.
