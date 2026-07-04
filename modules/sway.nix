@@ -56,4 +56,19 @@
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
   ];
+
+  # Prefer Sarabun whenever the text run is Thai. Installing a font only
+  # makes it *available* — without this rule fontconfig ranks Sarabun near
+  # the bottom of the fallback list and Thai renders in FreeSerif instead
+  # (noto-fonts ships no Thai face). Matching on lang (set per text-run by
+  # pango/harfbuzz/Chromium) covers every family request — generic
+  # "sans-serif" and named fonts alike. Alacritty is the one exception:
+  # it falls back per-codepoint via charset queries, so terminal Thai may
+  # still use another font.
+  fonts.fontconfig.localConf = ''
+    <match target="pattern">
+      <test name="lang" compare="contains"><string>th</string></test>
+      <edit name="family" mode="prepend"><string>Sarabun</string></edit>
+    </match>
+  '';
 }
