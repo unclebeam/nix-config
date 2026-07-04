@@ -125,6 +125,19 @@ in
       };
 
       input = {
+        # Keyboard: US + Thai, Alt+Shift cycles layouts. Applies to every
+        # keyboard, including kanata's virtual one (kanata works below xkb,
+        # so the capslock remap and the layout toggle don't fight).
+        "type:keyboard" = {
+          xkb_layout = "us,th";
+          xkb_options = "grp:alt_shift_toggle";
+        };
+
+        # Mouse: natural scrolling, to match the touchpad below.
+        "type:pointer" = {
+          natural_scroll = "enabled";
+        };
+
         # Touchpad (laptop): tap-to-click, natural scrolling, palm rejection.
         "type:touchpad" = {
           tap = "enabled";
