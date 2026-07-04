@@ -10,6 +10,7 @@
     ../../modules/sway.nix
     ../../modules/audio.nix
     ../../modules/laptop.nix     # power mgmt, backlight, lid behavior, fwupd
+    ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
     # ../../modules/gaming.nix   # uncomment to get Steam on the laptop too
   ];
 

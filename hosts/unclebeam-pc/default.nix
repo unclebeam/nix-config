@@ -12,6 +12,7 @@
     ../../modules/sway.nix       # sway session, greetd, portals
     ../../modules/audio.nix      # pipewire
     ../../modules/gaming.nix     # steam + gamemode (importing it = enabling it)
+    ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
   ];
 
   # MUST match the attribute name in flake.nix — this is how a bare
