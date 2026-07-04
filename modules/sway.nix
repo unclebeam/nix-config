@@ -57,18 +57,32 @@
     noto-fonts-color-emoji
   ];
 
-  # Prefer Sarabun whenever the text run is Thai. Installing a font only
-  # makes it *available* — without this rule fontconfig ranks Sarabun near
-  # the bottom of the fallback list and Thai renders in FreeSerif instead
-  # (noto-fonts ships no Thai face). Matching on lang (set per text-run by
-  # pango/harfbuzz/Chromium) covers every family request — generic
-  # "sans-serif" and named fonts alike. Alacritty is the one exception:
-  # it falls back per-codepoint via charset queries, so terminal Thai may
-  # still use another font.
+  # Prefer Sarabun whenever the text is Thai. Installing a font only makes
+  # it *available* — without these rules Thai renders in FreeSerif instead.
+  # Two rules because apps reach Thai glyphs by two different paths:
+  # lang-tagged queries (pango/harfbuzz, pages with lang="th") and raw
+  # per-character charset fallback (Chromium on pages without lang="th").
   fonts.fontconfig.localConf = ''
+    <!-- binding="strong" is load-bearing: NixOS's generated default-fonts
+         conf prefers DejaVu with strong binding, and a strong family match
+         outranks a lang match — a weak prepend here silently loses and
+         "sans-serif" resolves to DejaVu even for Thai. -->
     <match target="pattern">
       <test name="lang" compare="contains"><string>th</string></test>
-      <edit name="family" mode="prepend"><string>Sarabun</string></edit>
+      <edit name="family" mode="prepend" binding="strong"><string>Sarabun</string></edit>
     </match>
+
+    <!-- Chromium falls back per-character by charset (not lang) on pages
+         without lang="th", and GNU FreeFont (pulled in by NixOS's
+         fonts.enableDefaultPackages) wins that query — Thai renders in
+         FreeSerif instead of Sarabun. Nothing else needs these fonts;
+         Noto/DejaVu/Liberation cover everything they do. -->
+    <selectfont>
+      <rejectfont>
+        <pattern><patelt name="family"><string>FreeSerif</string></patelt></pattern>
+        <pattern><patelt name="family"><string>FreeSans</string></patelt></pattern>
+        <pattern><patelt name="family"><string>FreeMono</string></patelt></pattern>
+      </rejectfont>
+    </selectfont>
   '';
 }
