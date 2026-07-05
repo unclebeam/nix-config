@@ -13,6 +13,7 @@
     ../../modules/laptop.nix     # power mgmt, backlight, lid behavior, fwupd
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
+    ../../modules/dolphin.nix    # avahi (SMB discovery) + kwallet PAM unlock
     # ../../modules/gaming.nix   # uncomment to get Steam on the laptop too
   ];
 

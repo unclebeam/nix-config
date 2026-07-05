@@ -15,6 +15,7 @@
     ../../modules/gaming.nix     # steam + gamemode (importing it = enabling it)
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
+    ../../modules/dolphin.nix    # avahi (SMB discovery) + kwallet PAM unlock
   ];
 
   # MUST match the attribute name in flake.nix — this is how a bare
