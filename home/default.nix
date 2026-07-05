@@ -6,6 +6,7 @@
 {
   imports = [
     ./sway.nix      # window manager config + swaylock + swayidle
+    ./autotiling.nix # dynamic split orientation for sway (systemd user service)
     ./waybar.nix    # status bar
     ./fuzzel.nix    # launcher
     ./mako.nix      # notifications
