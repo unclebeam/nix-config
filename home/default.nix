@@ -12,6 +12,7 @@
     ./satty.nix     # screenshot annotator (Ctrl+Print)
     ./alacritty.nix # terminal
     ./fish.nix      # shell + prompt
+    ./direnv.nix    # per-directory envs (project dev shells via .envrc)
     ./helix.nix     # editor + language servers
     ./zellij.nix    # terminal multiplexer
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
