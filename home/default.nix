@@ -17,6 +17,7 @@
     ./zellij.nix    # terminal multiplexer
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
     ./dolphin.nix      # file manager + Qt theming + xdg default for dirs
+    ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
     ./google-drive.nix # ~/GoogleDrive rclone mount (one-time: `rclone config`)
   ];
 
