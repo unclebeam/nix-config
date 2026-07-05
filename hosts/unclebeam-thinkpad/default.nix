@@ -15,6 +15,7 @@
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
     ../../modules/dolphin.nix    # avahi (SMB discovery) + kwallet PAM unlock
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)
+    ../../modules/zsa.nix        # ZSA keyboard udev rules (flash via Oryx in browser)
     # ../../modules/gaming.nix   # uncomment to get Steam on the laptop too
   ];
 
