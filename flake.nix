@@ -26,6 +26,18 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Zen Browser is not in nixpkgs at all — this community flake repackages
+    # the official releases. It ships only packages (no NixOS module), so
+    # nothing gets wired into mkHost; core.nix pulls the package straight
+    # out of `inputs` (available there via specialArgs below).
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+      };
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, disko, ... }@inputs:

@@ -4,6 +4,7 @@
   config,
   lib,
   pkgs,
+  inputs, # from specialArgs in flake.nix — lets us reach other flakes' packages
   ...
 }:
 
@@ -91,5 +92,14 @@
     firefox
     # Electron (native Wayland via NIXOS_OZONE_WL) and unfree.
     obsidian # markdown notes — vaults live in $HOME, nothing for Nix to configure
+    slack # also Electron + unfree, same Wayland story as obsidian
+    libreoffice
+    # DBeaver Community Edition. nixpkgs only carries the upstream binary
+    # release (-bin); there is no from-source `dbeaver` attribute.
+    dbeaver-bin
+    # Zen Browser — not in nixpkgs, comes from the zen-browser flake input
+    # (see flake.nix). `default` is Zen's mainline release channel (their
+    # "beta"); the flake also offers the bleeding-edge `twilight`.
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 }
