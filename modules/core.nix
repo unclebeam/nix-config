@@ -91,8 +91,8 @@
     curl
     # Global Node = whatever nixpkgs calls "latest" at each `nix flake update`
     # (currently 26.x). Projects that need a SPECIFIC version don't fight this:
-    # they get theirs from a dev shell (flake.nix `devShells`) activated by
-    # direnv (home/direnv.nix), which shadows this one inside the project dir.
+    # they get theirs from a dev shell activated by direnv (home/direnv.nix),
+    # which shadows this one inside the project dir.
     nodejs_latest
     firefox
     # Electron (native Wayland via NIXOS_OZONE_WL) and unfree.

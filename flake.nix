@@ -94,21 +94,5 @@
         unclebeam-pc = mkHost "unclebeam-pc";
         unclebeam-thinkpad = mkHost "unclebeam-thinkpad";
       };
-
-      # Per-project toolchains, activated by direnv: a work repo gets an
-      # UNTRACKED one-line `.envrc` — e.g. `use flake ~/nix-config#node22` —
-      # (hidden from teammates via .git/info/exclude), so the project itself
-      # stays Nix-free while direnv (home/direnv.nix) drops the right tool
-      # versions onto PATH whenever you cd in, shadowing the globals from
-      # core.nix. Each shell's package set is pinned by THIS flake's lock.
-      devShells.x86_64-linux =
-        let
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        in
-        {
-          # cricslabs-co/bdi: .nvmrc says lts/jod (22), engines >=22.12.
-          # nodejs_22 bundles its own npm, which shadows the global one too.
-          node22 = pkgs.mkShell { packages = [ pkgs.nodejs_22 ]; };
-        };
     };
 }

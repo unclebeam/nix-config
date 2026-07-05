@@ -1,8 +1,8 @@
 # home/direnv.nix — per-directory environments.
 # direnv watches for an `.envrc` as you cd around and loads/unloads it
 # automatically. We use it for per-project toolchains: an .envrc saying
-# `use flake ~/nix-config#node22` puts that dev shell (flake.nix `devShells`)
-# on PATH inside the project and takes it off again when you leave — the
+# `use flake nixpkgs#nodejs_22` puts that dev shell on PATH inside the
+# project and takes it off again when you leave — the
 # NixOS answer to nvm/.nvmrc, whose downloaded binaries wouldn't run here
 # anyway (they expect a standard glibc layout the Nix store doesn't have).
 # New/changed .envrc files are inert until you approve them: `direnv allow`.
