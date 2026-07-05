@@ -9,6 +9,7 @@
     ./waybar.nix    # status bar
     ./fuzzel.nix    # launcher
     ./mako.nix      # notifications
+    ./satty.nix     # screenshot annotator (Ctrl+Print)
     ./alacritty.nix # terminal
     ./fish.nix      # shell + prompt
     ./helix.nix     # editor + language servers

@@ -124,9 +124,18 @@ in
         "XF86MonBrightnessUp" = "exec brightnessctl set 5%+";
         "XF86MonBrightnessDown" = "exec brightnessctl set 5%-";
 
-        # Screenshots: full screen / region → clipboard
-        "Print" = "exec grim - | wl-copy";
-        "Shift+Print" = ''exec grim -g "$(slurp)" - | wl-copy'';
+        # Screenshots → clipboard AND a timestamped PNG in ~/Pictures/Screenshots.
+        # tee splits grim's output into the file and wl-copy. The region binds
+        # grab slurp's geometry into $sel FIRST: Escape in slurp exits non-zero
+        # and aborts the whole chain — piping straight through tee instead
+        # would leave a zero-byte .png (tee creates its file before reading
+        # any input).
+        "Print" = ''exec mkdir -p "$HOME/Pictures/Screenshots" && grim - | tee "$HOME/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png" | wl-copy'';
+        "Shift+Print" = ''exec sel="$(slurp)" && mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$sel" - | tee "$HOME/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png" | wl-copy'';
+        # Region → satty annotator (config lives in home/satty.nix). A single
+        # CLICK in slurp selects the whole output, so this doubles as
+        # full-screen-annotate — no separate binding needed.
+        "Ctrl+Print" = ''exec sel="$(slurp)" && mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$sel" - | satty --filename -'';
 
         # Lock now
         "${mod}+Escape" = "exec swaylock -f";
