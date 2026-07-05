@@ -12,6 +12,7 @@
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
     ../../modules/laptop.nix     # power mgmt, backlight, lid behavior, fwupd
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
+    ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
     ../../modules/dolphin.nix    # avahi (SMB discovery) + kwallet PAM unlock
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)

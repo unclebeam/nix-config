@@ -40,41 +40,50 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      disko,
+      ...
+    }@inputs:
     let
       # Small helper so each host is a one-liner below.
       # `nixosSystem` evaluates a list of modules into a bootable system.
-      mkHost = hostName: nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        # Everything in specialArgs is passed as an argument to every module,
-        # so modules can refer to `inputs` if they ever need another flake.
-        specialArgs = { inherit inputs; };
-        modules = [
-          # The per-host entrypoint. Everything else is imported from there —
-          # this keeps the flake itself boring and the hosts/ dirs in charge.
-          ./hosts/${hostName}
+      mkHost =
+        hostName:
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          # Everything in specialArgs is passed as an argument to every module,
+          # so modules can refer to `inputs` if they ever need another flake.
+          specialArgs = { inherit inputs; };
+          modules = [
+            # The per-host entrypoint. Everything else is imported from there —
+            # this keeps the flake itself boring and the hosts/ dirs in charge.
+            ./hosts/${hostName}
 
-          # disko's NixOS module. Loading it only ADDS the `disko.devices`
-          # option — it does nothing until a host actually declares disks.
-          # Both hosts do, in hosts/<name>/disko.nix.
-          disko.nixosModules.disko
+            # disko's NixOS module. Loading it only ADDS the `disko.devices`
+            # option — it does nothing until a host actually declares disks.
+            # Both hosts do, in hosts/<name>/disko.nix.
+            disko.nixosModules.disko
 
-          # Wire home-manager in as a NixOS module: `nixos-rebuild switch`
-          # builds system AND user config in one transaction.
-          home-manager.nixosModules.home-manager
-          {
-            # Use the system's nixpkgs (with its allowUnfree etc.) for user
-            # packages too, and install them via the system profile.
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            # The shared user environment — identical on both machines.
-            home-manager.users.unclebeam = import ./home;
-            # On rebuild, keep any pre-existing conflicting dotfile as
-            # <name>.backup instead of aborting the whole switch.
-            home-manager.backupFileExtension = "backup";
-          }
-        ];
-      };
+            # Wire home-manager in as a NixOS module: `nixos-rebuild switch`
+            # builds system AND user config in one transaction.
+            home-manager.nixosModules.home-manager
+            {
+              # Use the system's nixpkgs (with its allowUnfree etc.) for user
+              # packages too, and install them via the system profile.
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              # The shared user environment — identical on both machines.
+              home-manager.users.unclebeam = import ./home;
+              # On rebuild, keep any pre-existing conflicting dotfile as
+              # <name>.backup instead of aborting the whole switch.
+              home-manager.backupFileExtension = "backup";
+            }
+          ];
+        };
     in
     {
       # IMPORTANT: these attribute names must equal each machine's
@@ -92,12 +101,14 @@
       # stays Nix-free while direnv (home/direnv.nix) drops the right tool
       # versions onto PATH whenever you cd in, shadowing the globals from
       # core.nix. Each shell's package set is pinned by THIS flake's lock.
-      devShells.x86_64-linux = let
-        pkgs = nixpkgs.legacyPackages.x86_64-linux;
-      in {
-        # cricslabs-co/bdi: .nvmrc says lts/jod (22), engines >=22.12.
-        # nodejs_22 bundles its own npm, which shadows the global one too.
-        node22 = pkgs.mkShell { packages = [ pkgs.nodejs_22 ]; };
-      };
+      devShells.x86_64-linux =
+        let
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        in
+        {
+          # cricslabs-co/bdi: .nvmrc says lts/jod (22), engines >=22.12.
+          # nodejs_22 bundles its own npm, which shadows the global one too.
+          node22 = pkgs.mkShell { packages = [ pkgs.nodejs_22 ]; };
+        };
     };
 }
