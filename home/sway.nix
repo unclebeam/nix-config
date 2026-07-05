@@ -132,10 +132,11 @@ in
         # any input).
         "Print" = ''exec mkdir -p "$HOME/Pictures/Screenshots" && grim - | tee "$HOME/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png" | wl-copy'';
         "Shift+Print" = ''exec sel="$(slurp)" && mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$sel" - | tee "$HOME/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png" | wl-copy'';
-        # Region → satty annotator (config lives in home/satty.nix). A single
-        # CLICK in slurp selects the whole output, so this doubles as
-        # full-screen-annotate — no separate binding needed.
-        "Ctrl+Print" = ''exec sel="$(slurp)" && mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$sel" - | satty --filename -'';
+        # Annotate with satty (config lives in home/satty.nix). Same modifier
+        # convention as the instant binds above: bare = full screen,
+        # +Shift = pick a region first.
+        "Ctrl+Print" = ''exec mkdir -p "$HOME/Pictures/Screenshots" && grim - | satty --filename -'';
+        "Ctrl+Shift+Print" = ''exec sel="$(slurp)" && mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$sel" - | satty --filename -'';
 
         # Lock now
         "${mod}+Escape" = "exec swaylock -f";
