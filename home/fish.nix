@@ -1,7 +1,7 @@
 # home/fish.nix — fish shell + starship prompt.
 # (modules/core.nix enables fish system-wide and sets it as login shell;
 # this file owns the per-user config.)
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgs-unstable, ... }:
 
 {
   programs.fish = {
@@ -19,5 +19,9 @@
 
   # Prompt. Starship's defaults are good; tweak via programs.starship.settings
   # later if you want. Fish integration (init hook) is enabled by default.
-  programs.starship.enable = true;
+  programs.starship = {
+    enable = true;
+    # Fast-moving; track unstable (see flake.nix).
+    package = pkgs-unstable.starship;
+  };
 }

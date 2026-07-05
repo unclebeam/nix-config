@@ -8,6 +8,14 @@
     # `nix flake update` later moves the pin forward within this branch.
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
+    # A SECOND nixpkgs tracking unstable. Used ONLY to source a curated set of
+    # fast-moving packages (helix, claude-code, lazygit, zellij, starship);
+    # everything else stays on nixos-26.05. Deliberately NOT `follows` nixpkgs —
+    # it must be its own package set, or those packages would rebuild against
+    # 26.05 deps and defeat the purpose. mkHost instantiates it once (with
+    # allowUnfree) and hands it to every module as `pkgs-unstable`.
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+
     # home-manager manages per-user config (dotfiles, sway config, waybar css…).
     # Its release branch must match the nixpkgs release.
     home-manager = {
@@ -44,6 +52,7 @@
     {
       self,
       nixpkgs,
+      nixpkgs-unstable,
       home-manager,
       disko,
       ...
@@ -53,11 +62,22 @@
       # `nixosSystem` evaluates a list of modules into a bootable system.
       mkHost =
         hostName:
-        nixpkgs.lib.nixosSystem {
+        let
           system = "x86_64-linux";
+          # The unstable package set, evaluated ONCE here with allowUnfree so
+          # unfree picks like claude-code resolve. Shared to every module via
+          # specialArgs/extraSpecialArgs below as `pkgs-unstable`; consumers
+          # just write `pkgs-unstable.<name>` to pull that one package.
+          pkgs-unstable = import nixpkgs-unstable {
+            inherit system;
+            config.allowUnfree = true;
+          };
+        in
+        nixpkgs.lib.nixosSystem {
+          inherit system;
           # Everything in specialArgs is passed as an argument to every module,
           # so modules can refer to `inputs` if they ever need another flake.
-          specialArgs = { inherit inputs; };
+          specialArgs = { inherit inputs pkgs-unstable; };
           modules = [
             # The per-host entrypoint. Everything else is imported from there —
             # this keeps the flake itself boring and the hosts/ dirs in charge.
@@ -81,6 +101,10 @@
               # On rebuild, keep any pre-existing conflicting dotfile as
               # <name>.backup instead of aborting the whole switch.
               home-manager.backupFileExtension = "backup";
+              # Make pkgs-unstable reachable from home/ modules too (mirrors
+              # the system-level specialArgs above), so home/helix.nix etc.
+              # can pull individual packages from unstable.
+              home-manager.extraSpecialArgs = { inherit pkgs-unstable; };
             }
           ];
         };

@@ -4,7 +4,7 @@
 # NOT the terminal colors — those still come from alacritty.nix. The theme
 # uses zellij's classic 11-color spec: bg/black are ribbon & status-bar
 # backgrounds, fg/white their text, green the "selected" ribbon.
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgs-unstable, ... }:
 
 let
   colors = import ./colors.nix;
@@ -12,6 +12,9 @@ in
 {
   programs.zellij = {
     enable = true;
+    # Fast-moving; track unstable (see flake.nix). Only swaps which build
+    # home-manager installs — the settings/theme below are unaffected.
+    package = pkgs-unstable.zellij;
 
     # `settings` becomes ~/.config/zellij/config.kdl via home-manager's
     # KDL generator. The theme is defined INLINE here on purpose: the

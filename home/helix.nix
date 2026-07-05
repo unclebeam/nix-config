@@ -1,12 +1,14 @@
 # home/helix.nix — Helix editor: package, language servers, plain-file config.
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgs-unstable, ... }:
 
 {
-  home.packages = with pkgs; [
-    helix
+  home.packages = [
+    # Helix tracks UNSTABLE for newer editor releases (see flake.nix); the LSPs
+    # below stay on stable — only the editor moves.
+    pkgs-unstable.helix
     # LSPs/formatters are Nix packages, never editor-installed (no Mason):
-    nil    # Nix language server — helix picks it up by default, zero config
-    nixfmt # Nix formatter — wired up in helix/languages.toml
+    pkgs.nil    # Nix language server — helix picks it up by default, zero config
+    pkgs.nixfmt # Nix formatter — wired up in helix/languages.toml
   ];
 
   # Configs stay PLAIN files — symlinked, not Nix-generated. Edit the TOML
