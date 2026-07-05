@@ -19,4 +19,8 @@
     # emulation is off by default — enable services.pipewire.jack.enable
     # if you ever do pro audio.
   };
+
+  # Lives here, not core.nix: pavucontrol only exists because of the audio
+  # stack, so removing this module removes the mixer GUI with it.
+  environment.systemPackages = [ pkgs.pavucontrol ];
 }

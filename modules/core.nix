@@ -1,14 +1,25 @@
 # core.nix — everything both machines need regardless of desktop or role:
 # nix itself, boot loader, networking, the user account, and baseline CLI tools.
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   # ── Nix ────────────────────────────────────────────────────────────────
   nix.settings = {
     # Flakes are still technically "experimental" but are the standard now.
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     # Let wheel users (you) use substituters, run privileged nix commands.
-    trusted-users = [ "root" "@wheel" ];
+    trusted-users = [
+      "root"
+      "@wheel"
+    ];
   };
 
   # Reclaim disk space from old generations automatically.
@@ -49,9 +60,9 @@
     isNormalUser = true;
     description = "unclebeam";
     extraGroups = [
-      "wheel"          # sudo
+      "wheel" # sudo
       "networkmanager" # manage connections without a password prompt
-      "video"          # backlight control on the laptop
+      "video" # backlight control on the laptop
     ];
     shell = pkgs.fish;
     # First-login password — CHANGE IT immediately after install with `passwd`.
@@ -64,6 +75,9 @@
   # (alacritty, waybar…) live in home/ instead; these are config-less here.
   environment.systemPackages = with pkgs; [
     fastfetch
+    btop
+    fzf
+    ripgrep
     lazygit
     git
     neovim # package only — config/plugins/LSPs are managed by hand, not Nix
@@ -71,7 +85,7 @@
     # write into the read-only Nix store — new versions arrive via
     # `nix flake update` + rebuild instead.
     claude-code
-    brave  # Chromium-based; runs native Wayland via NIXOS_OZONE_WL (modules/sway.nix)
+    brave # Chromium-based; runs native Wayland via NIXOS_OZONE_WL (modules/sway.nix)
     wget
     curl
     firefox
