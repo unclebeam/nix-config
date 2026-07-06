@@ -44,6 +44,12 @@
   boot.loader.systemd-boot.configurationLimit = 10; # keep /boot from filling up
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Keep kernel error chatter off the console so it can't paint over the
+  # tuigreet login screen (a flaky USB hub on the desktop spams err-level
+  # timeouts every boot). This only gates what's echoed to the screen —
+  # everything still lands in the journal (`journalctl -b -p err`).
+  boot.consoleLogLevel = 3; # 3 = critical and worse; the default of 4 shows err
+
   # ── Networking ─────────────────────────────────────────────────────────
   # NetworkManager handles wifi + ethernet on both machines.
   # CLI: `nmcli device wifi connect <ssid> --ask`, or `nmtui` for a TUI.

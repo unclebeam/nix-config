@@ -11,6 +11,7 @@
     ../../modules/core.nix       # users, nix settings, boot loader, networking…
     ../../modules/sway.nix       # sway session, greetd, portals
     ../../modules/audio.nix      # pipewire
+    ../../modules/bluetooth.nix  # bluez userspace for the MT7925's BT radio
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
     ../../modules/gaming.nix     # steam + gamemode (importing it = enabling it)
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
