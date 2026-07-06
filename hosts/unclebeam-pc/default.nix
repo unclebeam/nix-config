@@ -35,6 +35,15 @@
   # CPU microcode security/stability updates for the Ryzen.
   hardware.cpu.amd.updateMicrocode = true;
 
+  # The onboard MediaTek MT7925 WiFi/BT chip fails to probe on every boot
+  # ("mt7925e: driver own failed" → error -5, the message that leaks onto the
+  # login screen): the chip's MCU never answers the driver's ownership
+  # handshake. A known trigger on AMD boards is PCIe ASPM putting the device
+  # in a low-power state that races the probe; turning ASPM off system-wide
+  # lets the handshake complete. If this alone doesn't fix it, the next
+  # escalation is adding "pcie_port_pm=off" here as well.
+  boot.kernelParams = [ "pcie_aspm=off" ];
+
   # The disk layout (disko.nix) has no swap partition. Instead, use zram:
   # a compressed block device in RAM used as swap. Cheap insurance against
   # memory pressure with no disk wear and nothing to partition.
