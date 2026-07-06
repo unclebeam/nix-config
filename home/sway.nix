@@ -1,6 +1,11 @@
 # home/sway.nix — the USER half of sway: keybinds, colors, lock/idle.
 # (The session/greeter/portal plumbing is system-side in modules/sway.nix.)
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   colors = import ./colors.nix;
@@ -47,10 +52,20 @@ in
       # never by connector name — entries that don't match a plugged-in monitor
       # are silently ignored, which is what lets both hosts share this file.
       output = {
-      	"Dell Inc. DELL U3225QE 27D4834" = {
-	  mode = "3840x2160@120Hz";
-	  scale = "1.5";
-	};
+        "Dell Inc. DELL U3225QE 27D4834" = {
+          mode = "3840x2160@120Hz";
+          scale = "1.5";
+        };
+
+        # GIGA-BYTE M28U — 28" 4K gaming panel (external, plugged into the
+        # ThinkPad via DP-1). Pin the best mode the EDID advertises: 4K @ 144Hz.
+        # Scale 1.25 gives logical 3072x1728 — more real estate than the Dell's
+        # 1.5 on this slightly larger panel, without shrinking the UI to native-4K
+        # size.
+        "GIGA-BYTE TECHNOLOGY CO., LTD. M28U 22060B005352" = {
+          mode = "3840x2160@144Hz";
+          scale = "1.25";
+        };
 
         # The thinkpad's built-in OLED panel. Without this entry sway picks
         # 60Hz (the panel's first mode) and scale 2.0 — pinning gets us the
@@ -131,7 +146,8 @@ in
         # geometry into $sel FIRST so an Escape in slurp exits non-zero and
         # aborts the whole chain instead of handing satty an empty capture.
         "Print" = ''exec mkdir -p "$HOME/Pictures/Screenshots" && grim - | satty --filename -'';
-        "Ctrl+Print" = ''exec sel="$(slurp)" && mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$sel" - | satty --filename -'';
+        "Ctrl+Print" =
+          ''exec sel="$(slurp)" && mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$sel" - | satty --filename -'';
 
         # Lock now
         "${mod}+Escape" = "exec swaylock -f";
@@ -194,7 +210,10 @@ in
     events."before-sleep" = "${pkgs.swaylock}/bin/swaylock -f";
     timeouts = [
       # 5 min idle → lock
-      { timeout = 300; command = "${pkgs.swaylock}/bin/swaylock -f"; }
+      {
+        timeout = 300;
+        command = "${pkgs.swaylock}/bin/swaylock -f";
+      }
       # 10 min idle → screens off (back on when you touch anything)
       {
         timeout = 600;
@@ -206,9 +225,9 @@ in
 
   # Wayland desktop utilities used by the keybinds above.
   home.packages = with pkgs; [
-    grim          # screenshot
-    slurp         # region selection
-    wl-clipboard  # wl-copy / wl-paste
+    grim # screenshot
+    slurp # region selection
+    wl-clipboard # wl-copy / wl-paste
     brightnessctl # backlight (keybinds above; PC just has no backlight device)
   ];
 }
