@@ -19,4 +19,21 @@
   # greetd is our display manager (modules/sway.nix), so the PAM hook goes on
   # its service. pam_kwallet6 creates the wallet on first login if none exists.
   security.pam.services.greetd.kwallet.enable = true;
+
+  # ── Removable media (USB sticks, SD cards, cameras-as-USB-drives) ────────
+  # udisks2 is the D-Bus mount daemon Dolphin's Solid backend talks to. Without
+  # it, the kernel sees a plugged-in USB stick (usb_storage) but nothing exposes
+  # it to Dolphin — no sidebar entry, no way to mount. Enabling it is what makes
+  # removable drives appear at all. Its default polkit rules already let an
+  # active local-session user mount without a password, so nothing else is
+  # needed here. The *automatic* mount-on-insert half is udiskie, a session
+  # service in home/dolphin.nix — udisks2 only exposes and permits the mount.
+  services.udisks2.enable = true;
+
+  # Let udisks2 actually mount non-native filesystems. FAT is always supported
+  # and exfat rides along in the kernel, but NTFS (how most Windows-formatted
+  # sticks and plenty of cameras format their storage) needs the ntfs-3g driver
+  # — without it such drives fail to mount with a cryptic error. Listing both
+  # is explicit and cheap.
+  boot.supportedFilesystems = [ "ntfs" "exfat" ];
 }

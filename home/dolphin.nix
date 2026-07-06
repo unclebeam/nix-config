@@ -40,6 +40,21 @@
     kwalletmanager
   ];
 
+  # udiskie is the piece that makes mounting *automatic*. udisks2 (enabled in
+  # modules/dolphin.nix) only exposes removable drives and permits mounting;
+  # udiskie runs as a systemd user service in the Sway session, watches for
+  # newly-plugged devices, and mounts them the instant they appear under
+  # /run/media/unclebeam/<label>. tray = "never" because this minimal Waybar has
+  # no StatusNotifier tray host — with the default "auto", udiskie would sit
+  # waiting for a tray icon and silently never automount. notify routes toasts
+  # through mako (home/mako.nix) on mount/unmount.
+  services.udiskie = {
+    enable = true;
+    automount = true;
+    notify = true;
+    tray = "never";
+  };
+
   # Breeze widget style so Dolphin gets real theming instead of the Fusion
   # fallback. home-manager auto-installs the matching style package and
   # exports QT_STYLE_OVERRIDE + Qt plugin paths (session-global: any future
