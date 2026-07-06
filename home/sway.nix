@@ -35,6 +35,13 @@ in
       # workspace at launch (it was coming up on 10).
       defaultWorkspace = "workspace number 1";
 
+      # Obsidian launches stashed in the scratchpad at login so $mod+n is an
+      # instant dropdown toggle. The window rule below (window.commands) shoves
+      # it out of sight the moment it maps; nothing appears on screen until the
+      # first toggle. The Electron process is resident from boot as the price of
+      # that instant summon.
+      startup = [ { command = "obsidian"; } ];
+
       # Waybar runs as a systemd user service (home/waybar.nix), so sway's
       # built-in bar is disabled entirely.
       bars = [ ];
@@ -117,6 +124,20 @@ in
       window.titlebar = false; # borders only; titles waste vertical space
       window.border = 2;
 
+      # Newly-mapped Obsidian → scratchpad, sized to a tidy floating pad.
+      # Paired with the startup exec above and the $mod+n toggle below, this is
+      # the whole scratchpad setup. app_id is "obsidian" under native Wayland
+      # (NIXOS_OZONE_WL); if the toggle ever stops matching, re-check the id with
+      # `swaymsg -t get_tree`.
+      window.commands = [
+        {
+          criteria = {
+            app_id = "obsidian";
+          };
+          command = "move scratchpad, resize set 1200 800";
+        }
+      ];
+
       # Bind by physical keycode (--to-code), resolved against the FIRST
       # xkb layout (us). Without this, bindsym matches the keysym the active
       # layout produces — under the Thai layout $mod+1 emits "ๅ", not "1",
@@ -151,6 +172,11 @@ in
 
         # Lock now
         "${mod}+Escape" = "exec swaylock -f";
+
+        # Toggle the Obsidian scratchpad (started stashed at login above, moved
+        # to the scratchpad by window.commands above). [criteria] scratchpad
+        # show is a toggle: reveals the window if hidden, re-stashes it if shown.
+        "${mod}+n" = ''[app_id="obsidian"] scratchpad show'';
       };
 
       input = {
