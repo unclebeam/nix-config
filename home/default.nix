@@ -20,6 +20,7 @@
     ./dolphin.nix      # file manager + Qt theming + xdg default for dirs
     ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
     ./vlc.nix          # VLC media player + default video/audio handler
+    ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
     ./google-drive.nix # ~/GoogleDrive rclone mount (one-time: `rclone config`)
   ];
 
