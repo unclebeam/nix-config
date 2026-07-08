@@ -1,9 +1,8 @@
-# desktop.nix — desktop infrastructure shared by BOTH sessions (sway and
-# hyprland): the greeter that picks a session, Wayland-wide env, the GTK
-# portal, and fonts. Compositor-specific bits stay in modules/sway.nix and
-# modules/hyprland.nix. This file exists because a second session appeared —
-# per the repo rule, settings are only promoted to a shared file once a
-# second consumer shows up.
+# desktop.nix — compositor-agnostic desktop infrastructure: the greeter,
+# Wayland-wide env, the GTK portal, and fonts. Compositor-specific bits stay
+# in modules/hyprland.nix. (This file was split out when hyprland briefly ran
+# alongside sway; it keeps its role now that hyprland is the only session —
+# nothing in here assumes a particular compositor.)
 { config, lib, pkgs, ... }:
 
 let
@@ -22,15 +21,15 @@ in
   # with whatever we wrote. The greeter user is defaulted by greetd too.
   #
   # Sessions: regreet scans $XDG_DATA_DIRS/wayland-sessions, which NixOS
-  # points at the .desktop files that programs.sway / programs.hyprland
-  # install — sway and hyprland appear with zero wiring here.
+  # points at the .desktop files that programs.hyprland installs — the
+  # session appears with zero wiring here.
   #   NB: the dropdown shows TWO hyprland entries — the nixpkgs hyprland
   #   package unconditionally ships "Hyprland (uwsm-managed)" next to plain
   #   "Hyprland" (it can't be filtered out without breaking the
   #   sessionPackages assertion). Both work: modules/hyprland.nix sets
   #   withUWSM so uwsm's user units exist, and the hyprland.lua session
-  #   hook is dual-mode. Sway stays a single, non-uwsm entry.
-  # There is no "default session" knob: pick Hyprland once on first boot,
+  #   hook is dual-mode.
+  # There is no "default session" knob: pick a session once on first boot,
   # and regreet remembers the last user AND last session per user across
   # reboots (/var/lib/regreet/state.toml).
   #
@@ -50,7 +49,7 @@ in
     };
 
     # cursorTheme is left at its default (Adwaita, 24px) — the same theme
-    # home/cursor.nix sets for the sessions, so the pointer doesn't change
+    # home/cursor.nix sets for the session, so the pointer doesn't change
     # style at the login → desktop boundary.
 
     # Adwaita's dark variant as the base widget theme; the melange palette
@@ -74,10 +73,9 @@ in
 
   # xdg-desktop-portal is how sandbox-ish desktop APIs work on Wayland:
   # screen sharing, screenshots, file pickers. The GTK portal covers the
-  # generic interfaces (file chooser…) for both sessions; each compositor
-  # module adds its own ScreenCast/Screenshot backend (wlr for sway,
-  # xdg-desktop-portal-hyprland for hyprland) plus the portals.conf that
-  # routes each interface to the right backend.
+  # generic interfaces (file chooser…); modules/hyprland.nix adds the
+  # ScreenCast/Screenshot backend (xdg-desktop-portal-hyprland) plus the
+  # portals.conf that routes each interface to the right backend.
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
   # ── Fonts ──────────────────────────────────────────────────────────────

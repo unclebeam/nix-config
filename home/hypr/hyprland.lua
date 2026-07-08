@@ -56,15 +56,15 @@ hl.on("hyprland.start", function()
 end)
 
 --------------------------------------------------------------------
--- Monitors. Matched by EDID description ("desc:" = make model
--- serial — same string sway matches on, WITHOUT the "(PORT)"
--- suffix hyprctl prints). Entries that don't match a plugged-in
--- monitor are ignored, which is what lets both hosts share this
--- file; the wildcard fallback FIRST means an unmatched panel still
--- comes up at its preferred mode instead of going dark.
--- ⚠ VERIFY after first login with `hyprctl monitors all` — these
--- descs are carried over from sway's "make model serial" strings
--- and hyprland may format them slightly differently.
+-- Monitors. Matched by EDID description ("desc:" = the exact
+-- `description` string from `hyprctl monitors all`, WITHOUT the
+-- "(PORT)" suffix hyprctl prints). Entries that don't match a
+-- plugged-in monitor are ignored, which is what lets both hosts
+-- share this file; the wildcard fallback FIRST means an unmatched
+-- panel still comes up at its preferred mode instead of going dark.
+-- ⚠ When adding a monitor, take the desc verbatim from
+-- `hyprctl monitors all -j` — hand-derived "make model serial"
+-- strings can silently never match (see the OLED note below).
 --------------------------------------------------------------------
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
 
@@ -90,9 +90,10 @@ hl.monitor({
 -- brightness flicker.
 -- The desc is the exact `description` string hyprctl reports (make +
 -- model, serial is empty so it contributes nothing) — verified with
--- `hyprctl monitors all -j`. NOT sway's "make model serial" form:
--- hyprland reports no serial/"Unknown" here, so that suffix made the
--- entry silently never match (panel fell back to 60Hz/scale 2.0).
+-- `hyprctl monitors all -j`. A hand-derived "make model serial" form
+-- was used here once; hyprland reports no serial/"Unknown", so that
+-- suffix made the entry silently never match (panel fell back to
+-- 60Hz/scale 2.0).
 hl.monitor({
   output   = "desc:Samsung Display Corp. ATNA40HQ02-0",
   mode     = "2880x1800@120",
@@ -104,10 +105,8 @@ hl.monitor({
 -- Look & feel. Lightly polished, deliberately so: small gaps,
 -- slight rounding, fast animations, and blur behind the one
 -- translucent surface we have (alacritty at 0.92 opacity, set in
--- home/alacritty.nix). Shadows stay off. Sway keeps the old fully
--- minimal look — it's the fallback session, left untouched.
--- (Two knobs sway had that hyprland doesn't: an urgent-window
--- border color, and titlebars — hyprland simply has neither.)
+-- home/alacritty.nix). Shadows stay off, and nothing more gets
+-- added — the restrained look is a feature (see CLAUDE.md).
 --------------------------------------------------------------------
 hl.config({
   general = {
@@ -116,13 +115,12 @@ hl.config({
     border_size = 2,
     col = {
       -- focused = warm comment-beige, everything else fades into
-      -- the bg — same mapping as home/sway.nix window colors.
+      -- the bg.
       active_border   = "rgb(" .. nix.colors.a.com .. ")",
       inactive_border = "rgb(" .. nix.colors.a.float .. ")",
     },
     -- dwindle auto-splits along the longer side of the focused
-    -- window — natively covering what the autotiling daemon does
-    -- for sway (home/autotiling.nix stays sway-only).
+    -- window — no autotiling daemon needed.
     layout = "dwindle",
   },
 
@@ -148,8 +146,7 @@ hl.config({
     -- wallpaper must be off before background_color applies.
     disable_hyprland_logo   = true,
     force_default_wallpaper = 0,
-    -- No wallpaper manager, just solid melange — the counterpart
-    -- of sway's `output * bg <color> solid_color`. Wants a number,
+    -- No wallpaper manager, just solid melange. Wants a number,
     -- so parse the palette's rrggbb hex string.
     background_color = tonumber(nix.colors.a.bg, 16),
   },
@@ -159,8 +156,7 @@ hl.config({
     -- every keyboard, including kanata's virtual one.
     -- resolve_binds_by_sym stays false (the default): binds
     -- resolve against the FIRST layout, so SUPER+1 still switches
-    -- workspaces under the Thai layout — hyprland's equivalent of
-    -- sway's bindkeysToCode.
+    -- workspaces under the Thai layout.
     kb_layout  = "us,th",
     kb_options = "grp:alt_shift_toggle",
 
@@ -197,9 +193,9 @@ hl.animation({ leaf = "fade",       enabled = true, speed = 1.2, bezier = "almos
 hl.animation({ leaf = "workspaces", enabled = true, speed = 1.5, bezier = "almostLinear", style = "fade" })
 
 --------------------------------------------------------------------
--- Keybinds. Hyprland ships NO default binds — everything sway gave
--- us for free (terminal, menu, focus, workspaces…) is declared
--- explicitly here, same keys as the sway config.
+-- Keybinds. Hyprland ships NO default binds — everything a
+-- compositor usually gives for free (terminal, menu, focus,
+-- workspaces…) is declared explicitly here.
 --------------------------------------------------------------------
 local mod  = "SUPER"
 local term = "alacritty"
@@ -209,10 +205,10 @@ hl.bind(mod .. " + D",             hl.dsp.exec_cmd("fuzzel"))
 hl.bind(mod .. " + SHIFT + Q",     hl.dsp.window.close())
 hl.bind(mod .. " + F",             hl.dsp.window.fullscreen())
 hl.bind(mod .. " + SHIFT + space", hl.dsp.window.float({ action = "toggle" }))
--- No confirmation nag like sway's — this exits immediately.
+-- This exits immediately — no confirmation nag.
 hl.bind(mod .. " + SHIFT + E",     hl.dsp.exit())
 
--- Focus / move: arrows and hjkl, like sway's defaults.
+-- Focus / move: arrows and hjkl.
 local dirs = {
   { "left", "left" }, { "right", "right" }, { "up", "up" }, { "down", "down" },
   { "H", "left" },    { "L", "right" },     { "K", "up" },  { "J", "down" },
@@ -229,14 +225,13 @@ for i = 1, 10 do
   hl.bind(mod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
 
--- Mouse: SUPER+LMB drags, SUPER+RMB resizes (any window). The RMB
--- resize replaces sway's resize mode, which has no dwindle
--- equivalent (nor do tabbed/stacking layouts or focus-parent).
+-- Mouse: SUPER+LMB drags, SUPER+RMB resizes (any window) — the
+-- only resize mechanism; there is no keyboard resize mode.
 hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- Media keys → PipeWire. locked = they work on the lock screen too;
--- repeating = hold-to-repeat (both upgrades over the sway binds).
+-- repeating = hold-to-repeat.
 hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),        { locked = true, repeating = true })
 hl.bind("XF86AudioMute",         hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),       { locked = true })
@@ -263,8 +258,8 @@ hl.bind(mod .. " + Escape", hl.dsp.exec_cmd("loginctl lock-session"))
 -- Obsidian & TickTick LAZY scratchpads → special workspaces
 -- (hyprland's scratchpad). Nothing runs at login: SUPER+N / SUPER+O
 -- launch the app on first press and toggle it thereafter — trading an
--- instant first summon for not paying idle Electron RAM every session
--- (the sway side mirrors this). The window rule sends each app to its
+-- instant first summon for not paying idle Electron RAM every session.
+-- The window rule sends each app to its
 -- special workspace WITHOUT `silent`, so the first launch REVEALS it;
 -- the bind is a plain lua callback (special workspaces have no
 -- lazy-launch dispatcher of their own): if a window exists, toggle the
@@ -315,7 +310,7 @@ hl.bind(mod .. " + O", scratchpad("ticktick", "ticktick"))
 --------------------------------------------------------------------
 -- Cursor: theme/size from home/cursor.nix via the generated nix.lua.
 -- Adwaita ships no hyprcursor variant; hyprland falls back to
--- XCursor, which is exactly what sway renders too.
+-- XCursor, the same rendering every other toolkit uses.
 --------------------------------------------------------------------
 hl.env("XCURSOR_THEME", nix.cursor.name)
 hl.env("XCURSOR_SIZE", tostring(nix.cursor.size))

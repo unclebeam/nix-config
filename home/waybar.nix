@@ -1,8 +1,7 @@
 # home/waybar.nix — status bar. Runs as a systemd user service bound to
-# graphical-session.target, which BOTH sessions reach (sway-session.target /
-# hyprland-session.target bind to it) — so one waybar serves sway and
-# hyprland alike. All colors are interpolated from colors.nix into the CSS
-# below.
+# graphical-session.target, which the session reaches via
+# hyprland-session.target (home/hyprland.nix binds it there). All colors are
+# interpolated from colors.nix into the CSS below.
 { config, lib, pkgs, ... }:
 
 let
@@ -131,13 +130,14 @@ in
 {
   # The media widget's scripts reference playerctl by store path; this
   # install is for interactive debugging (`playerctl status`) and future
-  # media keybinds in sway.nix.
+  # media keybinds in hyprland.lua.
   home.packages = [ pkgs.playerctl ];
 
   programs.waybar = {
     enable = true;
-    # Start via systemd (sway-session.target) instead of an `exec` line in
-    # the sway config — restarts cleanly, logs land in `journalctl --user`.
+    # Start via systemd (graphical-session.target) instead of an exec line
+    # in the compositor config — restarts cleanly, logs land in
+    # `journalctl --user`.
     systemd.enable = true;
 
     settings.mainBar = {
@@ -145,17 +145,9 @@ in
       position = "top";
       height = 28;
 
-      # Both compositors' workspace modules are listed: waybar constructs
-      # each module in a try/catch and silently skips the one whose
-      # compositor IPC isn't reachable (one journal warning), so this one
-      # config serves both sessions.
-      modules-left = [ "sway/workspaces" "hyprland/workspaces" "group/media" "sway/mode" ];
+      modules-left = [ "hyprland/workspaces" "group/media" ];
       modules-center = [ "clock" ];
       modules-right = [ "pulseaudio" "network" "custom/wifi-name" "cpu" "memory" "battery" "tray" ];
-
-      "sway/workspaces" = {
-        disable-scroll = true;
-      };
 
       # Media pill (DankMaterialShell-style): cover art | waveform | title.
       # The group renders as one box (CSS id #media); each child hides on
@@ -262,9 +254,6 @@ in
         color: ${colors.a.ui};
         background: transparent;
       }
-      /* sway calls the current workspace .focused, hyprland calls it
-         .active — style both so the bar looks identical in each session. */
-      #workspaces button.focused,
       #workspaces button.active {
         color: ${colors.a.fg};
         background: ${colors.a.sel};
@@ -273,12 +262,6 @@ in
       #workspaces button.urgent {
         color: ${colors.a.fg};
         background: ${colors.d.red};
-      }
-
-      #mode {
-        color: ${colors.a.bg};
-        background: ${colors.b.yellow};
-        padding: 0 10px;
       }
 
       /* Media widget. The group box stays styling-free (no background or

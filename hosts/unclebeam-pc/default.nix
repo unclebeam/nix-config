@@ -10,8 +10,7 @@
     ./disko.nix                  # declarative disk layout (partitions, btrfs, mounts)
     ../../modules/core.nix       # users, nix settings, boot loader, networking…
     ../../modules/desktop.nix    # greeter (session picker), fonts, Wayland env
-    ../../modules/sway.nix       # sway session (fallback, selectable at greeter)
-    ../../modules/hyprland.nix   # hyprland session (the greeter default)
+    ../../modules/hyprland.nix   # hyprland session (the only one offered at the greeter)
     ../../modules/audio.nix      # pipewire
     ../../modules/bluetooth.nix  # bluez userspace for the MT7925's BT radio
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl

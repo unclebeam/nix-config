@@ -1,9 +1,9 @@
 # home/ticktick.nix — TickTick task-management client.
 # One file per intent: everything that exists because of TickTick lives here.
 # Removing TickTick = delete this file + its import line in default.nix —
-# PLUS the small SUPER+O scratchpad blocks it owns in home/sway.nix and
-# home/hypr/hyprland.lua (kept next to obsidian's, the same split obsidian
-# has). Grep "ticktick" across home/ to find them.
+# PLUS the small SUPER+O scratchpad block it owns in home/hypr/hyprland.lua
+# (kept next to obsidian's, the same split obsidian has). Grep "ticktick"
+# across home/ to find it.
 #
 # Unfree package — covered by the allowUnfree set in modules/core.nix
 # (home-manager runs with useGlobalPkgs, so the system nixpkgs config
@@ -28,8 +28,8 @@ let
   #     X11 if not (safe: never worse than today).
   #   --class=ticktick → pin the window identity to a stable "ticktick"
   #     (app_id under Wayland, WM_CLASS under X11) so the SUPER+O scratchpad
-  #     rule + bind in home/sway.nix and home/hypr/hyprland.lua have a
-  #     deterministic match instead of whatever electron would default to.
+  #     rule + bind in home/hypr/hyprland.lua have a deterministic match
+  #     instead of whatever electron would default to.
   # The package wraps its binary with wrapGAppsHook3, which reads the
   # gappsWrapperArgs array at fixup time — appending there re-wraps
   # bin/ticktick, and the generated .desktop Exec points at that same

@@ -11,14 +11,11 @@
     enable = true;
     package = pkgs.adwaita-icon-theme; # plain GNOME cursor — matches the minimal look
     name = "Adwaita";
-    size = 24; # logical px; sway multiplies by the output scale (1.5) on screen
+    size = 24; # logical px; hyprland multiplies by the output scale (1.5) on screen
 
-    # Writes `seat * xcursor_theme Adwaita 24` into the sway config so the
-    # compositor-drawn cursor (desktop, window borders) matches the apps.
-    # (hyprland gets the same theme/size too: home/hyprland.nix exports this
-    # option into the generated ~/.config/hypr/nix.lua, and hl.env lines in
-    # home/hypr/hyprland.lua read nix.cursor — one source of truth.)
-    sway.enable = true;
+    # Hyprland picks this up too: home/hyprland.nix exports this option into
+    # the generated ~/.config/hypr/nix.lua, and hl.env lines in
+    # home/hypr/hyprland.lua read nix.cursor — one source of truth.
 
     # Generates the gtk cursor settings so GTK apps pick the same theme/size.
     gtk.enable = true;

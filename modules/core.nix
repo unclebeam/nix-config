@@ -92,7 +92,7 @@
     neovim # package only — config/plugins/LSPs are managed by hand, not Nix
     # claude-code moved to home/claude.nix — it grew per-user config
     # (settings + statusline), and apps with per-user config live in home/.
-    brave # Chromium-based; runs native Wayland via NIXOS_OZONE_WL (modules/sway.nix)
+    brave # Chromium-based; runs native Wayland via NIXOS_OZONE_WL (modules/desktop.nix)
     wget
     curl
     # Global Node = whatever nixpkgs calls "latest" at each `nix flake update`

@@ -44,7 +44,7 @@ let
   #   - error/warn/ok  = b.red / b.yellow / b.green
   #   - links          = b.blue, visited = b.magenta
   #   - focus ring     = b.yellow (matches fuzzel's match highlight)
-  #   - hover glow     = a.com   (matches sway's focused border)
+  #   - hover glow     = a.com   (matches hyprland's focused border)
   colorSet = bg: alt: {
     BackgroundNormal = rgb bg;
     BackgroundAlternate = rgb alt;

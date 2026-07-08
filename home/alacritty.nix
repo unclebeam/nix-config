@@ -54,8 +54,6 @@ in
 
       # The one translucent surface in the setup — hyprland's blur
       # (home/hypr/hyprland.lua, decoration.blur) shows through here.
-      # Under the sway fallback session there's no blur, so the
-      # terminal is just faintly transparent there; acceptable.
       window.opacity = 0.92;
 
       # Shift+Enter normally sends the exact same bytes as plain Enter, so

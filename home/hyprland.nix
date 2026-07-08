@@ -79,11 +79,10 @@ in
     }
   '';
 
-  # ── hyprlock — themed lock screen (this session's swaylock) ─────────────
-  # PAM side is system-level (modules/hyprland.nix). Color mapping mirrors
-  # programs.swaylock in home/sway.nix. hyprlock/hypridle configs stay
-  # Nix-generated on purpose (unlike hyprland.lua): they're hyprlang INI
-  # with interpolated palette colors and are never iterated on.
+  # ── hyprlock — themed lock screen ────────────────────────────────────────
+  # PAM side is system-level (modules/hyprland.nix). hyprlock/hypridle
+  # configs stay Nix-generated on purpose (unlike hyprland.lua): they're
+  # hyprlang INI with interpolated palette colors and are never iterated on.
   programs.hyprlock = {
     enable = true;
     settings = {
@@ -109,7 +108,7 @@ in
           check_color = "rgb(${raw colors.b.green})";
           fail_color = "rgb(${raw colors.b.red})";
           capslock_color = "rgb(${raw colors.b.yellow})";
-          # = swaylock's show-failed-attempts
+          # show how many unlock attempts have failed
           fail_text = "$FAIL ($ATTEMPTS)";
           placeholder_text = "";
           fade_on_empty = false;
@@ -119,17 +118,15 @@ in
   };
 
   # ── hyprland-session.target — the session anchor ────────────────────────
-  # The exact analogue of the sway-session.target that home-manager's sway
-  # module generates. Since the HM hyprland module is deliberately NOT used
-  # (see the top of this file), nothing generates this target for us —
-  # without it the lua hook's `systemctl --user start hyprland-session.target`
-  # fails "unit not found" and waybar + hypridle silently never start. The
-  # lua hook starts it at compositor launch; BindsTo stops it when
-  # graphical-session.target goes down at logout (both the plain and the
-  # uwsm-managed launch modes).
-  # Deliberately NO Install section (sway's has none either): a WantedBy on
-  # graphical-session.target would start it — and hypridle below — under
-  # sway too, exactly what the systemdTarget scoping is here to prevent.
+  # Since the HM hyprland module is deliberately NOT used (see the top of
+  # this file), nothing generates this target for us — without it the lua
+  # hook's `systemctl --user start hyprland-session.target` fails "unit not
+  # found" and waybar + hypridle silently never start. The lua hook starts
+  # it at compositor launch; BindsTo stops it when graphical-session.target
+  # goes down at logout (both the plain and the uwsm-managed launch modes).
+  # Deliberately NO Install section: the target must only ever be reached by
+  # the lua hook's explicit start, not pulled in whenever a graphical
+  # session appears — that's what scopes hypridle below to this compositor.
   systemd.user.targets.hyprland-session = {
     Unit = {
       Description = "hyprland compositor session";
@@ -141,13 +138,11 @@ in
   };
 
   # ── hypridle — lock, screen off, and lock-before-sleep ──────────────────
-  # Same timeouts as swayidle in home/sway.nix.
   services.hypridle = {
     enable = true;
-    # Scope to the hyprland session ONLY. The default target
-    # (graphical-session.target) is reached by BOTH sessions, which would
-    # start hypridle under sway too, fighting swayidle — the mirror of the
-    # systemdTargets override on services.swayidle in home/sway.nix.
+    # Scope to the hyprland session, not the default graphical-session.target:
+    # any other graphical session (a future second compositor, a nested test
+    # session) would start hypridle where it doesn't belong.
     systemdTarget = "hyprland-session.target";
     settings = {
       general = {
@@ -175,9 +170,8 @@ in
     };
   };
 
-  # Wayland desktop utilities used by the lua keybinds. Deliberately the
-  # same list as home/sway.nix (nix dedupes): each compositor file must be
-  # removable atomically without orphaning the other's keybinds.
+  # Wayland desktop utilities used by the lua keybinds — they live here, not
+  # in a shared file, so removing hyprland removes them atomically.
   home.packages = with pkgs; [
     grim # screenshot
     slurp # region selection

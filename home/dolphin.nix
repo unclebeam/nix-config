@@ -4,7 +4,7 @@
 # Plasma, and the wallet that remembers SMB share passwords.
 #
 # The system half (avahi for SMB discovery, PAM kwallet unlock) lives in
-# modules/dolphin.nix — same split as sway.nix. The Qt widget style + colors
+# modules/dolphin.nix — same split as hyprland.nix. The Qt widget style + colors
 # used to live here too, but moved to home/qt.nix once the Hyprland share
 # picker became a second consumer. Removing Dolphin = delete both dolphin
 # files + their import lines (qt.nix stays — other Qt apps use it).
@@ -43,7 +43,7 @@
 
   # udiskie is the piece that makes mounting *automatic*. udisks2 (enabled in
   # modules/dolphin.nix) only exposes removable drives and permits mounting;
-  # udiskie runs as a systemd user service in the Sway session, watches for
+  # udiskie runs as a systemd user service in the graphical session, watches for
   # newly-plugged devices, and mounts them the instant they appear under
   # /run/media/unclebeam/<label>. tray = "never" because this minimal Waybar has
   # no StatusNotifier tray host — with the default "auto", udiskie would sit

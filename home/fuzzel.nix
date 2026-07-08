@@ -1,4 +1,4 @@
-# home/fuzzel.nix — application launcher ($mod+d in sway).
+# home/fuzzel.nix — application launcher (SUPER+D, bound in home/hypr/hyprland.lua).
 { config, lib, pkgs, ... }:
 
 let
@@ -31,7 +31,7 @@ in
       };
       border = {
         width = 2;
-        radius = 0; # square corners, matching sway's plain borders
+        radius = 0; # square corners — the launcher stays plain on purpose
       };
     };
   };

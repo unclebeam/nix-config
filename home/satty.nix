@@ -1,8 +1,7 @@
-# home/satty.nix — screenshot annotator (Print / Ctrl+Print in sway).
-# Owns everything satty: the package, config.toml, and its palette colors.
-# The keybind itself stays in home/sway.nix: keybindings there are one
-# attrset wrapped in mkOptionDefault, and a second definition from this
-# file would OVERRIDE that set (higher priority wins), not merge into it.
+# home/satty.nix — screenshot annotator (Print / Ctrl+Print, bound in
+# home/hypr/hyprland.lua). Owns everything satty: the package, config.toml,
+# and its palette colors. The keybinds themselves stay in the compositor
+# config, where all keybinds live.
 { config, lib, pkgs, ... }:
 
 let
@@ -14,8 +13,8 @@ in
     # Rendered to ~/.config/satty/config.toml.
     settings = {
       general = {
-        # Sway would tile satty into whatever gap is free — fullscreen it
-        # so there's actually room to annotate.
+        # A tiling compositor would squeeze satty into whatever gap is
+        # free — fullscreen it so there's actually room to annotate.
         fullscreen = true;
         early-exit = true; # close after the first save/copy
         copy-command = "wl-copy"; # wayland clipboard

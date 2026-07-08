@@ -14,7 +14,7 @@
   hardware.cpu.intel.updateMicrocode = true;
 
   # ── Lid & suspend ──────────────────────────────────────────────────────
-  # logind handles the lid; swayidle (home/sway.nix) locks the session
+  # logind handles the lid; hypridle (home/hyprland.nix) locks the session
   # before the suspend actually happens.
   services.logind.settings.Login = {
     HandleLidSwitch = "suspend";
@@ -23,9 +23,9 @@
   };
 
   # ── Backlight ──────────────────────────────────────────────────────────
-  # brightnessctl (installed in home/sway.nix, bound to the XF86 brightness
-  # keys) talks to logind — no extra permissions or udev rules needed for
-  # users with an active session.
+  # brightnessctl (installed in home/hyprland.nix, bound to the XF86
+  # brightness keys) talks to logind — no extra permissions or udev rules
+  # needed for users with an active session.
 
   # ── Firmware updates ───────────────────────────────────────────────────
   # ThinkPads publish firmware on LVFS. When you want firmware updates,
