@@ -5,8 +5,9 @@
 
 {
   imports = [
-    ./sway.nix      # window manager config + swaylock + swayidle
-    ./autotiling.nix # dynamic split orientation for sway (systemd user service)
+    ./sway.nix      # sway config + swaylock + swayidle (fallback session)
+    ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + hyprlock + hypridle (default session)
+    ./autotiling.nix # dynamic split orientation, sway-only (hyprland's dwindle layout does this natively)
     ./waybar.nix    # status bar
     ./fuzzel.nix    # launcher
     ./mako.nix      # notifications

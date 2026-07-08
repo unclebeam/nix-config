@@ -1,5 +1,6 @@
 # home/sway.nix — the USER half of sway: keybinds, colors, lock/idle.
-# (The session/greeter/portal plumbing is system-side in modules/sway.nix.)
+# (Session/portal plumbing is system-side in modules/sway.nix; the greeter
+# that picks between sway and hyprland lives in modules/desktop.nix.)
 {
   config,
   lib,
@@ -231,6 +232,11 @@ in
   # ── swayidle — lock, screen off, and lock-before-sleep ──────────────────
   services.swayidle = {
     enable = true;
+    # Scope to the sway session ONLY. The default target
+    # (graphical-session.target) is reached by BOTH sessions since hyprland
+    # arrived — without this, swayidle would fire swaylock inside hyprland,
+    # fighting hypridle (which is scoped the same way in home/hyprland.nix).
+    systemdTargets = [ "sway-session.target" ];
     # Lock BEFORE the system suspends (lid close, systemctl suspend…).
     # Each event maps to its command string directly.
     events."before-sleep" = "${pkgs.swaylock}/bin/swaylock -f";

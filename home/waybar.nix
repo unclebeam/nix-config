@@ -1,6 +1,8 @@
 # home/waybar.nix — status bar. Runs as a systemd user service bound to
-# sway-session.target (started by home-manager's sway integration).
-# All colors are interpolated from colors.nix into the CSS below.
+# graphical-session.target, which BOTH sessions reach (sway-session.target /
+# hyprland-session.target bind to it) — so one waybar serves sway and
+# hyprland alike. All colors are interpolated from colors.nix into the CSS
+# below.
 { config, lib, pkgs, ... }:
 
 let
@@ -104,7 +106,11 @@ in
       position = "top";
       height = 28;
 
-      modules-left = [ "sway/workspaces" "group/media" "sway/mode" ];
+      # Both compositors' workspace modules are listed: waybar constructs
+      # each module in a try/catch and silently skips the one whose
+      # compositor IPC isn't reachable (one journal warning), so this one
+      # config serves both sessions.
+      modules-left = [ "sway/workspaces" "hyprland/workspaces" "group/media" "sway/mode" ];
       modules-center = [ "clock" ];
       modules-right = [ "pulseaudio" "network" "cpu" "memory" "battery" "tray" ];
 
@@ -207,7 +213,10 @@ in
         color: ${colors.a.ui};
         background: transparent;
       }
-      #workspaces button.focused {
+      /* sway calls the current workspace .focused, hyprland calls it
+         .active — style both so the bar looks identical in each session. */
+      #workspaces button.focused,
+      #workspaces button.active {
         color: ${colors.a.fg};
         background: ${colors.a.sel};
         border-bottom: 2px solid ${colors.b.yellow};

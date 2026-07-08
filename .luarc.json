@@ -1,0 +1,5 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "workspace.library": ["/home/unclebeam/.config/hypr/stubs"],
+  "workspace.checkThirdParty": false
+}
