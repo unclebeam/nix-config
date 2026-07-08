@@ -86,6 +86,45 @@ let
       sleep 0.4
     done
   '';
+
+  # Persistent script behind custom/wifi-name: a fixed-width marquee of the
+  # connected Wi-Fi SSID, mirroring mediaTitle. The network module owns the
+  # icon + signal %; this only scrolls the name so the pill reads
+  # "󰖩 87% - Name". Empty output when not on Wi-Fi collapses the module.
+  wifiName = pkgs.writeShellScript "waybar-wifi-name" ''
+    export PATH=${lib.makeBinPath [ pkgs.coreutils pkgs.networkmanager ]}:$PATH
+    export LC_ALL=C.UTF-8   # ''${var:off:len} counts chars only under UTF-8
+    WIDTH=6    # visible name window, in characters (fixed)
+    SEP="   "  # gap between end and restart of the scrolling text
+
+    last="" offset=0 tick=0
+    while :; do
+      # nmcli is heavy to spawn; only re-read the SSID every ~2s (every 5th
+      # 0.4s tick) — the marquee itself still advances every tick from cache.
+      if [ $(( tick % 5 )) -eq 0 ]; then
+        ssid=$(nmcli -t -f active,ssid dev wifi 2>/dev/null \
+               | awk -F: '/^yes:/{sub(/^yes:/,""); print; exit}')
+      fi
+      tick=$(( tick + 1 ))
+
+      if [ -z "$ssid" ]; then
+        # Not on Wi-Fi: empty line hides the module; network shows on its own.
+        [ -n "$last" ] && { last=""; offset=0; }
+        echo ""
+      else
+        [ "$ssid" != "$last" ] && { last="$ssid"; offset=0; }
+        if [ "''${#ssid}" -le "$WIDTH" ]; then
+          # Pad short names so the box width never changes (truly fixed).
+          printf -- '- %-*s\n' "$WIDTH" "$ssid"
+        else
+          s="$ssid$SEP"; d="$s$s"
+          printf -- '- %s\n' "''${d:offset:WIDTH}"
+          offset=$(( (offset + 1) % ''${#s} ))
+        fi
+      fi
+      sleep 0.4
+    done
+  '';
 in
 {
   # The media widget's scripts reference playerctl by store path; this
@@ -106,7 +145,7 @@ in
 
       modules-left = [ "sway/workspaces" "group/media" "sway/mode" ];
       modules-center = [ "clock" ];
-      modules-right = [ "pulseaudio" "network" "cpu" "memory" "battery" "tray" ];
+      modules-right = [ "pulseaudio" "network" "custom/wifi-name" "cpu" "memory" "battery" "tray" ];
 
       "sway/workspaces" = {
         disable-scroll = true;
@@ -169,6 +208,16 @@ in
         format-ethernet = "󰈀 {ifname}";
         format-disconnected = "󰖪 offline";
         tooltip-format = "{ifname}: {ipaddr}";
+      };
+
+      # Scrolling SSID name, glued to the right of the network module so the
+      # pair reads "󰖩 87% - Name". Persistent marquee (see wifiName above);
+      # empty when not on Wi-Fi, so on ethernet/offline it vanishes and the
+      # network module looks exactly as it did before.
+      "custom/wifi-name" = {
+        exec = "${wifiName}";  # persistent: no `interval`, one frame per line
+        escape = true;         # pango-escape < > & in SSIDs
+        tooltip = false;
       };
 
       cpu.format = "󰻠 {usage}%";
@@ -248,6 +297,9 @@ in
 
       #pulseaudio { color: ${colors.b.yellow}; }
       #network    { color: ${colors.b.cyan}; }
+      /* Scrolling SSID: same cyan as #network, no left padding so it butts
+         up against it; collapses to 0px when the script prints nothing. */
+      #custom-wifi-name { color: ${colors.b.cyan}; padding: 0 10px 0 0; }
       #cpu        { color: ${colors.b.green}; }
       #memory     { color: ${colors.b.blue}; }
       #battery    { color: ${colors.b.green}; }
