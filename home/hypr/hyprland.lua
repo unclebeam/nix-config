@@ -101,16 +101,18 @@ hl.monitor({
 })
 
 --------------------------------------------------------------------
--- Look & feel. The minimal look is deliberate: no gaps, no
--- rounding, no blur, no shadows, no animations — melange borders
--- on a solid melange background, matching the sway setup exactly.
+-- Look & feel. Lightly polished, deliberately so: small gaps,
+-- slight rounding, fast animations, and blur behind the one
+-- translucent surface we have (alacritty at 0.92 opacity, set in
+-- home/alacritty.nix). Shadows stay off. Sway keeps the old fully
+-- minimal look — it's the fallback session, left untouched.
 -- (Two knobs sway had that hyprland doesn't: an urgent-window
 -- border color, and titlebars — hyprland simply has neither.)
 --------------------------------------------------------------------
 hl.config({
   general = {
-    gaps_in     = 0,
-    gaps_out    = 0,
+    gaps_in     = 5,
+    gaps_out    = 10,
     border_size = 2,
     col = {
       -- focused = warm comment-beige, everything else fades into
@@ -125,12 +127,21 @@ hl.config({
   },
 
   decoration = {
-    rounding = 0,
+    rounding = 8,
     shadow = { enabled = false },
-    blur = { enabled = false },
+    -- "A bit" of blur — only visible through translucent surfaces,
+    -- i.e. the terminal. size/passes kept modest so the 4K panels
+    -- don't pay for a heavy blur kernel every frame.
+    blur = {
+      enabled = true,
+      size    = 5,
+      passes  = 2,
+    },
   },
 
-  animations = { enabled = false },
+  -- Master switch; the actual curves and per-leaf timings are the
+  -- hl.curve/hl.animation calls right below this config block.
+  animations = { enabled = true },
 
   misc = {
     -- Both required to get a plain background: the logo/anime-girl
@@ -169,6 +180,21 @@ hl.config({
   -- re-deriving it from window size on every close.
   dwindle = { preserve_split = true },
 })
+
+-- Fast, snappy animations. `speed` is a duration in ~deciseconds,
+-- so LOWER = faster — hyprland's own defaults sit around 4.8
+-- (≈480ms); these run at roughly half that. The "global" leaf is
+-- the fallback for every animation not listed; the explicit leaves
+-- tune the ones you actually see all day. Curve/leaf API cribbed
+-- from the example config hyprland ships (share/hypr/hyprland.lua).
+hl.curve("quick",        { type = "bezier", points = { {0.15, 0},  {0.1, 1}  } })
+hl.curve("almostLinear", { type = "bezier", points = { {0.5, 0.5}, {0.75, 1} } })
+
+hl.animation({ leaf = "global",     enabled = true, speed = 2,   bezier = "quick" })
+hl.animation({ leaf = "windows",    enabled = true, speed = 2,   bezier = "quick", style = "popin 90%" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 1.2, bezier = "quick", style = "popin 90%" })
+hl.animation({ leaf = "fade",       enabled = true, speed = 1.2, bezier = "almostLinear" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 1.5, bezier = "almostLinear", style = "fade" })
 
 --------------------------------------------------------------------
 -- Keybinds. Hyprland ships NO default binds — everything sway gave
