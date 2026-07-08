@@ -260,26 +260,57 @@ hl.bind("CTRL + Print", hl.dsp.exec_cmd([[sel="$(slurp)" && mkdir -p "$HOME/Pict
 hl.bind(mod .. " + Escape", hl.dsp.exec_cmd("loginctl lock-session"))
 
 --------------------------------------------------------------------
--- Obsidian scratchpad → special workspace (hyprland's scratchpad).
--- Launched at login and sent to special:obsidian silently (nothing
--- appears on screen), as a centered 1200x800 float; SUPER+N toggles
--- it — the same instant-dropdown setup as under sway. The Electron
--- process is resident from boot as the price of that instant
--- summon. class is "obsidian" under native Wayland (NIXOS_OZONE_WL);
--- if the toggle stops matching, re-check with `hyprctl clients`.
+-- Obsidian & TickTick LAZY scratchpads → special workspaces
+-- (hyprland's scratchpad). Nothing runs at login: SUPER+N / SUPER+O
+-- launch the app on first press and toggle it thereafter — trading an
+-- instant first summon for not paying idle Electron RAM every session
+-- (the sway side mirrors this). The window rule sends each app to its
+-- special workspace WITHOUT `silent`, so the first launch REVEALS it;
+-- the bind is a plain lua callback (special workspaces have no
+-- lazy-launch dispatcher of their own): if a window exists, toggle the
+-- special workspace, else launch the app. class is the Wayland app_id —
+-- "obsidian"; "ticktick" is pinned via --class in home/ticktick.nix.
+-- If a toggle stops matching, re-check with `hyprctl clients`.
+--
+-- ⚠ Do NOT rewrite this as a shell guard around `hyprctl dispatch
+-- togglespecialworkspace …` (the classic hyprlang spelling). Under the
+-- lua config, `hyprctl dispatch X` evaluates X as the LUA EXPRESSION
+-- hl.dispatch(X) — the old dispatcher string is a lua syntax error, and
+-- hyprctl still exits 0 on that error, so even an `|| launch` fallback
+-- never fires. That exact bug shipped once: first press launched,
+-- every later press silently did nothing.
 --------------------------------------------------------------------
+-- launch-or-toggle: window with this class exists → toggle its special
+-- workspace; else spawn it (the window rule reveals it on first map).
+local function scratchpad(class, cmd)
+  return function()
+    if #hl.get_windows({ class = class }) > 0 then
+      hl.dispatch(hl.dsp.workspace.toggle_special(class))
+    else
+      hl.exec_cmd(cmd)
+    end
+  end
+end
+
 hl.window_rule({
   name  = "obsidian-scratchpad",
   match = { class = "obsidian" },
-  workspace = "special:obsidian silent",
+  workspace = "special:obsidian",   -- no `silent`: first launch shows it
   float  = true,
   size   = { 1200, 800 },
   center = true,
 })
-hl.bind(mod .. " + N", hl.dsp.workspace.toggle_special("obsidian"))
-hl.on("hyprland.start", function()
-  hl.exec_cmd("obsidian")
-end)
+hl.bind(mod .. " + N", scratchpad("obsidian", "obsidian"))
+
+hl.window_rule({
+  name  = "ticktick-scratchpad",
+  match = { class = "ticktick" },
+  workspace = "special:ticktick",   -- no `silent`: first launch shows it
+  float  = true,
+  size   = { 1200, 800 },
+  center = true,
+})
+hl.bind(mod .. " + O", scratchpad("ticktick", "ticktick"))
 
 --------------------------------------------------------------------
 -- Cursor: theme/size from home/cursor.nix via the generated nix.lua.
