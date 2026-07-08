@@ -15,6 +15,9 @@
 
     # Writes `seat * xcursor_theme Adwaita 24` into the sway config so the
     # compositor-drawn cursor (desktop, window borders) matches the apps.
+    # (hyprland gets the same theme/size too: home/hyprland.nix exports this
+    # option into the generated ~/.config/hypr/nix.lua, and hl.env lines in
+    # home/hypr/hyprland.lua read nix.cursor — one source of truth.)
     sway.enable = true;
 
     # Generates the gtk cursor settings so GTK apps pick the same theme/size.
