@@ -175,6 +175,32 @@ hl.config({
   -- Keep the split direction where you put it instead of
   -- re-deriving it from window size on every close.
   dwindle = { preserve_split = true },
+
+  -- Theme the group so it matches everything else — the groupbar
+  -- renders the moment a group exists, and unstyled it ships
+  -- hyprland's default (non-melange) colors. Palette from
+  -- home/colors.nix via nix.colors (already #-stripped), same rgb()
+  -- form as the window borders above. Gradients off = flat tabs, in
+  -- keeping with the restrained look.
+  group = {
+    col = {
+      -- Group's own tile border: reuse the window border scheme.
+      border_active   = "rgb(" .. nix.colors.a.com .. ")",
+      border_inactive = "rgb(" .. nix.colors.a.float .. ")",
+    },
+    groupbar = {
+      enabled   = true,
+      gradients = false,
+      col = {
+        -- Active tab = selection bg, the rest = float bg.
+        active   = "rgb(" .. nix.colors.a.sel .. ")",
+        inactive = "rgb(" .. nix.colors.a.float .. ")",
+      },
+      -- Tab titles: cream for the focused tab, muted beige otherwise.
+      text_color          = "rgb(" .. nix.colors.a.fg .. ")",
+      text_color_inactive = "rgb(" .. nix.colors.a.com .. ")",
+    },
+  },
 })
 
 -- Fast, snappy animations. `speed` is a duration in ~deciseconds,
@@ -205,10 +231,20 @@ hl.bind(mod .. " + D",             hl.dsp.exec_cmd("fuzzel"))
 hl.bind(mod .. " + SHIFT + Q",     hl.dsp.window.close())
 hl.bind(mod .. " + F",             hl.dsp.window.fullscreen())
 hl.bind(mod .. " + SHIFT + space", hl.dsp.window.float({ action = "toggle" }))
+-- Sway's tabbed container ≙ a hyprland group: toggle turns the focused
+-- window into a group (a groupbar/tab strip appears) and dissolves it
+-- again. Windows opened while a group member is focused join as tabs;
+-- SUPER+T / SUPER+SHIFT+T cycle the tabs, and SUPER+ALT+<dir> moves
+-- a window in/out of a group (both in the group block further below).
+-- Groupbar theming lives in the group block of hl.config.
+hl.bind(mod .. " + G",             hl.dsp.group.toggle())
 -- This exits immediately — no confirmation nag.
 hl.bind(mod .. " + SHIFT + E",     hl.dsp.exit())
 
--- Focus / move: arrows and hjkl.
+-- Focus / move: arrows and hjkl. Plain and vanilla — SUPER+<dir>
+-- moves focus, SUPER+SHIFT+<dir> moves the window. Group behavior
+-- lives on its own keys below, deliberately kept OFF these so normal
+-- tiling never has grouping intrude.
 local dirs = {
   { "left", "left" }, { "right", "right" }, { "up", "up" }, { "down", "down" },
   { "H", "left" },    { "L", "right" },     { "K", "up" },  { "J", "down" },
@@ -216,6 +252,19 @@ local dirs = {
 for _, d in ipairs(dirs) do
   hl.bind(mod .. " + " .. d[1],         hl.dsp.focus({ direction = d[2] }))
   hl.bind(mod .. " + SHIFT + " .. d[1], hl.dsp.window.move({ direction = d[2] }))
+end
+
+-- Group navigation (Sway's tabbed container; SUPER+G toggles a group,
+-- up with the window binds). T / SHIFT+T cycle the tabs
+-- (group.next/prev = changeGroupActive fwd/back). SUPER+ALT+<dir> moves
+-- the focused window IN or OUT of a group: window.move{group_aware=true}
+-- dispatches moveWindowOrGroup — into a group in that direction, or out
+-- at the far edge — WITHOUT touching the plain SUPER+SHIFT+<dir> move.
+-- (Field names verified against hyprland's LuaBindingsDispatchers.cpp.)
+hl.bind(mod .. " + T",         hl.dsp.group.next())
+hl.bind(mod .. " + SHIFT + T", hl.dsp.group.prev())
+for _, d in ipairs(dirs) do
+  hl.bind(mod .. " + ALT + " .. d[1], hl.dsp.window.move({ direction = d[2], group_aware = true }))
 end
 
 -- Workspaces 1–10 (the 0 key is workspace 10).
