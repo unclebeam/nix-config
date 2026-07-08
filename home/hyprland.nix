@@ -28,7 +28,8 @@ in
   # when it exists (hyprlang is deprecated). The home-manager
   # wayland.windowManager.hyprland module is deliberately NOT used: all it
   # would add over this symlink is the systemd session hook, which the lua
-  # file carries by hand (see its ⚠ Load-bearing comment). The hyprland
+  # file carries by hand (see its ⚠ Load-bearing comment), and the
+  # hyprland-session.target unit, declared below. The hyprland
   # package itself comes from the system module (programs.hyprland), so the
   # cap_sys_nice "Hyprland" wrapper stays in charge of the session.
   # NB: no activation hook either — after a rebuild inside a running
@@ -96,6 +97,28 @@ in
           fade_on_empty = false;
         }
       ];
+    };
+  };
+
+  # ── hyprland-session.target — the session anchor ────────────────────────
+  # The exact analogue of the sway-session.target that home-manager's sway
+  # module generates. Since the HM hyprland module is deliberately NOT used
+  # (see the top of this file), nothing generates this target for us —
+  # without it the lua hook's `systemctl --user start hyprland-session.target`
+  # fails "unit not found" and waybar + hypridle silently never start. The
+  # lua hook starts it at compositor launch; BindsTo stops it when
+  # graphical-session.target goes down at logout (both the plain and the
+  # uwsm-managed launch modes).
+  # Deliberately NO Install section (sway's has none either): a WantedBy on
+  # graphical-session.target would start it — and hypridle below — under
+  # sway too, exactly what the systemdTarget scoping is here to prevent.
+  systemd.user.targets.hyprland-session = {
+    Unit = {
+      Description = "hyprland compositor session";
+      Documentation = [ "man:systemd.special(7)" ];
+      BindsTo = [ "graphical-session.target" ];
+      Wants = [ "graphical-session-pre.target" ];
+      After = [ "graphical-session-pre.target" ];
     };
   };
 

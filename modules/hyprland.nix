@@ -12,9 +12,19 @@
   #  * xdg-desktop-portal-hyprland (ScreenCast/Screenshot) plus the
   #    portals.conf that routes those interfaces to it under hyprland
   #  * polkit + xwayland, same as programs.sway does
-  # withUWSM stays off — no systemd-managed session layer, matching how
-  # sway is run here. Window-manager *configuration* comes from home-manager.
+  # Window-manager *configuration* comes from home-manager.
   programs.hyprland.enable = true;
+
+  # withUWSM installs uwsm plus its systemd USER units (wayland-wm@.service,
+  # wayland-session-bindpid@.service & friends, via systemd.packages). Without
+  # them the "Hyprland (uwsm-managed)" entry that the nixpkgs hyprland package
+  # unconditionally ships in the greeter menu is a trap: uwsm starts, then
+  # `systemctl --user start wayland-session-bindpid@<pid>` fails with "unit
+  # not found" (exit 5) and login bounces back to the greeter. This does NOT
+  # force uwsm onto the plain "Hyprland" entry — both entries work; the lua
+  # config's load-bearing hook detects the mode at runtime (NOTIFY_SOCKET) and
+  # finalizes the uwsm unit only when one exists. Sway stays non-uwsm.
+  programs.hyprland.withUWSM = true;
 
   # PAM for hyprlock so unlocking actually works — the mirror of what
   # programs.sway sets up for swaylock. Deliberately NOT the NixOS

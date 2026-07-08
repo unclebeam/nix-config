@@ -18,17 +18,37 @@
 local nix = require("nix")
 
 --------------------------------------------------------------------
--- ⚠ Load-bearing: exports the session env into systemd --user and
--- starts hyprland-session.target — the exact analogue of
--- sway-session.target. Waybar (graphical-session.target), the portal,
--- and hypridle (hyprland-session.target) all hang off this firing.
--- Never delete. (home-manager generated this block before this file
--- went plain; dbus-update-activation-environment is on PATH via
--- services.dbus, which is always on under NixOS. The stop-then-start
--- makes `hyprctl reload` restart the session services cleanly.)
+-- ⚠ Load-bearing: makes systemd user services work in BOTH launch
+-- modes the greeter offers — plain "Hyprland" and "Hyprland
+-- (uwsm-managed)". Waybar (graphical-session.target), the portal,
+-- and hypridle (hyprland-session.target, declared in
+-- home/hyprland.nix) all hang off this firing. Never delete.
+--
+-- uwsm mode only: wayland-wm@hyprland.desktop.service is Type=notify
+-- with a 30s timeout — `uwsm finalize` exports WAYLAND_DISPLAY and
+-- DISPLAY (always) plus the named vars into the systemd user env,
+-- then signals READY=1. Skip it and uwsm tears the whole session
+-- down after 30 seconds. NOTIFY_SOCKET is the mode probe: systemd
+-- sets it for notify-type units, a plain greetd exec doesn't. The
+-- `||` + `;` keep the rest of the chain alive when the guard skips
+-- (plain mode) or finalize fails; re-runs on `hyprctl reload` are
+-- safe (an already-active finalize exits 0). uwsm is on PATH via
+-- programs.hyprland.withUWSM in modules/hyprland.nix.
+--
+-- Both modes: dbus-update-activation-environment pushes the vars
+-- into the D-Bus activation env too (finalize only feeds systemd),
+-- then hyprland-session.target is stop/started — the stop-then-start
+-- makes `hyprctl reload` restart the session services cleanly. In
+-- plain mode its BindsTo pulls up graphical-session.target; under
+-- uwsm that's already up because finalize ran first.
+-- (dbus-update-activation-environment is on PATH via services.dbus,
+-- always on under NixOS.)
 --------------------------------------------------------------------
 hl.on("hyprland.start", function()
-  hl.exec_cmd("dbus-update-activation-environment --systemd DISPLAY"
+  hl.exec_cmd('test -z "$NOTIFY_SOCKET"'
+    .. " || uwsm finalize HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP"
+    .. " XDG_SESSION_TYPE NIXOS_OZONE_WL XCURSOR_THEME XCURSOR_SIZE"
+    .. " ; dbus-update-activation-environment --systemd DISPLAY"
     .. " HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
     .. " XDG_SESSION_TYPE NIXOS_OZONE_WL XCURSOR_THEME XCURSOR_SIZE"
     .. " && systemctl --user stop hyprland-session.target"
