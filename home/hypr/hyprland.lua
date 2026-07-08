@@ -88,11 +88,13 @@ hl.monitor({
 -- 60Hz) and scale 1.5 (logical 1920x1200). VRR stays off (the
 -- default) on purpose: VRR on OLED panels commonly causes
 -- brightness flicker.
--- ⚠ The double space before "Unknown" is real: the EDID model
--- string is "ATNA40HQ02-0 " with a trailing space. Don't "fix" it,
--- or the entry stops matching.
+-- The desc is the exact `description` string hyprctl reports (make +
+-- model, serial is empty so it contributes nothing) — verified with
+-- `hyprctl monitors all -j`. NOT sway's "make model serial" form:
+-- hyprland reports no serial/"Unknown" here, so that suffix made the
+-- entry silently never match (panel fell back to 60Hz/scale 2.0).
 hl.monitor({
-  output   = "desc:Samsung Display Corp. ATNA40HQ02-0  Unknown",
+  output   = "desc:Samsung Display Corp. ATNA40HQ02-0",
   mode     = "2880x1800@120",
   position = "auto",
   scale    = 1.5,
