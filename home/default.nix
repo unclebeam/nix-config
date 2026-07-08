@@ -23,6 +23,7 @@
     ./vlc.nix          # VLC media player + default video/audio handler
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
     ./google-drive.nix # ~/GoogleDrive rclone mount (one-time: `rclone config`)
+    ./claude.nix       # Claude Code CLI + settings + statusline script
   ];
 
   home.username = "unclebeam";

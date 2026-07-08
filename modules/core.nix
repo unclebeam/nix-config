@@ -90,11 +90,8 @@
     pkgs-unstable.lazygit # fast-moving; tracks unstable (see flake.nix)
     git
     neovim # package only — config/plugins/LSPs are managed by hand, not Nix
-    # Unfree (covered by allowUnfree — here AND on the unstable set in flake.nix).
-    # Ships releases almost daily, so it tracks unstable; new versions arrive by
-    # `nix flake update` moving the unstable pin + rebuild. Its built-in
-    # auto-updater still can't write into the read-only Nix store.
-    pkgs-unstable.claude-code
+    # claude-code moved to home/claude.nix — it grew per-user config
+    # (settings + statusline), and apps with per-user config live in home/.
     brave # Chromium-based; runs native Wayland via NIXOS_OZONE_WL (modules/sway.nix)
     wget
     curl
