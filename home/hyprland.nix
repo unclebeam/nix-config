@@ -61,6 +61,24 @@ in
   # inside the lua config.
   xdg.configFile."hypr/stubs".source = "${pkgs.hyprland}/share/hypr/stubs";
 
+  # ── xdph.conf — xdg-desktop-portal-hyprland (the screen-share portal) ───
+  # Auto-grant "restore tokens": Chromium browsers request one on every
+  # screen share (the "Allow a restore token" checkbox in the picker), and
+  # granting it by default means the portal dialog appears only the FIRST
+  # time a site shares — afterwards the token silently re-approves the same
+  # source and only the browser's own picker shows. Without this, Meet
+  # double-asks on every single share: Brave's tab/window/screen dialog PLUS
+  # hyprland-share-picker on top of it. Tradeoff: a site you've shared with
+  # once can re-capture that same source without the portal asking again
+  # (picking a different source re-opens the dialog once). The portal reads
+  # this at startup — after a rebuild, restart it or re-login:
+  #   systemctl --user restart xdg-desktop-portal-hyprland
+  xdg.configFile."hypr/xdph.conf".text = ''
+    screencopy {
+      allow_token_by_default = true
+    }
+  '';
+
   # ── hyprlock — themed lock screen (this session's swaylock) ─────────────
   # PAM side is system-level (modules/hyprland.nix). Color mapping mirrors
   # programs.swaylock in home/sway.nix. hyprlock/hypridle configs stay
