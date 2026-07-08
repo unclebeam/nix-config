@@ -18,7 +18,8 @@
     ./helix.nix     # editor + language servers
     ./zellij.nix    # terminal multiplexer
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
-    ./dolphin.nix      # file manager + Qt theming + xdg default for dirs
+    ./qt.nix           # Qt look: breeze style + melange kdeglobals (dolphin, ark, hyprland-share-picker)
+    ./dolphin.nix      # file manager + xdg default for dirs
     ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
     ./vlc.nix          # VLC media player + default video/audio handler
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)

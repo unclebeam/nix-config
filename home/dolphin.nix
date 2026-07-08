@@ -1,12 +1,13 @@
 # home/dolphin.nix — Dolphin as THE file manager (also the xdg default for
 # opening directories). One file per intent: everything that exists because
 # of Dolphin lives here — the KDE package set it needs to function outside
-# Plasma, Qt theming so it doesn't render as bare grey Fusion under Sway,
-# and the wallet that remembers SMB share passwords.
+# Plasma, and the wallet that remembers SMB share passwords.
 #
 # The system half (avahi for SMB discovery, PAM kwallet unlock) lives in
-# modules/dolphin.nix — same split as sway.nix. Removing Dolphin = delete
-# both files + their import lines.
+# modules/dolphin.nix — same split as sway.nix. The Qt widget style + colors
+# used to live here too, but moved to home/qt.nix once the Hyprland share
+# picker became a second consumer. Removing Dolphin = delete both dolphin
+# files + their import lines (qt.nix stays — other Qt apps use it).
 { config, lib, pkgs, ... }:
 
 {
@@ -53,18 +54,6 @@
     automount = true;
     notify = true;
     tray = "never";
-  };
-
-  # Breeze widget style so Dolphin gets real theming instead of the Fusion
-  # fallback. home-manager auto-installs the matching style package and
-  # exports QT_STYLE_OVERRIDE + Qt plugin paths (session-global: any future
-  # Qt app renders breeze too — one look everywhere, on purpose).
-  # Deliberately NOT setting platformTheme = "kde": it drags in
-  # plasma-integration and systemsettings for marginal gain. Stock breeze
-  # colors, no custom scheme — the minimal look is a feature.
-  qt = {
-    enable = true;
-    style.name = "breeze";
   };
 
   # Make Dolphin the session-wide default for opening directories — file
