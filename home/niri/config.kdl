@@ -1,0 +1,349 @@
+// home/niri/config.kdl — THE niri config, a plain KDL file symlinked to
+// ~/.config/niri/config.kdl by home/niri.nix (same "editor configs stay
+// plain files" rule as helix and hyprland.lua). niri live-reloads on save;
+// after a rebuild the store symlink flips and niri picks that up too.
+// Sanity-check edits with `niri validate` before logging out.
+//
+// Runs SIDE-BY-SIDE with hyprland while niri is on trial — nothing here
+// touches the hyprland session.
+
+// Every color-bearing section lives in the Nix-GENERATED include below
+// (KDL has no variables; home/colors.nix stays the single source of truth
+// — NEVER hardcode a hex color here). Include merging is property-level:
+// nix.kdl only carries the color properties, the structural halves of the
+// same sections stay in this file. Two rules to remember:
+//  * the ~ form (not a bare relative path) — a relative include resolves
+//    against this file's directory, and this file is a symlink into the
+//    store where nix.kdl does not exist;
+//  * flags like `border {}`-on/off only count in the MAIN file, an
+//    include can never flip them.
+include "~/.config/niri/nix.kdl"
+
+input {
+    keyboard {
+        xkb {
+            // US + Thai, Alt+Shift cycles layouts — applies to every
+            // keyboard, including kanata's virtual one. Binds resolve
+            // against the FIRST layout, so Mod+1 still switches
+            // workspaces under the Thai layout (niri's default).
+            layout "us,th"
+            options "grp:alt_shift_toggle"
+        }
+    }
+
+    // Touchpad (laptop): tap-to-click, natural scrolling, palm rejection
+    // while typing (dwt = disable-while-typing).
+    touchpad {
+        tap
+        natural-scroll
+        dwt
+    }
+
+    // Mice scroll naturally, to match the touchpad.
+    mouse {
+        natural-scroll
+    }
+
+    // Focus follows the mouse like hyprland's default did, but never
+    // scrolls the strip just because the pointer crossed a screen edge.
+    focus-follows-mouse max-scroll-amount="0%"
+}
+
+// ── Outputs ─────────────────────────────────────────────────────────────
+// Matched by "Make Model Serial" (or the connector name). Entries that
+// don't match a plugged-in monitor are ignored — that's what lets both
+// hosts share this file. Unlike hyprland there is NO wildcard entry: an
+// unmatched panel simply comes up at its preferred mode automatically,
+// which is the same net behavior.
+// ⚠ The name strings below are derived from hyprland's EDID descs — after
+// the first niri login run `niri msg outputs` and correct them verbatim
+// if any monitor ignores its entry (hand-derived strings silently never
+// match; that exact bug hit the OLED once under hyprland).
+// Refresh is deliberately omitted everywhere: niri then picks the HIGHEST
+// rate the panel offers at that resolution (120/144/144/120 — exactly the
+// rates we pinned under hyprland) and we dodge niri's rule that an
+// explicit rate must match the modeline to three decimals.
+
+output "Dell Inc. DELL U3225QE 27D4834" {
+    mode "3840x2160"
+    scale 1.5
+}
+
+// GIGA-BYTE M28U — 28" 4K gaming panel (external, on the ThinkPad).
+// scale 1.25 = logical 3072x1728.
+output "GIGA-BYTE TECHNOLOGY CO., LTD. M28U 22060B005352" {
+    mode "3840x2160"
+    scale 1.25
+}
+
+// Dell S2721DGF — 27" 1440p gaming panel (external, over HDMI; the panel
+// does 165Hz but only over DisplayPort). 27" at 1440p is comfortable at
+// 1x, so no fractional scaling.
+output "Dell Inc. DELL S2721DGF 361Y3H3" {
+    mode "2560x1440"
+    scale 1
+}
+
+// The thinkpad's built-in OLED panel. hyprland reports no serial for it,
+// and a built-in panel's connector never changes — match "eDP-1" and
+// sidestep the make/model/serial guessing game entirely. VRR stays off
+// (niri's default) on purpose: VRR on OLED panels commonly causes
+// brightness flicker.
+output "eDP-1" {
+    mode "2880x1800"
+    scale 1.5
+}
+
+// ── Layout ──────────────────────────────────────────────────────────────
+// Lightly polished, deliberately so — the restrained look is a feature
+// (see CLAUDE.md). niri has ONE gap value (hyprland had in 5 / out 10);
+// 8 splits the difference.
+layout {
+    gaps 8
+
+    // niri draws a focus-ring by DEFAULT — turn it off, the border below
+    // is the focus indicator (same 2px scheme as hyprland had). Border
+    // colors merge in from nix.kdl; the on/off state and width must live
+    // here in the main file.
+    focus-ring {
+        off
+    }
+    border {
+        width 2
+    }
+
+    // The tab indicator is niri's groupbar (see Mod+G below) — a slim
+    // strip inside the column edge. Colors from nix.kdl.
+    tab-indicator {
+        hide-when-single-tab
+        place-within-column
+    }
+
+    // New windows open at half the column strip by default; Mod+R cycles
+    // these presets. ⚠ preset widths do NOT merge across includes — the
+    // whole list must stay in this one file.
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    default-column-width { proportion 0.5; }
+
+    // background-color (solid melange, no wallpaper manager) is in nix.kdl.
+}
+
+// Ask apps to skip client-side decorations — no alien title bars, niri's
+// border is the only chrome (matches the hyprland look).
+prefer-no-csd
+
+// niri's built-in screenshot UI (Mod+Print below) saves here — the same
+// directory satty writes its annotated shots into (home/satty.nix).
+screenshot-path "~/Pictures/Screenshots/%Y-%m-%d %H-%M-%S.png"
+
+// The "these are your keybinds" splash on first login — nice once,
+// noise every session.
+hotkey-overlay {
+    skip-at-startup
+}
+
+// ── Animations ──────────────────────────────────────────────────────────
+// DELIBERATELY absent: niri's stock spring animations are its showcase
+// and the reason the compositor feels the way it does — unlike hyprland,
+// where the defaults dragged and we ran everything at ~2x speed. Live
+// with the defaults first; tune (or `animations { off }`) only if they
+// actually feel slow in practice.
+
+// Session anchor for niri-only user services (swayidle — declared in
+// home/niri.nix, mirroring hyprland-session.target). niri runs this after
+// WAYLAND_DISPLAY is already in the user manager, so units hanging off
+// the target always see the session env. Nothing else ever starts this
+// target, which is what keeps swayidle out of hyprland sessions (and
+// hypridle out of niri ones).
+spawn-at-startup "systemctl" "--user" "start" "niri-session.target"
+
+// ── Window rules ────────────────────────────────────────────────────────
+
+// Obsidian & TickTick scratchpads (Mod+N / Mod+O below): float at the
+// same 1200x800 hyprland gave them, centered (niri's default float
+// position). niri has no special workspaces, so the scratchpad itself is
+// the niri-scratch focus-toggle script — these rules only shape the
+// window. app-ids: "obsidian" is upstream's; "ticktick" is pinned via
+// --class in home/ticktick.nix.
+window-rule {
+    match app-id=r#"^obsidian$"#
+    open-floating true
+    default-column-width { fixed 1200; }
+    default-window-height { fixed 800; }
+}
+window-rule {
+    match app-id=r#"^ticktick$"#
+    open-floating true
+    default-column-width { fixed 1200; }
+    default-window-height { fixed 800; }
+}
+
+// "A bit" of blur behind the one translucent surface we have (alacritty
+// at 0.92 opacity, set in home/alacritty.nix) — window blur is new in
+// niri 26.04. xray stays default-on: it blurs the melange backdrop
+// through the window rather than the windows underneath, which is both
+// calmer and cheaper (non-xray blur is the experimental path).
+window-rule {
+    match app-id=r#"^Alacritty$"#
+    background-effect {
+        blur true
+    }
+}
+
+// Slight rounding on every window — the same 8px hyprland had.
+// clip-to-geometry makes the window content actually follow the curve
+// instead of poking square corners through it.
+window-rule {
+    geometry-corner-radius 8
+    clip-to-geometry true
+}
+
+// ── Keybinds ────────────────────────────────────────────────────────────
+// Defining a binds section replaces niri's defaults wholesale — everything
+// (terminal, focus, workspaces, media keys…) is declared explicitly here,
+// same policy as the hyprland config. Mod = Super.
+// Mod+Shift+Slash shows the whole list at runtime.
+binds {
+    Mod+Shift+Slash { show-hotkey-overlay; }
+
+    Mod+Return { spawn "alacritty"; }
+    Mod+D { spawn "fuzzel"; }
+    Mod+Shift+Q { close-window; }
+
+    // Scrollable-tiling "fullscreen" comes in two sizes: Mod+F grows the
+    // column to the full strip width (the everyday one), Mod+Shift+F is
+    // real fullscreen over the bar and gaps.
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+Shift+Space { toggle-window-floating; }
+
+    // Hyprland group ≙ niri tabbed column: the column's windows collapse
+    // into tabs (the tab-indicator strip appears), Mod+T / Mod+Shift+T
+    // cycle through them, and the consume/expel binds below move windows
+    // in and out. Same keys as the hyprland groups had.
+    Mod+G { toggle-column-tabbed-display; }
+    Mod+T { focus-window-down-or-top; }
+    Mod+Shift+T { focus-window-up-or-bottom; }
+
+    // Exit immediately — no confirmation nag (matches hyprland's bind;
+    // without the flag niri 25.08+ pops a modal dialog).
+    Mod+Shift+E { quit skip-confirmation=true; }
+
+    // Focus / move: arrows and hjkl. THE paradigm shift vs dwindle:
+    // left/right walk COLUMNS on the infinite strip, up/down walk the
+    // windows stacked inside one column.
+    Mod+Left  { focus-column-left; }
+    Mod+H     { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+L     { focus-column-right; }
+    Mod+Up    { focus-window-up; }
+    Mod+K     { focus-window-up; }
+    Mod+Down  { focus-window-down; }
+    Mod+J     { focus-window-down; }
+
+    Mod+Shift+Left  { move-column-left; }
+    Mod+Shift+H     { move-column-left; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+L     { move-column-right; }
+    Mod+Shift+Up    { move-window-up; }
+    Mod+Shift+K     { move-window-up; }
+    Mod+Shift+Down  { move-window-down; }
+    Mod+Shift+J     { move-window-down; }
+
+    // Hyprland's Mod+Alt+dir (move window in/out of a group) → niri's
+    // consume/expel: pull the neighbor window into this column, or push
+    // the focused one out. Columns are horizontal, so only left/right
+    // exist; vertical in-column order is plain Mod+Shift+K/J above.
+    Mod+Alt+Left  { consume-or-expel-window-left; }
+    Mod+Alt+H     { consume-or-expel-window-left; }
+    Mod+Alt+Right { consume-or-expel-window-right; }
+    Mod+Alt+L     { consume-or-expel-window-right; }
+
+    // Column sizing — new muscle memory, core to the scrollable layout:
+    // Mod+R cycles the preset widths (layout section above), Mod+Shift+R
+    // the window heights within a column, Mod+C centers a column that's
+    // wandered off to one edge of the strip.
+    Mod+R { switch-preset-column-width; }
+    Mod+Shift+R { switch-preset-window-height; }
+    Mod+C { center-column; }
+
+    // Workspaces 1–10 (0 = workspace 10), same keys as hyprland. niri
+    // workspaces are dynamic, VERTICAL, and per-monitor: these indexes
+    // address each monitor's stack top-down, and empty ones vanish.
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+0 { focus-workspace 10; }
+    Mod+Shift+1 { move-column-to-workspace 1; }
+    Mod+Shift+2 { move-column-to-workspace 2; }
+    Mod+Shift+3 { move-column-to-workspace 3; }
+    Mod+Shift+4 { move-column-to-workspace 4; }
+    Mod+Shift+5 { move-column-to-workspace 5; }
+    Mod+Shift+6 { move-column-to-workspace 6; }
+    Mod+Shift+7 { move-column-to-workspace 7; }
+    Mod+Shift+8 { move-column-to-workspace 8; }
+    Mod+Shift+9 { move-column-to-workspace 9; }
+    Mod+Shift+0 { move-column-to-workspace 10; }
+
+    // Walk the workspace stack without reaching for a number; the wheel
+    // variants get a cooldown so one flick is one workspace, not five.
+    Mod+Page_Down { focus-workspace-down; }
+    Mod+Page_Up   { focus-workspace-up; }
+    Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
+
+    // niri natives with no hyprland equivalent: the zoomed-out Overview
+    // of every workspace/window, and last-window switching.
+    Mod+Tab { toggle-overview; }
+    Alt+Tab { focus-window-previous; }
+
+    // NOTE: no Mod+mouse binds for drag/resize — niri's Mod+LeftDrag
+    // (move) and Mod+RightDrag (resize) gestures are built in, and
+    // binding the buttons would OVERRIDE them.
+
+    // Media keys → PipeWire. allow-when-locked mirrors hyprland's
+    // `locked` (they work on the lock screen); held keys repeat by
+    // default, the toggles opt out so one press = one toggle.
+    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"; }
+    XF86AudioMute        allow-when-locked=true repeat=false { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
+    XF86AudioMicMute     allow-when-locked=true repeat=false { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
+
+    // Backlight keys (laptop; harmless on the PC).
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "brightnessctl" "set" "5%+"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "5%-"; }
+
+    // Screenshots open the satty annotator (home/satty.nix), exactly the
+    // hyprland flow — grim 1.5 speaks niri's ext-image-copy-capture, so
+    // the pipeline carries over verbatim. Bare Print = whole screen;
+    // Ctrl+Print grabs slurp's geometry FIRST so an Escape in slurp
+    // aborts the chain instead of handing satty an empty capture.
+    // Mod+Print adds niri's own built-in screenshot UI on top.
+    Print { spawn-sh r#"mkdir -p "$HOME/Pictures/Screenshots" && grim - | satty --filename -"#; }
+    Ctrl+Print { spawn-sh r#"sel="$(slurp)" && mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$sel" - | satty --filename -"#; }
+    Mod+Print { screenshot; }
+
+    // Lock now. Via loginctl (not swaylock directly) so it takes the same
+    // path as idle/suspend locking and swayidle's lock handler can
+    // guarantee a single swaylock instance (home/niri.nix).
+    Mod+Escape { spawn "loginctl" "lock-session"; }
+
+    // Obsidian & TickTick LAZY scratchpads — niri has no special
+    // workspaces, so niri-scratch (home/niri.nix) emulates the toggle by
+    // focus: window exists → jump to it (or bounce back to the previous
+    // window if it's already focused); no window → launch it (floating,
+    // via the rules above). Nothing runs at login; first press pays the
+    // launch instead of every session paying idle Electron RAM.
+    Mod+N { spawn "niri-scratch" "obsidian" "obsidian"; }
+    Mod+O { spawn "niri-scratch" "ticktick" "ticktick"; }
+}

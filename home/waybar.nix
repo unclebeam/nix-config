@@ -1,7 +1,8 @@
 # home/waybar.nix — status bar. Runs as a systemd user service bound to
-# graphical-session.target, which the session reaches via
-# hyprland-session.target (home/hyprland.nix binds it there). All colors are
-# interpolated from colors.nix into the CSS below.
+# graphical-session.target, which BOTH sessions reach: hyprland via
+# hyprland-session.target (home/hyprland.nix binds it there), niri via
+# niri.service itself. All colors are interpolated from colors.nix into
+# the CSS below.
 { config, lib, pkgs, ... }:
 
 let
@@ -145,7 +146,10 @@ in
       position = "top";
       height = 28;
 
-      modules-left = [ "hyprland/workspaces" "group/media" ];
+      # Both compositors' workspace modules are listed while the niri trial
+      # runs: waybar disables (with one log line) any module whose
+      # compositor IPC socket is absent, so each session shows only its own.
+      modules-left = [ "hyprland/workspaces" "niri/workspaces" "group/media" ];
       modules-center = [ "clock" ];
       modules-right = [ "pulseaudio" "network" "custom/wifi-name" "cpu" "memory" "battery" "tray" ];
 
@@ -254,7 +258,11 @@ in
         color: ${colors.a.ui};
         background: transparent;
       }
-      #workspaces button.active {
+      /* hyprland marks the current workspace .active; niri calls that one
+         .focused (its .active = "visible on some monitor"). Style both so
+         the bar looks identical under either session. */
+      #workspaces button.active,
+      #workspaces button.focused {
         color: ${colors.a.fg};
         background: ${colors.a.sel};
         border-bottom: 2px solid ${colors.b.yellow};

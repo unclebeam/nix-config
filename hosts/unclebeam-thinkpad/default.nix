@@ -8,7 +8,8 @@
     ./disko.nix                  # declarative disk layout (partitions, btrfs, mounts)
     ../../modules/core.nix
     ../../modules/desktop.nix    # greeter (session picker), fonts, Wayland env
-    ../../modules/hyprland.nix   # hyprland session (the only one offered at the greeter)
+    ../../modules/hyprland.nix   # hyprland session
+    ../../modules/niri.nix       # niri session — side-by-side trial next to hyprland
     ../../modules/audio.nix
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
     ../../modules/laptop.nix     # power mgmt, backlight, lid behavior, fwupd

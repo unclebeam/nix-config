@@ -6,6 +6,7 @@
 {
   imports = [
     ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + hyprlock + hypridle
+    ./niri.nix      # niri glue: symlinks niri/config.kdl + swaylock + swayidle (trial)
     ./waybar.nix    # status bar
     ./fuzzel.nix    # launcher
     ./mako.nix      # notifications
