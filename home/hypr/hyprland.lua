@@ -95,6 +95,19 @@ hl.monitor({
   scale    = 1.0,
 })
 
+-- Xiaomi 34" ultrawide (external, on the PC, over DP). Its EDID marks
+-- 60Hz as "preferred", so it needs an explicit 180Hz pin. ~110ppi at
+-- 3440x1440, so 1x scale.
+-- ⚠ desc derived from `niri msg outputs` (same EDID make/model/serial),
+-- not yet verified against `hyprctl monitors all -j` — check it on the
+-- next hyprland login (see the OLED note below for why that matters).
+hl.monitor({
+  output   = "desc:Xiaomi Corporation Mi monitor 7085110017071",
+  mode     = "3440x1440@180",
+  position = "auto",
+  scale    = 1.0,
+})
+
 -- The thinkpad's built-in OLED panel: pin 120Hz (default pick is
 -- 60Hz) and scale 1.5 (logical 1920x1200). VRR stays off (the
 -- default) on purpose: VRR on OLED panels commonly causes
