@@ -46,6 +46,14 @@
         home-manager.follows = "home-manager";
       };
     };
+
+    # SilentSDDM — the SDDM login theme (Qt6/QML). Unlike zen-browser this
+    # one ships a NixOS module (programs.silentSDDM), so it IS wired into
+    # mkHost below; modules/desktop.nix flips it on and skins it melange.
+    silentSDDM = {
+      url = "github:uiriansan/SilentSDDM";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -55,6 +63,7 @@
       nixpkgs-unstable,
       home-manager,
       disko,
+      silentSDDM,
       ...
     }@inputs:
     let
@@ -87,6 +96,11 @@
             # option — it does nothing until a host actually declares disks.
             # Both hosts do, in hosts/<name>/disko.nix.
             disko.nixosModules.disko
+
+            # SilentSDDM's NixOS module. Same deal as disko: loading it only
+            # adds the `programs.silentSDDM` options; modules/desktop.nix is
+            # what actually enables and configures the greeter.
+            silentSDDM.nixosModules.default
 
             # Wire home-manager in as a NixOS module: `nixos-rebuild switch`
             # builds system AND user config in one transaction.

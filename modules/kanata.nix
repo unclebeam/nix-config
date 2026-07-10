@@ -1,6 +1,6 @@
 # kanata.nix — key remapping at the evdev level, below the compositor.
 # Because kanata rewrites events before anything else sees them, the
-# remap works everywhere: hyprland, TTYs, even the greetd login screen —
+# remap works everywhere: hyprland, TTYs, even the SDDM login screen —
 # unlike an xkb option, which only applies inside the graphical session.
 { config, lib, pkgs, ... }:
 

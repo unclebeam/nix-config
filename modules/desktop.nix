@@ -9,63 +9,163 @@ let
   colors = import ../home/colors.nix;
 in
 {
-  # ── greetd + ReGreet ───────────────────────────────────────────────────
-  # greetd is a tiny display manager; ReGreet is its graphical (GTK4) UI.
-  # After login it execs the chosen compositor directly — no
-  # desktop-manager layer at all.
+  # ── SDDM + SilentSDDM ──────────────────────────────────────────────────
+  # SDDM is the display manager; SilentSDDM (a flake input, module wired in
+  # by mkHost) is its QML theme. Enabling programs.silentSDDM does ALL the
+  # SDDM plumbing itself: services.displayManager.sddm.enable, the Qt6
+  # build (kdePackages.sddm — the theme needs sddm ≥ 0.21 / Qt ≥ 6.5), the
+  # theme's Qt deps (svg/virtualkeyboard/multimedia/imageformats), and
+  # wayland.enable — so there is deliberately no sddm.enable line here.
+  # It also installs `test-sddm-silent`, which previews the greeter in a
+  # window from a running session — use that instead of logging out.
   #
-  # There is deliberately NO services.greetd block here: enabling regreet
-  # sets services.greetd.enable and the default_session command (regreet
-  # inside cage, a single-app kiosk compositor, on VT1) itself — both via
-  # mkDefault, so an explicit command here would silently REPLACE regreet
-  # with whatever we wrote. The greeter user is defaulted by greetd too.
-  #
-  # Sessions: regreet scans $XDG_DATA_DIRS/wayland-sessions, which NixOS
-  # points at the .desktop files that programs.hyprland installs — the
-  # session appears with zero wiring here.
-  #   NB: the dropdown shows TWO hyprland entries — the nixpkgs hyprland
-  #   package unconditionally ships "Hyprland (uwsm-managed)" next to plain
-  #   "Hyprland" (it can't be filtered out without breaking the
-  #   sessionPackages assertion). Both work: modules/hyprland.nix sets
+  # Sessions: SDDM scans the same wayland-sessions dir regreet (the old
+  # greeter) did, so the .desktop files that programs.hyprland installs
+  # appear with zero wiring here.
+  #   NB: the session menu shows TWO hyprland entries — the nixpkgs
+  #   hyprland package unconditionally ships "Hyprland (uwsm-managed)"
+  #   next to plain "Hyprland" (it can't be filtered out without breaking
+  #   the sessionPackages assertion). Both work: modules/hyprland.nix sets
   #   withUWSM so uwsm's user units exist, and the hyprland.lua session
-  #   hook is dual-mode.
-  # There is no "default session" knob: pick a session once on first boot,
-  # and regreet remembers the last user AND last session per user across
-  # reboots (/var/lib/regreet/state.toml).
-  #
-  # Side effect to know about: this enables services.accounts-daemon —
-  # that's how regreet lists users instead of asking for a typed username.
-  programs.regreet = {
+  #   hook is dual-mode. SDDM remembers the last user + session across
+  #   reboots (/var/lib/sddm/state.conf).
+  programs.silentSDDM = {
     enable = true;
+    theme = "rei"; # the upstream default preset; melange-skinned below
 
-    # The greeter's UI font. The package is already in fonts.packages
-    # below, but the module wants the pair (name + package) so the font is
-    # guaranteed present even if the list changes; without an override the
-    # greeter would pull in Cantarell just for itself.
-    font = {
-      package = pkgs.nerd-fonts.jetbrains-mono;
-      name = "JetBrainsMono Nerd Font";
-      size = 14;
-    };
+    # Melange over the rei preset, same spirit as the CSS overlay the old
+    # ReGreet greeter had. These are appended to the preset's INI config
+    # (last key wins), so only the keys we change are listed: rei's video
+    # background becomes a flat palette color, its lavender accent becomes
+    # melange yellow, and its bundled RedHatDisplay font becomes ours.
+    # QColor wants '#'-prefixed hex — exactly what colors.nix holds — and
+    # string values are quoted to match how the preset's own config is
+    # written. Everything else (sizes, layout, animations) stays stock.
+    settings =
+      let
+        q = s: ''"${s}"''; # quote a string value for the INI file
+        font = q "JetBrainsMono Nerd Font"; # already in fonts.packages below
+        accent = q colors.b.yellow; # interactive highlight (buttons, borders)
+        text = q colors.a.fg;
+        onAccent = q colors.a.bg; # dark text/icons on a filled accent
+        surface = q colors.a.float; # inputs, popups, tooltips
+        border = q colors.a.ui;
+      in
+      {
+        # The pre-login screen ("press any key"): flat melange, big clock.
+        LockScreen = {
+          use-background-color = true;
+          background-color = q colors.a.bg;
+        };
+        "LockScreen.Clock" = {
+          font-family = font;
+          color = text;
+        };
+        "LockScreen.Date" = {
+          font-family = font;
+          color = q colors.a.com; # secondary text, like comments
+        };
 
-    # cursorTheme is left at its default (Adwaita, 24px) — the same theme
-    # home/cursor.nix sets for the session, so the pointer doesn't change
-    # style at the login → desktop boundary.
+        # The user/password screen: same flat background.
+        LoginScreen = {
+          use-background-color = true;
+          background-color = q colors.a.bg;
+        };
+        "LoginScreen.LoginArea.Avatar" = {
+          active-border-color = accent;
+          inactive-border-color = border;
+        };
+        "LoginScreen.LoginArea.Username" = {
+          font-family = font;
+          color = text;
+        };
+        "LoginScreen.LoginArea.PasswordInput" = {
+          font-family = font;
+          content-color = text;
+          background-color = surface;
+          background-opacity = 1.0; # rei has this transparent
+          border-color = border;
+        };
+        "LoginScreen.LoginArea.LoginButton" = {
+          font-family = font;
+          content-color = text; # idle: outline + cream arrow…
+          border-color = border;
+          background-color = accent;
+          active-background-color = accent; # …focused: filled yellow,
+          active-content-color = onAccent; #  dark arrow on it
+        };
+        "LoginScreen.LoginArea.Spinner" = {
+          font-family = font;
+          color = text;
+        };
+        "LoginScreen.LoginArea.WarningMessage" = {
+          font-family = font;
+          normal-color = text;
+          warning-color = accent;
+          error-color = q colors.b.red;
+        };
 
-    # Adwaita's dark variant as the base widget theme; the melange palette
-    # is layered on top via CSS below.
-    settings.GTK.application_prefer_dark_theme = true;
+        # The bottom-left menu row (session / layout / keyboard / power):
+        # each button is its own section, all skinned identically — cream
+        # icon at rest, filled yellow with a dark icon when open.
+        "LoginScreen.MenuArea.Buttons".font-family = font;
+        "LoginScreen.MenuArea.Session" = {
+          background-color = accent;
+          content-color = text;
+          active-content-color = onAccent;
+        };
+        "LoginScreen.MenuArea.Layout" = {
+          background-color = accent;
+          content-color = text;
+          active-content-color = onAccent;
+        };
+        "LoginScreen.MenuArea.Keyboard" = {
+          background-color = accent;
+          content-color = text;
+          active-content-color = onAccent;
+        };
+        "LoginScreen.MenuArea.Power" = {
+          background-color = accent;
+          content-color = text;
+          active-content-color = onAccent;
+        };
+        "LoginScreen.MenuArea.Popups" = {
+          font-family = font;
+          background-color = surface;
+          content-color = text;
+          active-option-background-color = accent;
+          active-content-color = onAccent;
+          border-color = border;
+        };
 
-    # Melange over Adwaita-dark, kept minimal on purpose: a flat palette
-    # background, stock widgets. colors.nix values keep their leading '#',
-    # which is exactly what CSS wants. (GTK4 CSS, not a full theme — see
-    # https://docs.gtk.org/gtk4/css-properties.html for what's tweakable.)
-    extraCss = ''
-      window {
-        background-color: ${colors.a.bg};
-      }
-    '';
+        # The tap-to-type keyboard the menu row can summon (SDDM runs it
+        # via qtvirtualkeyboard; the module wires that up).
+        "LoginScreen.VirtualKeyboard" = {
+          background-color = surface;
+          key-color = surface;
+          key-content-color = text;
+          selection-background-color = q colors.a.sel;
+          selection-content-color = text;
+          primary-color = accent;
+          border-color = border;
+        };
+
+        Tooltips = {
+          font-family = font;
+          content-color = text;
+          background-color = surface;
+        };
+      };
   };
+
+  # The SDDM greeter itself needs a Wayland compositor to draw in; SDDM's
+  # Wayland mode runs it inside a kiosk session on VT1 (no X11 anywhere).
+  # NOT the "weston" default: Weston 15.0.1 aborts on startup on the
+  # RX 9070 XT (assertion in weston_drm_format_add_modifier — Mesa 26.1.4
+  # advertises a duplicate DRM modifier), which killed the greeter and left
+  # a black screen. KWin drives the same hardware fine, at the cost of
+  # pulling kdePackages.kwin into the closure.
+  services.displayManager.sddm.wayland.compositor = "kwin";
 
   # Chromium-based apps (Brave) run native Wayland instead of XWayland when
   # this is set. Electron apps honor it too. Session-agnostic.

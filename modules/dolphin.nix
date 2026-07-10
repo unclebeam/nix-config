@@ -16,9 +16,9 @@
 
   # Auto-unlock KWallet at login with the login password, so Dolphin's saved
   # SMB credentials don't trigger a second password prompt every session.
-  # greetd is our display manager (modules/desktop.nix), so the PAM hook goes on
+  # SDDM is our display manager (modules/desktop.nix), so the PAM hook goes on
   # its service. pam_kwallet6 creates the wallet on first login if none exists.
-  security.pam.services.greetd.kwallet.enable = true;
+  security.pam.services.sddm.kwallet.enable = true;
 
   # ── Removable media (USB sticks, SD cards, cameras-as-USB-drives) ────────
   # udisks2 is the D-Bus mount daemon Dolphin's Solid backend talks to. Without
