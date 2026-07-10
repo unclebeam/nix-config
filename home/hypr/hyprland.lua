@@ -84,6 +84,17 @@ hl.monitor({
   scale    = 1.25,
 })
 
+-- Dell S2721DGF — 27" 1440p gaming panel (external, over HDMI).
+-- Best EDID mode over HDMI is 1440p @ 144Hz (the panel does 165Hz,
+-- but only over DisplayPort — bump the mode if it ever moves to DP).
+-- 27" at 1440p is comfortable at 1x, so no fractional scaling.
+hl.monitor({
+  output   = "desc:Dell Inc. DELL S2721DGF 361Y3H3",
+  mode     = "2560x1440@144",
+  position = "auto",
+  scale    = 1.0,
+})
+
 -- The thinkpad's built-in OLED panel: pin 120Hz (default pick is
 -- 60Hz) and scale 1.5 (logical 1920x1200). VRR stays off (the
 -- default) on purpose: VRR on OLED panels commonly causes
