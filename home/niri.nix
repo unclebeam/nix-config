@@ -50,22 +50,27 @@ in
         // Solid melange background, no wallpaper manager.
         background-color "${colors.a.bg}"
         // niri's stock focus indicator is the RING (config.kdl keeps it
-        // on, stock width); focused = warm comment-beige, everything
-        // else fades into the bg.
+        // on, stock width). Focused = a warm gold→orange gradient (the
+        // look niri's own gradient docs showcase, in melange's yellows);
+        // relative-to="workspace-view" makes it one sweep across the
+        // whole workspace instead of restarting per window. A gradient
+        // takes precedence over active-color, so no solid is set.
         focus-ring {
-            active-color "${colors.a.com}"
+            active-gradient from="${colors.b.yellow}" to="${colors.c.yellow}" angle=45 relative-to="workspace-view"
             inactive-color "${colors.a.float}"
             urgent-color "${colors.b.red}"
         }
-        // Tabbed columns (Mod+W), stock structure — colors only.
+        // Tabbed columns (Mod+W), stock structure — same gradient as the
+        // ring so tabs read as the same focus signal.
         tab-indicator {
-            active-color "${colors.a.com}"
+            active-gradient from="${colors.b.yellow}" to="${colors.c.yellow}" angle=45 relative-to="workspace-view"
             inactive-color "${colors.a.float}"
             urgent-color "${colors.b.red}"
         }
-        // Drop-target highlight while dragging a window; 80 = ~50% alpha.
+        // Drop-target highlight while dragging a window: the ring's
+        // gradient at ~50% alpha (the trailing 80).
         insert-hint {
-            color "${colors.a.com}80"
+            gradient from="${colors.b.yellow}80" to="${colors.c.yellow}80" angle=45 relative-to="workspace-view"
         }
     }
     overview {
