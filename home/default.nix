@@ -19,6 +19,7 @@
     ./nautilus.nix     # file manager + xdg default for dirs
     ./file-roller.nix  # archive manager (.zip/.7z/.rar) + CLI backends
     ./vlc.nix          # VLC media player + default video/audio handler
+    ./obs.nix          # OBS Studio (screencast via GNOME portal, audio via PipeWire)
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
     ./ticktick.nix     # TickTick task manager (unfree; allowUnfree in core.nix)
     ./google-drive.nix # ~/GoogleDrive rclone mount (one-time: `rclone config`)
