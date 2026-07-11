@@ -1,12 +1,12 @@
 # home/niri.nix — the USER half of niri: glue for the plain KDL config,
 # plus swaylock and swayidle. (Session/portal plumbing is system-side in
-# modules/niri.nix.) Runs SIDE-BY-SIDE with home/hyprland.nix while niri
-# is on trial.
+# modules/niri.nix.) Niri started as a side-by-side trial next to hyprland
+# and won; it's the only session now.
 #
 # The window-manager config itself is NOT here: it's the plain, tracked
 # KDL file home/niri/config.kdl — symlinked, not Nix-generated, same rule
-# as helix and hyprland.lua ("editor configs stay plain files"). This file
-# only wires it up and exports the few values that must come from Nix.
+# as helix ("editor configs stay plain files"). This file only wires it up
+# and exports the few values that must come from Nix.
 {
   config,
   lib,
@@ -78,13 +78,12 @@ in
   '';
 
   # ── niri-session.target — the session anchor ────────────────────────────
-  # Mirror of hyprland-session.target (home/hyprland.nix): started
-  # explicitly by config.kdl's spawn-at-startup, stopped via BindsTo when
-  # graphical-session.target goes down at logout. Deliberately NO Install
-  # section — the target must only ever be reached by that explicit start,
-  # never pulled in whenever a graphical session appears. That scoping is
-  # what keeps swayidle (below) out of hyprland sessions, where hypridle
-  # already owns idle/lock.
+  # Started explicitly by config.kdl's spawn-at-startup, stopped via BindsTo
+  # when graphical-session.target goes down at logout. Deliberately NO
+  # Install section — the target must only ever be reached by that explicit
+  # start, never pulled in whenever a graphical session appears. That
+  # scoping is what lets units like swayidle (below) belong to THIS session
+  # specifically rather than to any graphical session that ever starts.
   systemd.user.targets.niri-session = {
     Unit = {
       Description = "niri compositor session";
@@ -96,12 +95,11 @@ in
   };
 
   # ── swaylock — themed lock screen ────────────────────────────────────────
-  # What niri's own example setup uses (hyprlock stays untouched for the
-  # hyprland session). PAM comes from programs.niri system-side. swaylock's
-  # whole UI is the ring indicator: melange ring states stand in for
-  # hyprlock's colored input field (verify = green, wrong = red, capslock =
-  # yellow), and show-failed-attempts is its counterpart to hyprlock's
-  # "$FAIL ($ATTEMPTS)" counter.
+  # What niri's own example setup uses. PAM comes from programs.niri
+  # system-side (security.pam.services.swaylock — without it unlocking
+  # silently fails). swaylock's whole UI is the ring indicator: melange ring
+  # states color the feedback (verify = green, wrong = red, capslock =
+  # yellow), and show-failed-attempts adds a wrong-guess counter.
   programs.swaylock = {
     enable = true;
     settings = {
@@ -139,13 +137,13 @@ in
   };
 
   # ── swayidle — lock, screen off, and lock-before-sleep ──────────────────
-  # Same timeline hypridle runs under hyprland: 5 min → lock, 10 min →
-  # screens off (back on when you touch anything), lock BEFORE suspend.
+  # The idle timeline: 5 min → lock, 10 min → screens off (back on when you
+  # touch anything), lock BEFORE suspend.
   services.swayidle = {
     enable = true;
-    # Scope to the niri session only (see niri-session.target above) —
-    # under hyprland, hypridle owns this job and two idle daemons would
-    # double-lock.
+    # Scope to the niri session (see niri-session.target above), not to
+    # graphical-session.target — idle/lock policy belongs to the session
+    # that defines it, so a future second session can bring its own.
     systemdTargets = [ "niri-session.target" ];
     timeouts = [
       # 5 min idle → lock
@@ -171,15 +169,17 @@ in
     };
   };
 
-  # Utilities the config.kdl keybinds shell out to. brightnessctl is ALSO
-  # declared in home/hyprland.nix and playerctl in home/waybar.nix — the
-  # duplication is deliberate (nix dedupes installs) so that deleting any
-  # of those files later stays atomic without orphaning this file's
-  # keybind deps. grim/slurp are gone from here on purpose: the stock
-  # config uses niri's built-in screenshot UI, the grim→satty pipeline is
-  # hyprland-only now.
+  # Utilities the session shells out to. playerctl is ALSO declared in
+  # home/waybar.nix — the duplication is deliberate (nix dedupes installs)
+  # so that deleting either file later stays atomic without orphaning the
+  # other's deps. No grim/slurp here on purpose: the stock config uses
+  # niri's built-in screenshot UI (Print/Ctrl+Print/Alt+Print).
   home.packages = with pkgs; [
     brightnessctl # backlight (keybinds above; PC just has no backlight device)
     playerctl # stock XF86AudioPlay/Stop/Prev/Next binds
+    # Session-wide clipboard CLI: satty's copy-command, helix/zellij system
+    # clipboard, and shell pipelines all exec wl-copy / wl-paste. Lives here
+    # because it's Wayland-session infrastructure, not any one app's dep.
+    wl-clipboard
   ];
 }

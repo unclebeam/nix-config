@@ -10,8 +10,7 @@
     ./disko.nix                  # declarative disk layout (partitions, btrfs, mounts)
     ../../modules/core.nix       # users, nix settings, boot loader, networking…
     ../../modules/desktop.nix    # greeter (session picker), fonts, Wayland env
-    ../../modules/hyprland.nix   # hyprland session
-    ../../modules/niri.nix       # niri session — side-by-side trial next to hyprland
+    ../../modules/niri.nix       # niri session (the only compositor; won the trial vs hyprland)
     ../../modules/audio.nix      # pipewire
     ../../modules/bluetooth.nix  # bluez userspace for the MT7925's BT radio
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
@@ -19,7 +18,7 @@
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
-    ../../modules/dolphin.nix    # avahi (SMB discovery) + kwallet PAM unlock
+    ../../modules/nautilus.nix   # gvfs (smb://) + avahi discovery + keyring PAM unlock
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)
     ../../modules/zsa.nix        # ZSA keyboard udev rules (flash via Oryx in browser)
   ];

@@ -11,11 +11,10 @@
     enable = true;
     package = pkgs.adwaita-icon-theme; # plain GNOME cursor — matches the minimal look
     name = "Adwaita";
-    size = 24; # logical px; hyprland multiplies by the output scale (1.5) on screen
+    size = 24; # logical px; the compositor multiplies by the output scale (1.5) on screen
 
-    # Hyprland picks this up too: home/hyprland.nix exports this option into
-    # the generated ~/.config/hypr/nix.lua, and hl.env lines in
-    # home/hypr/hyprland.lua read nix.cursor — one source of truth.
+    # niri picks this up too: home/niri.nix reads this option into the
+    # generated ~/.config/niri/nix.kdl cursor section — one source of truth.
 
     # Generates the gtk cursor settings so GTK apps pick the same theme/size.
     gtk.enable = true;

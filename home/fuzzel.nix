@@ -1,4 +1,4 @@
-# home/fuzzel.nix — application launcher (SUPER+D, bound in home/hypr/hyprland.lua).
+# home/fuzzel.nix — application launcher (Mod+D, niri's stock bind in home/niri/config.kdl).
 { config, lib, pkgs, ... }:
 
 let

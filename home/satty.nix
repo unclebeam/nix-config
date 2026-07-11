@@ -1,7 +1,8 @@
-# home/satty.nix — screenshot annotator (Print / Ctrl+Print, bound in
-# home/hypr/hyprland.lua). Owns everything satty: the package, config.toml,
-# and its palette colors. The keybinds themselves stay in the compositor
-# config, where all keybinds live.
+# home/satty.nix — screenshot annotator. No keybind launches it anymore:
+# niri's built-in screenshot UI (Print) saves to ~/Pictures/Screenshots,
+# and satty is run BY HAND on a saved file when a shot needs arrows/text:
+#   satty --filename ~/Pictures/Screenshots/<shot>.png
+# Owns everything satty: the package, config.toml, and its palette colors.
 { config, lib, pkgs, ... }:
 
 let

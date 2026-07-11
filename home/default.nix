@@ -5,21 +5,19 @@
 
 {
   imports = [
-    ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + hyprlock + hypridle
-    ./niri.nix      # niri glue: symlinks niri/config.kdl + swaylock + swayidle (trial)
+    ./niri.nix      # niri glue: symlinks niri/config.kdl + swaylock + swayidle
     ./waybar.nix    # status bar
     ./fuzzel.nix    # launcher
     ./mako.nix      # notifications
-    ./satty.nix     # screenshot annotator (Ctrl+Print)
+    ./satty.nix     # screenshot annotator (run by hand on saved screenshots)
     ./alacritty.nix # terminal
     ./fish.nix      # shell + prompt
     ./direnv.nix    # per-directory envs (project dev shells via .envrc)
     ./helix.nix     # editor + language servers
     ./zellij.nix    # terminal multiplexer
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
-    ./qt.nix           # Qt look: breeze style + melange kdeglobals (dolphin, ark, hyprland-share-picker)
-    ./dolphin.nix      # file manager + xdg default for dirs
-    ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
+    ./nautilus.nix     # file manager + xdg default for dirs
+    ./file-roller.nix  # archive manager (.zip/.7z/.rar) + CLI backends
     ./vlc.nix          # VLC media player + default video/audio handler
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
     ./ticktick.nix     # TickTick task manager (unfree; allowUnfree in core.nix)

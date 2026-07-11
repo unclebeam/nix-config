@@ -1,8 +1,6 @@
 # home/waybar.nix — status bar. Runs as a systemd user service bound to
-# graphical-session.target, which BOTH sessions reach: hyprland via
-# hyprland-session.target (home/hyprland.nix binds it there), niri via
-# niri.service itself. All colors are interpolated from colors.nix into
-# the CSS below.
+# graphical-session.target, which niri.service activates once the session
+# is up. All colors are interpolated from colors.nix into the CSS below.
 { config, lib, pkgs, ... }:
 
 let
@@ -130,8 +128,9 @@ let
 in
 {
   # The media widget's scripts reference playerctl by store path; this
-  # install is for interactive debugging (`playerctl status`) and future
-  # media keybinds in hyprland.lua.
+  # install is for interactive debugging (`playerctl status`). Also declared
+  # in home/niri.nix for the XF86 media keybinds — deliberate duplication
+  # (nix dedupes) so deleting either file stays atomic.
   home.packages = [ pkgs.playerctl ];
 
   programs.waybar = {
@@ -146,10 +145,7 @@ in
       position = "top";
       height = 28;
 
-      # Both compositors' workspace modules are listed while the niri trial
-      # runs: waybar disables (with one log line) any module whose
-      # compositor IPC socket is absent, so each session shows only its own.
-      modules-left = [ "hyprland/workspaces" "niri/workspaces" "group/media" ];
+      modules-left = [ "niri/workspaces" "group/media" ];
       modules-center = [ "clock" ];
       modules-right = [ "pulseaudio" "network" "custom/wifi-name" "cpu" "memory" "battery" "tray" ];
 
@@ -258,10 +254,9 @@ in
         color: ${colors.a.ui};
         background: transparent;
       }
-      /* hyprland marks the current workspace .active; niri calls that one
-         .focused (its .active = "visible on some monitor"). Style both so
-         the bar looks identical under either session. */
-      #workspaces button.active,
+      /* niri: .focused = the workspace with keyboard focus; .active only
+         means "visible on some monitor", so it's deliberately NOT styled —
+         on a two-monitor setup both visible workspaces would light up. */
       #workspaces button.focused {
         color: ${colors.a.fg};
         background: ${colors.a.sel};

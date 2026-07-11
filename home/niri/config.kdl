@@ -1,11 +1,8 @@
 // home/niri/config.kdl — THE niri config, a plain KDL file symlinked to
 // ~/.config/niri/config.kdl by home/niri.nix (same "editor configs stay
-// plain files" rule as helix and hyprland.lua). niri live-reloads on save;
-// after a rebuild the store symlink flips and niri picks that up too.
-// Sanity-check edits with `niri validate` before logging out.
-//
-// Runs SIDE-BY-SIDE with hyprland while niri is on trial — nothing here
-// touches the hyprland session.
+// plain files" rule as helix). niri live-reloads on save; after a rebuild
+// the store symlink flips and niri picks that up too. Sanity-check edits
+// with `niri validate` before logging out.
 //
 // This file deliberately TRACKS NIRI'S STOCK DEFAULT CONFIG (shipped at
 // ${pkgs.niri.doc}/share/doc/niri/default-config.kdl) — the first cut was
@@ -249,12 +246,11 @@ layout {
 
 // SESSION PLUMBING (not stock — stock spawns waybar here instead; ours
 // already starts via its systemd user service in home/waybar.nix, and a
-// second spawn would double the bar). Session anchor for niri-only user
-// services (swayidle — declared in home/niri.nix, mirroring
-// hyprland-session.target). niri runs this after WAYLAND_DISPLAY is
-// already in the user manager, so units hanging off the target always see
-// the session env. Nothing else ever starts this target, which is what
-// keeps swayidle out of hyprland sessions (and hypridle out of niri ones).
+// second spawn would double the bar). Session anchor for niri-scoped user
+// services (swayidle — declared in home/niri.nix). niri runs this after
+// WAYLAND_DISPLAY is already in the user manager, so units hanging off the
+// target always see the session env. Nothing else ever starts this target,
+// which is what scopes those services to THIS session specifically.
 spawn-at-startup "systemctl" "--user" "start" "niri-session.target"
 
 hotkey-overlay {

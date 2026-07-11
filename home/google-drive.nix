@@ -3,8 +3,8 @@
 # Why rclone and not KDE's kio-gdrive: Google revoked KDE's OAuth client in
 # June 2024 and upstream removed the Drive scope entirely (KDE bug 480779),
 # so kio-gdrive can no longer be granted Drive access — it's a dead end.
-# An rclone FUSE mount is just a folder, which Dolphin (and every other app)
-# browses natively.
+# An rclone FUSE mount is just a folder, which Nautilus (and every other
+# app) browses natively.
 #
 # Why NOT home-manager's programs.rclone: declaring any remotes.<name> there
 # makes home-manager regenerate ~/.config/rclone/rclone.conf on every switch,

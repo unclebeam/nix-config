@@ -1,7 +1,7 @@
 # desktop.nix — compositor-agnostic desktop infrastructure: the greeter,
 # Wayland-wide env, the GTK portal, and fonts. Compositor-specific bits stay
-# in modules/hyprland.nix. (This file was split out when hyprland briefly ran
-# alongside sway; it keeps its role now that hyprland is the only session —
+# in modules/niri.nix. (This file was split out when hyprland briefly ran
+# alongside sway; it keeps its role now that niri is the only session —
 # nothing in here assumes a particular compositor.)
 { config, lib, pkgs, ... }:
 
@@ -20,15 +20,11 @@ in
   # window from a running session — use that instead of logging out.
   #
   # Sessions: SDDM scans the same wayland-sessions dir regreet (the old
-  # greeter) did, so the .desktop files that programs.hyprland installs
-  # appear with zero wiring here.
-  #   NB: the session menu shows TWO hyprland entries — the nixpkgs
-  #   hyprland package unconditionally ships "Hyprland (uwsm-managed)"
-  #   next to plain "Hyprland" (it can't be filtered out without breaking
-  #   the sessionPackages assertion). Both work: modules/hyprland.nix sets
-  #   withUWSM so uwsm's user units exist, and the hyprland.lua session
-  #   hook is dual-mode. SDDM remembers the last user + session across
-  #   reboots (/var/lib/sddm/state.conf).
+  # greeter) did, so the .desktop file that programs.niri installs appears
+  # with zero wiring here. SDDM remembers the last user + session across
+  # reboots (/var/lib/sddm/state.conf) — NB: after a session is REMOVED
+  # (sway→hyprland→niri), the remembered entry dangles and the menu needs
+  # one manual pick of the surviving session.
   programs.silentSDDM = {
     enable = true;
     theme = "rei"; # the upstream default preset; melange-skinned below
@@ -173,9 +169,9 @@ in
 
   # xdg-desktop-portal is how sandbox-ish desktop APIs work on Wayland:
   # screen sharing, screenshots, file pickers. The GTK portal covers the
-  # generic interfaces (file chooser…); modules/hyprland.nix adds the
-  # ScreenCast/Screenshot backend (xdg-desktop-portal-hyprland) plus the
-  # portals.conf that routes each interface to the right backend.
+  # generic interfaces (file chooser…); modules/niri.nix adds the GNOME
+  # portal (niri's ScreenCast backend) plus the niri-portals.conf that
+  # routes each interface to the right backend.
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
   # ── Fonts ──────────────────────────────────────────────────────────────

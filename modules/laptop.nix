@@ -14,8 +14,8 @@
   hardware.cpu.intel.updateMicrocode = true;
 
   # ── Lid & suspend ──────────────────────────────────────────────────────
-  # logind handles the lid; hypridle (home/hyprland.nix) locks the session
-  # before the suspend actually happens.
+  # logind handles the lid; swayidle (home/niri.nix, before-sleep hook)
+  # locks the session before the suspend actually happens.
   services.logind.settings.Login = {
     HandleLidSwitch = "suspend";
     HandleLidSwitchExternalPower = "suspend"; # also suspend when plugged in
@@ -23,7 +23,7 @@
   };
 
   # ── Backlight ──────────────────────────────────────────────────────────
-  # brightnessctl (installed in home/hyprland.nix, bound to the XF86
+  # brightnessctl (installed in home/niri.nix, bound to the XF86
   # brightness keys) talks to logind — no extra permissions or udev rules
   # needed for users with an active session.
 

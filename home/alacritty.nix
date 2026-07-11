@@ -52,8 +52,8 @@ in
         y = 6;
       };
 
-      # The one translucent surface in the setup — hyprland's blur
-      # (home/hypr/hyprland.lua, decoration.blur) shows through here.
+      # The one translucent surface in the setup. (No blur behind it —
+      # niri draws whatever is underneath straight through.)
       window.opacity = 0.92;
 
       # Shift+Enter normally sends the exact same bytes as plain Enter, so

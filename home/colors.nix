@@ -12,7 +12,7 @@
 #   colors = import ./colors.nix;
 # and interpolate e.g. ${colors.a.bg} into CSS/INI/TOML strings.
 # All values carry the leading "#"; strip it where a format demands
-# (fuzzel, hyprlock) with lib.removePrefix "#".
+# (fuzzel, swaylock) with lib.removePrefix "#".
 {
   a = {
     bg    = "#292522"; # main background — warm dark brown
