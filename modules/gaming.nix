@@ -11,6 +11,13 @@
     # opt-in niceties:
     remotePlay.openFirewall = true;              # stream games to other devices
     localNetworkGameTransfers.openFirewall = true; # LAN game-download sharing
+
+    # GE-Proton alongside Valve's bundled Proton. Some games need a newer
+    # Proton than Valve's stable channel ships — e.g. Monster Hunter Wilds'
+    # model streaming (DirectStorage) breaks on older builds and leaves
+    # models permanently low-poly. This only makes GE-Proton *selectable*
+    # (per game: Properties → Compatibility); it forces nothing globally.
+    extraCompatPackages = [ pkgs.proton-ge-bin ];
   };
 
   # GameMode: games (or `gamemoderun %command%` in Steam launch options)
