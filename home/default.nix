@@ -25,6 +25,7 @@
     ./mangohud.nix     # in-game FPS overlay (per-game: `mangohud %command%` in Steam)
     ./google-drive.nix # ~/GoogleDrive rclone mount (one-time: `rclone config`)
     ./claude.nix       # Claude Code CLI + settings + statusline script
+    ./insta360-link.nix # Insta360 Link 2 Pro webcam: v4l2-ctl + cameractrls PTZ control
   ];
 
   home.username = "unclebeam";
