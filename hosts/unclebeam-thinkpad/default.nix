@@ -16,6 +16,7 @@
     ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
     ../../modules/nautilus.nix   # gvfs (smb://) + avahi discovery + keyring PAM unlock
+    ../../modules/localsend.nix  # LAN file sharing (AirDrop-style) + firewall port
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)
     ../../modules/zsa.nix        # ZSA keyboard udev rules (flash via Oryx in browser)
     # ../../modules/gaming.nix   # uncomment to get Steam on the laptop too
