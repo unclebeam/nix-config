@@ -27,6 +27,7 @@
     ./google-drive.nix # ~/GoogleDrive rclone mount (one-time: `rclone config`)
     ./claude.nix       # Claude Code CLI + settings + statusline script
     ./insta360-link.nix # Insta360 Link 2 Pro webcam: v4l2-ctl + cameractrls PTZ control
+    ./power.nix         # Shutdown/Reboot as fuzzel launcher entries (systemctl via logind)
   ];
 
   home.username = "unclebeam";
