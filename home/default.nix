@@ -22,6 +22,7 @@
     ./obs.nix          # OBS Studio (screencast via GNOME portal, audio via PipeWire)
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
     ./ticktick.nix     # TickTick task manager (unfree; allowUnfree in core.nix)
+    ./onlyoffice.nix   # OnlyOffice desktop editors (alongside LibreOffice in core.nix)
     ./mangohud.nix     # in-game FPS overlay (per-game: `mangohud %command%` in Steam)
     ./google-drive.nix # ~/GoogleDrive rclone mount (one-time: `rclone config`)
     ./claude.nix       # Claude Code CLI + settings + statusline script
