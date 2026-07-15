@@ -7,6 +7,21 @@
 
 let
   colors = import ../home/colors.nix;
+
+  # TH Sarabun PSK — the 2006 DIP/SIPA font that Thai official documents
+  # require. Not in nixpkgs (pkgs.sarabun-font below is Google's newer,
+  # *different* "Sarabun" family — the two coexist because this one's
+  # internal family name is "TH SarabunPSK"), so the TTFs are vendored
+  # in-repo under fonts/th-sarabun-psk/ along with their license.
+  th-sarabun-psk = pkgs.stdenvNoCC.mkDerivation {
+    pname = "th-sarabun-psk";
+    version = "1.0";
+    src = ./fonts/th-sarabun-psk;
+    installPhase = ''
+      mkdir -p $out/share/fonts/truetype
+      cp *.ttf "$out/share/fonts/truetype/"
+    '';
+  };
 in
 {
   # ── SDDM + SilentSDDM ──────────────────────────────────────────────────
@@ -180,7 +195,8 @@ in
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
     nerd-fonts.iosevka-term # alacritty's terminal font (home/alacritty.nix)
-    sarabun-font # Thai text font
+    sarabun-font # Thai text font (the fontconfig rules below prefer it)
+    th-sarabun-psk # family "TH SarabunPSK" — for Thai official documents
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
