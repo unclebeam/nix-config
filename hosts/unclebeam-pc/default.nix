@@ -49,6 +49,16 @@
   # escalation is adding "pcie_port_pm=off" here as well.
   boot.kernelParams = [ "pcie_aspm=off" ];
 
+  # The MT7925's OTHER power-management failure: with btusb USB autosuspend
+  # active (kernel default Y), the BT radio gets power-cycled mid-session and
+  # live connections drop — observed here (2026-07) as the Xbox controller
+  # binding fine (xpadneo "gamepad detected") and then disconnecting ~30s
+  # later, in a loop, across two controller firmware versions and a clean
+  # re-pair. Desktop box: autosuspend on the radio saves nothing worth having.
+  boot.extraModprobeConfig = ''
+    options btusb enable_autosuspend=n
+  '';
+
   # The disk layout (disko.nix) has no swap partition. Instead, use zram:
   # a compressed block device in RAM used as swap. Cheap insurance against
   # memory pressure with no disk wear and nothing to partition.
