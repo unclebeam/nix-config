@@ -8,7 +8,7 @@
     ./niri.nix      # niri glue: symlinks niri/config.kdl + swayidle (locker = modules/gtklock.nix)
     ./waybar.nix    # status bar
     ./fuzzel.nix    # launcher
-    ./mako.nix      # notifications
+    ./swaync.nix    # notifications (replaced mako: renders action buttons)
     ./satty.nix     # screenshot annotator (run by hand on saved screenshots)
     ./alacritty.nix # terminal
     ./fish.nix      # shell + prompt

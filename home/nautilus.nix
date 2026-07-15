@@ -25,7 +25,7 @@
   # /run/media/unclebeam/<label>. tray = "never" because this minimal Waybar has
   # no StatusNotifier tray host — with the default "auto", udiskie would sit
   # waiting for a tray icon and silently never automount. notify routes toasts
-  # through mako (home/mako.nix) on mount/unmount.
+  # through the notification daemon (home/swaync.nix) on mount/unmount.
   services.udiskie = {
     enable = true;
     automount = true;
