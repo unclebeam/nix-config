@@ -7,7 +7,7 @@ NixOS flake for my two machines. One repo, one palette, reinstall = one command.
 | `unclebeam-pc` | AMD Ryzen 9 + AMD RDNA GPU (mesa/RADV) | Desktop, gaming |
 | `unclebeam-thinkpad` | ThinkPad X1 Carbon Aura (Intel Core Ultra) | Laptop |
 
-Both run NixOS 26.05 + niri + Waybar/fuzzel/mako/swaylock, themed with the
+Both run NixOS 26.05 + niri + Waybar/fuzzel/mako/gtklock, themed with the
 [melange](https://github.com/savq/melange-nvim) dark palette. The palette is
 defined once in [`home/colors.nix`](home/colors.nix) and every app references it.
 

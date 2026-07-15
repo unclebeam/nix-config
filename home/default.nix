@@ -5,7 +5,7 @@
 
 {
   imports = [
-    ./niri.nix      # niri glue: symlinks niri/config.kdl + swaylock + swayidle
+    ./niri.nix      # niri glue: symlinks niri/config.kdl + swayidle (locker = modules/gtklock.nix)
     ./waybar.nix    # status bar
     ./fuzzel.nix    # launcher
     ./mako.nix      # notifications

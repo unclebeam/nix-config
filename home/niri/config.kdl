@@ -360,8 +360,8 @@ binds {
     Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     // SESSION PLUMBING deviation: stock spawns swaylock directly; we route
     // through loginctl so this takes the same path as idle/suspend locking
-    // and swayidle's lock handler can guarantee a single swaylock instance
-    // (home/niri.nix).
+    // and swayidle's lock handler can guarantee a single locker instance
+    // (home/niri.nix — the locker is gtklock, modules/gtklock.nix).
     Super+Alt+L hotkey-overlay-title="Lock the Screen" { spawn "loginctl" "lock-session"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.

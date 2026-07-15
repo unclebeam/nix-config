@@ -11,6 +11,7 @@
     ../../modules/core.nix       # users, nix settings, boot loader, networking…
     ../../modules/desktop.nix    # greeter (session picker), fonts, Wayland env
     ../../modules/niri.nix       # niri session (the only compositor; won the trial vs hyprland)
+    ../../modules/gtklock.nix    # greeter-look lock screen (gtklock + plugin modules + PAM)
     ../../modules/audio.nix      # pipewire
     ../../modules/bluetooth.nix  # bluez userspace for the MT7925's BT radio
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl

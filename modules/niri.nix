@@ -2,7 +2,8 @@
 # side-by-side trial next to hyprland — same playbook as the sway→hyprland
 # move — and won; hyprland was removed 2026-07.) The greeter, fonts, and
 # Wayland-wide env stay in modules/desktop.nix (compositor-agnostic). The
-# USER half (config.kdl glue, swaylock, swayidle) lives in home/niri.nix.
+# USER half (config.kdl glue, swayidle) lives in home/niri.nix; the lock
+# screen is gtklock, system-side in modules/gtklock.nix.
 { config, lib, pkgs, ... }:
 
 {
@@ -22,8 +23,10 @@
   #    saves SMB passwords — the PAM auto-unlock half is in
   #    modules/nautilus.nix) so the gnome portal's FileChooser works.
   #  * swaylock PAM (security.pam.services.swaylock) — set by this module
-  #    directly. Unlocking would silently fail without it; lock/idle config
-  #    itself is user-side in home/niri.nix.
+  #    directly. Unused since the locker became gtklock (whose PAM service
+  #    comes from modules/gtklock.nix), but harmless: it's upstream's
+  #    unconditional default, not something we can or need to turn off.
+  #    Idle/lock invocation is user-side in home/niri.nix.
   # Window-manager *configuration* comes from home-manager.
   programs.niri.enable = true;
 

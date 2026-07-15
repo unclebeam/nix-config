@@ -1,7 +1,10 @@
 # home/niri.nix — the USER half of niri: glue for the plain KDL config,
-# plus swaylock and swayidle. (Session/portal plumbing is system-side in
-# modules/niri.nix.) Niri started as a side-by-side trial next to hyprland
-# and won; it's the only session now.
+# plus swayidle (idle/lock policy). (Session/portal plumbing is system-side
+# in modules/niri.nix; the locker itself — gtklock, themed to match the
+# SDDM greeter — is system-side too in modules/gtklock.nix, because
+# home-manager 26.05 has no gtklock module. This file only *invokes* it.)
+# Niri started as a side-by-side trial next to hyprland and won; it's the
+# only session now.
 #
 # The window-manager config itself is NOT here: it's the plain, tracked
 # KDL file home/niri/config.kdl — symlinked, not Nix-generated, same rule
@@ -16,8 +19,6 @@
 
 let
   colors = import ./colors.nix;
-  # swaylock wants rrggbb without the leading '#'; KDL wants it WITH.
-  raw = c: lib.removePrefix "#" c;
 
   # Cursor theme/size come from home/cursor.nix (home.pointerCursor) — the
   # generated nix.kdl below feeds them to niri's cursor section, kept in
@@ -28,7 +29,7 @@ let
   # command below must be an absolute store path or it silently fails.
   loginctl = "${pkgs.systemd}/bin/loginctl";
   niri = "${pkgs.niri}/bin/niri"; # same drv programs.niri installs
-  swaylock = "${config.programs.swaylock.package}/bin/swaylock";
+  gtklock = "${pkgs.gtklock}/bin/gtklock"; # same drv modules/gtklock.nix installs
   pidof = "${pkgs.procps}/bin/pidof";
 in
 {
@@ -99,48 +100,6 @@ in
     };
   };
 
-  # ── swaylock — themed lock screen ────────────────────────────────────────
-  # What niri's own example setup uses. PAM comes from programs.niri
-  # system-side (security.pam.services.swaylock — without it unlocking
-  # silently fails). swaylock's whole UI is the ring indicator: melange ring
-  # states color the feedback (verify = green, wrong = red, capslock =
-  # yellow), and show-failed-attempts adds a wrong-guess counter.
-  programs.swaylock = {
-    enable = true;
-    settings = {
-      ignore-empty-password = true;
-      show-failed-attempts = true;
-      indicator-caps-lock = true;
-
-      color = raw colors.a.bg;
-
-      inside-color = raw colors.a.float;
-      ring-color = raw colors.a.ui;
-      text-color = raw colors.a.fg;
-      key-hl-color = raw colors.b.green; # keypress blip
-      bs-hl-color = raw colors.b.red; # backspace blip
-
-      inside-ver-color = raw colors.a.float;
-      ring-ver-color = raw colors.b.green;
-      text-ver-color = raw colors.a.fg;
-
-      inside-wrong-color = raw colors.a.float;
-      ring-wrong-color = raw colors.b.red;
-      text-wrong-color = raw colors.a.fg;
-
-      inside-caps-lock-color = raw colors.a.float;
-      ring-caps-lock-color = raw colors.b.yellow;
-      caps-lock-key-hl-color = raw colors.b.yellow;
-      caps-lock-bs-hl-color = raw colors.b.red;
-
-      # The thin separator ring adds nothing at this size — blend it away.
-      line-color = raw colors.a.bg;
-      line-ver-color = raw colors.a.bg;
-      line-wrong-color = raw colors.a.bg;
-      line-caps-lock-color = raw colors.a.bg;
-    };
-  };
-
   # ── swayidle — lock, screen off, and lock-before-sleep ──────────────────
   # The idle timeline: 5 min → lock, 10 min → screens off (back on when you
   # touch anything), lock BEFORE suspend.
@@ -164,9 +123,12 @@ in
       }
     ];
     events = {
-      # pidof-guard: loginctl lock-session, the Mod+Escape bind, and
-      # before-sleep can all fire this — never stack swaylock instances.
-      lock = "${pidof} swaylock || ${swaylock} -f";
+      # The locker is gtklock (modules/gtklock.nix: theme, plugin modules,
+      # and the PAM service without which unlocking silently fails). -d
+      # daemonizes after grabbing the session lock, like swaylock's -f.
+      # pidof-guard: loginctl lock-session, the Super+Alt+L bind, and
+      # before-sleep can all fire this — never stack locker instances.
+      lock = "${pidof} gtklock || ${gtklock} -d";
       # Lock BEFORE the system suspends (lid close, systemctl suspend…).
       before-sleep = "${loginctl} lock-session";
       # Screens back on when waking from suspend (DPMS state can stick).
