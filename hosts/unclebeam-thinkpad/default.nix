@@ -11,6 +11,7 @@
     ../../modules/niri.nix       # niri session (the only compositor; won the trial vs hyprland)
     ../../modules/gtklock.nix    # greeter-look lock screen (gtklock + plugin modules + PAM)
     ../../modules/audio.nix
+    ../../modules/bluetooth.nix  # bluetoothd + Blueman GUI (built-in Intel adapter)
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
     ../../modules/laptop.nix     # power mgmt, backlight, lid behavior, fwupd
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
