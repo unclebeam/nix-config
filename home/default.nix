@@ -11,6 +11,7 @@
     ./swaync.nix    # notifications (replaced mako: renders action buttons)
     ./satty.nix     # screenshot annotator (run by hand on saved screenshots)
     ./alacritty.nix # terminal
+    ./tmux.nix      # terminal multiplexer (plain tmux.conf; nvim navigation pairing)
     ./fish.nix      # shell + prompt
     ./direnv.nix    # per-directory envs (project dev shells via .envrc)
     ./neovim.nix    # Neovim + LazyVim (live-symlinked lua config; LSPs from Nix, no Mason)
