@@ -14,6 +14,7 @@
     ../../modules/bluetooth.nix  # bluetoothd + Blueman GUI (built-in Intel adapter)
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
     ../../modules/laptop.nix     # power mgmt, backlight, lid behavior, fwupd
+    ../../modules/fprintd.nix    # fingerprint auth (sudo/polkit/gtklock; greeter stays password)
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
