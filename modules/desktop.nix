@@ -229,11 +229,36 @@ in
          fonts.enableDefaultPackages) wins that query — Thai renders in
          FreeSerif instead of Sarabun. Nothing else needs these fonts;
          Noto/DejaVu/Liberation cover everything they do. -->
+    <!-- Noto's Thai faces are rejected for the same reason. Chromium/Skia
+         glyph fallback never scores charset coverage: it sorts ALL fonts by
+         the page language (Slack's UI is lang="en-US", so the lang=th rule
+         above never fires) and takes the FIRST font in that list that has
+         the glyph — and Noto Sans Thai sorts ahead of Sarabun (#152 vs #175
+         for lang=en). No match rule can reorder that walk; the font has to
+         leave the set. noto-fonts stays installed — every other script it
+         covers is unaffected, and Thai is Sarabun's job anyway. -->
+    <!-- Unifont goes too (also from fonts.enableDefaultPackages). With Noto
+         Thai gone it became the next Thai-capable font in Chromium's walk:
+         Chromium bundles its own fontconfig with its own caches, so ties
+         break in a different order than fc-match shows, and Unifont beat
+         Sarabun. Worse, it loads the bitmap unifont.otb face — its sfnt
+         wrapper says fontformat=TrueType, slipping past Chromium's format
+         filter, but Skia gets no outlines from it: Thai drew as INVISIBLE
+         glyphs, not even tofu. Rejecting only the bitmap faces isn't
+         enough (the scalable unifont.otf could still win the tie-break),
+         so the whole family leaves the set — then Sarabun/TH SarabunPSK
+         are the only Thai fonts left and the walk is deterministic.
+         Obscure codepoints now show visible tofu, which beats invisible
+         text. -->
     <selectfont>
       <rejectfont>
         <pattern><patelt name="family"><string>FreeSerif</string></patelt></pattern>
         <pattern><patelt name="family"><string>FreeSans</string></patelt></pattern>
         <pattern><patelt name="family"><string>FreeMono</string></patelt></pattern>
+        <pattern><patelt name="family"><string>Noto Sans Thai</string></patelt></pattern>
+        <pattern><patelt name="family"><string>Noto Sans Thai Looped</string></patelt></pattern>
+        <pattern><patelt name="family"><string>Noto Serif Thai</string></patelt></pattern>
+        <pattern><patelt name="family"><string>Unifont</string></patelt></pattern>
       </rejectfont>
     </selectfont>
     </fontconfig>
