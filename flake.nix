@@ -9,7 +9,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
     # A SECOND nixpkgs tracking unstable. Used ONLY to source a curated set of
-    # fast-moving packages (helix, claude-code, lazygit, zellij, starship);
+    # fast-moving packages (claude-code, lazygit, starship);
     # everything else stays on nixos-26.05. Deliberately NOT `follows` nixpkgs —
     # it must be its own package set, or those packages would rebuild against
     # 26.05 deps and defeat the purpose. mkHost instantiates it once (with
@@ -116,7 +116,7 @@
               # <name>.backup instead of aborting the whole switch.
               home-manager.backupFileExtension = "backup";
               # Make pkgs-unstable reachable from home/ modules too (mirrors
-              # the system-level specialArgs above), so home/helix.nix etc.
+              # the system-level specialArgs above), so home/fish.nix etc.
               # can pull individual packages from unstable.
               home-manager.extraSpecialArgs = { inherit pkgs-unstable; };
             }

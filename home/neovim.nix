@@ -21,13 +21,12 @@
     # ── LSPs/formatters as Nix packages, never editor-installed (no Mason) ──
     pkgs.lua-language-server # LazyVim's default lua tooling (edits this very config)
     pkgs.stylua # lua formatter, ditto
-    # nil (nix LSP) is already on PATH via home/helix.nix — neovim reuses it.
-    # If helix ever goes away, nil must move here.
+    pkgs.nil # Nix LSP — lspconfig finds it on PATH (moved here when helix was removed)
     # Enabling a LazyVim language extra later = add its server HERE first
     # (trap: the TypeScript extra wants vtsls, not typescript-language-server).
   ];
 
-  # DELIBERATE deviation from the niri/helix store-symlink pattern:
+  # DELIBERATE deviation from the niri store-symlink pattern:
   # ~/.config/nvim is an out-of-store symlink to this repo checkout, because
   # (a) LazyVim writes INTO its config dir (lazy-lock.json plugin lockfile,
   #     lazyvim.json extras state) and those belong in git for reproducible
@@ -38,4 +37,7 @@
   # On a fresh install the link dangles (harmlessly) until the repo exists.
   xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink
     "${config.home.homeDirectory}/repositories/github.com/unclebeam/nix-config/home/nvim";
+
+  # git commit messages, sudoedit, etc. open Neovim.
+  home.sessionVariables.EDITOR = "nvim";
 }

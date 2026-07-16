@@ -64,7 +64,7 @@ Three layers, each with a strict role:
 
 Choices that look like gaps but are intentional. Don't "improve" them unprompted:
 
-- **Editor configs stay plain files.** Neovim/Helix configs are ordinary config files symlinked via home-manager — never convert them to nixvim or other Nix-generated equivalents.
+- **Editor configs stay plain files.** Neovim configs are ordinary config files symlinked via home-manager — never convert them to nixvim or other Nix-generated equivalents.
 - **No Mason, ever.** LSPs and formatters are declared as Nix packages in `home/`, not installed by the editor.
 - **No kanshi, no desktop-shell frameworks** (DMS/Noctalia/HyprPanel), **no extra compositors** — unless the human explicitly asks.
 - **The restrained look is a feature, not an oversight.** Plain Waybar, melange palette. Do not suggest visual "improvements" unprompted.

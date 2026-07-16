@@ -1,6 +1,6 @@
 // home/niri/config.kdl — THE niri config, a plain KDL file symlinked to
 // ~/.config/niri/config.kdl by home/niri.nix (same "editor configs stay
-// plain files" rule as helix). niri live-reloads on save; after a rebuild
+// plain files" rule as neovim). niri live-reloads on save; after a rebuild
 // the store symlink flips and niri picks that up too. Sanity-check edits
 // with `niri validate` before logging out.
 //

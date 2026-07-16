@@ -8,7 +8,7 @@
 #
 # The window-manager config itself is NOT here: it's the plain, tracked
 # KDL file home/niri/config.kdl — symlinked, not Nix-generated, same rule
-# as helix ("editor configs stay plain files"). This file only wires it up
+# as the editor configs ("stay plain files"). This file only wires it up
 # and exports the few values that must come from Nix.
 {
   config,
@@ -144,7 +144,7 @@ in
   home.packages = with pkgs; [
     brightnessctl # backlight (keybinds above; PC just has no backlight device)
     playerctl # stock XF86AudioPlay/Stop/Prev/Next binds
-    # Session-wide clipboard CLI: satty's copy-command, helix/zellij system
+    # Session-wide clipboard CLI: satty's copy-command, neovim's system
     # clipboard, and shell pipelines all exec wl-copy / wl-paste. Lives here
     # because it's Wayland-session infrastructure, not any one app's dep.
     wl-clipboard
