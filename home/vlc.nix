@@ -3,17 +3,18 @@
 # Removing VLC = delete this file + its import line in default.nix.
 #
 # No system-side (modules/) half and no theming block here: VLC is Qt-based
-# and draws its stock look — the only Qt app left in an otherwise GTK
-# session, not worth a theming layer. VLC's own settings live in
-# ~/.config/vlc, managed by the app itself, not Nix.
+# and gets its Breeze look from the shared home/qt.nix (alongside Dolphin
+# and Ark — VLC is Qt5, so it's the reason qt.nix carries the .qt5 style
+# variant). VLC's own settings live in ~/.config/vlc, managed by the app
+# itself, not Nix.
 { config, lib, pkgs, ... }:
 
 {
   home.packages = with pkgs; [ vlc ];
 
-  # Make double-clicking a media file in Nautilus open VLC. Merges with the
+  # Make double-clicking a media file in Dolphin open VLC. Merges with the
   # inode/directory + archive defaults already registered (xdg.mimeApps is
-  # enabled in home/nautilus.nix; don't re-set enable here). VLC's desktop id
+  # enabled in home/dolphin.nix; don't re-set enable here). VLC's desktop id
   # is `vlc.desktop`.
   xdg.mimeApps.defaultApplications = {
     "video/mp4" = "vlc.desktop";

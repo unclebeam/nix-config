@@ -17,7 +17,7 @@
   services.fprintd.enable = true;
 
   # ── Keep the greeter (and tty login) password-only ─────────────────────
-  # pam_gnome_keyring (wired on the sddm service in modules/nautilus.nix)
+  # pam_gnome_keyring (wired on the sddm service in modules/niri.nix)
   # can only auto-unlock the keyring with the password typed at login. A
   # fingerprint login would leave the keyring locked and every
   # keyring-backed app prompting separately — so first login stays

@@ -18,7 +18,7 @@
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
-    ../../modules/nautilus.nix   # gvfs (smb://) + avahi discovery + keyring PAM unlock
+    ../../modules/dolphin.nix    # avahi discovery + udisks2 + ntfs/exfat (system half of Dolphin)
     ../../modules/localsend.nix  # LAN file sharing (AirDrop-style) + firewall port
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)
     ../../modules/zsa.nix        # ZSA keyboard udev rules (flash via Oryx in browser)

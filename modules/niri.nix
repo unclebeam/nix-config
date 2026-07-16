@@ -16,12 +16,14 @@
   #    No uwsm anywhere — niri needs no external session manager.
   #  * portals per upstream recommendation: adds xdg-desktop-portal-gnome
   #    (the ONLY screencast backend niri supports) and writes a
-  #    niri-portals.conf routing default→gnome,gtk / Secret→gnome-keyring.
+  #    niri-portals.conf routing default→gnome,gtk / Secret→gnome-keyring
+  #    (FileChooser→gtk, because useNautilus = false below).
   #    Portal routing is per-desktop (picked by XDG_CURRENT_DESKTOP at
   #    login), so it composes with the generic GTK portal in desktop.nix.
-  #  * enables gnome-keyring (the Secret portal backend, and where Nautilus
-  #    saves SMB passwords — the PAM auto-unlock half is in
-  #    modules/nautilus.nix) so the gnome portal's FileChooser works.
+  #  * enables gnome-keyring (the Secret portal backend, and — via the
+  #    kwalletd6→Secret Service bridge in home/dolphin.nix — where Dolphin's
+  #    saved share passwords land; the PAM auto-unlock half is right below)
+  #    so the gnome portal's FileChooser works.
   #  * swaylock PAM (security.pam.services.swaylock) — set by this module
   #    directly. Unused since the locker became gtklock (whose PAM service
   #    comes from modules/gtklock.nix), but harmless: it's upstream's
@@ -29,6 +31,27 @@
   #    Idle/lock invocation is user-side in home/niri.nix.
   # Window-manager *configuration* comes from home-manager.
   programs.niri.enable = true;
+
+  # The nixpkgs niri module defaults useNautilus=true: it puts the full
+  # Nautilus package on the session bus so xdg-desktop-portal-gnome can use
+  # Nautilus's dialog as the FileChooser. Two problems since the file manager
+  # went to Dolphin (2026-07): every app's open/save dialog was secretly
+  # Nautilus, and Nautilus's D-Bus dir also claims org.freedesktop.FileManager1
+  # — so "reveal in folder" (1Password etc.) opened Nautilus, not Dolphin.
+  # false = FileChooser routes to the GTK portal (already here via desktop.nix)
+  # and Dolphin becomes the only FileManager1 provider. Screencast/Secret
+  # portal routing is untouched — still GNOME.
+  programs.niri.useNautilus = false;
+
+  # Auto-unlock gnome-keyring at login with the login password, so nothing
+  # keyring-backed (Secret portal consumers, Dolphin's saved share passwords)
+  # triggers a second prompt every session. programs.niri above enables the
+  # keyring daemon itself; this is only the PAM half, and it goes on sddm
+  # because that's our display manager (modules/desktop.nix). It lives here —
+  # not in a file-manager module — because the keyring serves the whole
+  # session. (modules/fprintd.nix depends on this: first login must stay
+  # password-only or PAM has nothing to unlock the keyring with.)
+  security.pam.services.sddm.enableGnomeKeyring = true;
 
   # niri 26.04 has xwayland-satellite integration built in: it creates the
   # X11 sockets, exports $DISPLAY, and spawns xwayland-satellite ON DEMAND

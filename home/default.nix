@@ -16,8 +16,9 @@
     ./direnv.nix    # per-directory envs (project dev shells via .envrc)
     ./neovim.nix    # Neovim + LazyVim (live-symlinked lua config; LSPs from Nix, no Mason)
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
-    ./nautilus.nix     # file manager + xdg default for dirs
-    ./file-roller.nix  # archive manager (.zip/.7z/.rar) + CLI backends
+    ./dolphin.nix      # file manager (KIO workers, kwallet→keyring bridge) + xdg default for dirs
+    ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
+    ./qt.nix           # Breeze widget/icon theming for the Qt apps (Dolphin/Ark/VLC)
     ./vlc.nix          # VLC media player + default video/audio handler
     ./obs.nix          # OBS Studio (screencast via GNOME portal, audio via PipeWire)
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
