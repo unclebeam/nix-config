@@ -89,7 +89,8 @@
     ripgrep
     pkgs-unstable.lazygit # fast-moving; tracks unstable (see flake.nix)
     git
-    neovim # package only — config/plugins/LSPs are managed by hand, not Nix
+    # neovim moved to home/neovim.nix — it grew per-user config (LazyVim),
+    # and apps with per-user config live in home/.
     # claude-code moved to home/claude.nix — it grew per-user config
     # (settings + statusline), and apps with per-user config live in home/.
     brave # Chromium-based; runs native Wayland via NIXOS_OZONE_WL (modules/desktop.nix)

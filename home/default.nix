@@ -14,6 +14,7 @@
     ./fish.nix      # shell + prompt
     ./direnv.nix    # per-directory envs (project dev shells via .envrc)
     ./helix.nix     # editor + language servers
+    ./neovim.nix    # Neovim + LazyVim (live-symlinked lua config; LSPs from Nix, no Mason)
     ./zellij.nix    # terminal multiplexer
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
     ./nautilus.nix     # file manager + xdg default for dirs
