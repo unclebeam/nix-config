@@ -57,6 +57,7 @@ Three layers, each with a strict role:
 **Invariants to preserve**:
 - `nixosConfigurations` attribute names must equal each machine's `networking.hostName` — that's what makes bare `nixos-rebuild switch --flake .` work on-machine.
 - `stateVersion` (system and home) is set once at first install; never bump it.
+- The repo checkout lives at `~/nix-config` on every machine. `home/neovim.nix`'s out-of-store symlink hardcodes that path, and its failure mode is silent (a dangling `~/.config/nvim` — nvim just runs configless). Any future out-of-store symlink must use the same base path.
 - Boot loader settings live in `core.nix`, *not* hardware-configuration.nix, so regenerating the hardware file can't drop them.
 - home-manager's release branch must match the nixpkgs release when bumping either.
 

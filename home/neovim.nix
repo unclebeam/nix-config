@@ -33,10 +33,14 @@
   #     plugin versions — a read-only store symlink would break them, and
   # (b) lua config gets edited constantly while learning LazyVim — a store
   #     symlink would force a rebuild+switch per edit; this way edits are live.
-  # Cost: the path below must be where the repo is cloned on every machine.
-  # On a fresh install the link dangles (harmlessly) until the repo exists.
+  # Cost: the path below is a CONTRACT — the repo checkout lives at
+  # ~/nix-config on EVERY machine (recorded in CLAUDE.md's invariants).
+  # This once pointed at a ghq-style ~/repositories/... path that didn't
+  # exist, and the failure is silent: the link dangles without error and
+  # nvim just runs with no config at all. On a fresh install it dangles
+  # the same way (harmlessly) until the repo is cloned into place.
   xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink
-    "${config.home.homeDirectory}/repositories/github.com/unclebeam/nix-config/home/nvim";
+    "${config.home.homeDirectory}/nix-config/home/nvim";
 
   # git commit messages, sudoedit, etc. open Neovim.
   home.sessionVariables.EDITOR = "nvim";
