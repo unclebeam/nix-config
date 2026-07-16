@@ -15,15 +15,17 @@
   #    user manager itself, and only then activates graphical-session.target.
   #    No uwsm anywhere — niri needs no external session manager.
   #  * portals per upstream recommendation: adds xdg-desktop-portal-gnome
-  #    (the ONLY screencast backend niri supports) and writes a
-  #    niri-portals.conf routing default→gnome,gtk / Secret→gnome-keyring
-  #    (FileChooser→gtk, because useNautilus = false below).
+  #    and writes a niri-portals.conf routing default→gnome,gtk /
+  #    Secret→gnome-keyring. Since the 2026-07 KDE-plumbing migration we
+  #    REROUTE most of that below: every dialog-ish interface goes to the
+  #    KDE portal, and only the capture family stays GNOME — it has to,
+  #    because xdg-desktop-portal-gnome is the ONLY screencast backend niri
+  #    supports (niri implements org.gnome.Mutter.ScreenCast; xdp-kde's
+  #    capture code speaks KWin's private zkde_screencast protocol instead).
   #    Portal routing is per-desktop (picked by XDG_CURRENT_DESKTOP at
-  #    login), so it composes with the generic GTK portal in desktop.nix.
-  #  * enables gnome-keyring (the Secret portal backend, and — via the
-  #    kwalletd6→Secret Service bridge in home/dolphin.nix — where Dolphin's
-  #    saved share passwords land; the PAM auto-unlock half is right below)
-  #    so the gnome portal's FileChooser works.
+  #    login), so it composes with the fallback GTK portal in desktop.nix.
+  #  * enables gnome-keyring — overridden back OFF in modules/kwallet.nix,
+  #    where ksecretd (KDE) is the session keyring now.
   #  * swaylock PAM (security.pam.services.swaylock) — set by this module
   #    directly. Unused since the locker became gtklock (whose PAM service
   #    comes from modules/gtklock.nix), but harmless: it's upstream's
@@ -38,20 +40,38 @@
   # went to Dolphin (2026-07): every app's open/save dialog was secretly
   # Nautilus, and Nautilus's D-Bus dir also claims org.freedesktop.FileManager1
   # — so "reveal in folder" (1Password etc.) opened Nautilus, not Dolphin.
-  # false = FileChooser routes to the GTK portal (already here via desktop.nix)
-  # and Dolphin becomes the only FileManager1 provider. Screencast/Secret
-  # portal routing is untouched — still GNOME.
+  # false = keeps Nautilus out of the closure and Dolphin the only
+  # FileManager1 provider. (The FileChooser→gtk route it writes is
+  # overridden to kde just below.)
   programs.niri.useNautilus = false;
 
-  # Auto-unlock gnome-keyring at login with the login password, so nothing
-  # keyring-backed (Secret portal consumers, Dolphin's saved share passwords)
-  # triggers a second prompt every session. programs.niri above enables the
-  # keyring daemon itself; this is only the PAM half, and it goes on sddm
-  # because that's our display manager (modules/desktop.nix). It lives here —
-  # not in a file-manager module — because the keyring serves the whole
-  # session. (modules/fprintd.nix depends on this: first login must stay
-  # password-only or PAM has nothing to unlock the keyring with.)
-  security.pam.services.sddm.enableGnomeKeyring = true;
+  # ── Portal routing: KDE for dialogs, GNOME only for capture ─────────────
+  # The KDE portal serves everything interactive: file dialogs (KIO/Breeze,
+  # matching Dolphin), notifications (forwarded to org.freedesktop.
+  # Notifications, i.e. swaync), Access prompts, and Settings — note that
+  # means apps now read the color-scheme preference from kdeglobals, not
+  # gsettings (neither is set today; future dark-mode work targets
+  # kdeglobals). The niri module hard-sets these keys as plain coerced
+  # strings, so overriding same keys needs mkForce (a second plain
+  # definition is an eval conflict); the gnome pins are NEW keys — today
+  # they fall through `default=gnome` — and merge without force. They exist
+  # because the whole capture family (ScreenCast/Screenshot/RemoteDesktop)
+  # in xdg-desktop-portal-kde is hard-wired to KWin's private
+  # zkde_screencast protocol: routed to kde they wouldn't just be untested,
+  # they'd be certainly broken. GNOME capture is the permanent exception to
+  # the KDE plumbing — do not "finish" the migration by flipping these.
+  # (Secret→kwallet lives in modules/kwallet.nix: one file per intent, so
+  # deleting the keyring module deletes its route.)
+  xdg.portal.extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ];
+  xdg.portal.config.niri = {
+    default = lib.mkForce [ "kde" "gtk" ];
+    "org.freedesktop.impl.portal.Access" = lib.mkForce "kde";
+    "org.freedesktop.impl.portal.FileChooser" = lib.mkForce "kde";
+    "org.freedesktop.impl.portal.Notification" = lib.mkForce "kde";
+    "org.freedesktop.impl.portal.ScreenCast" = "gnome";
+    "org.freedesktop.impl.portal.Screenshot" = "gnome";
+    "org.freedesktop.impl.portal.RemoteDesktop" = "gnome";
+  };
 
   # niri 26.04 has xwayland-satellite integration built in: it creates the
   # X11 sockets, exports $DISPLAY, and spawns xwayland-satellite ON DEMAND
@@ -60,9 +80,7 @@
   # X11 apps just fail to connect, nothing crashes.
   environment.systemPackages = [ pkgs.xwayland-satellite ];
 
-  # Deliberately NO polkit authentication agent, even though upstream
-  # suggests plasma-polkit-agent: the old hyprland session ran without one
-  # (1Password ships its own polkit policy and nothing else has needed GUI
-  # auth), and niri has needed none since. If auth prompts ever go missing,
-  # plasma-polkit-agent is the upstream-recommended fix.
+  # The polkit authentication agent (upstream-recommended
+  # plasma-polkit-agent) lives in modules/polkit-agent.nix — added 2026-07
+  # with the KDE plumbing, reversing the earlier deliberate no-agent setup.
 }

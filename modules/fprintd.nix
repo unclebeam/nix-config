@@ -1,10 +1,10 @@
 # fprintd.nix — fingerprint auth for the ThinkPad's Synaptics sensor
 # (lsusb 06cb:0123, libfprint "synaptics" driver). Enroll once after the
 # first switch with:
-#   sudo fprintd-enroll unclebeam
-# (sudo, not plain fprintd-enroll: enrollment needs polkit auth, and this
-# session deliberately runs no polkit agent — see modules/niri.nix — so
-# there is nothing to show the prompt and polkit denies. Root bypasses it.)
+#   fprintd-enroll
+# (enrollment needs polkit auth; since 2026-07 plasma-polkit-agent —
+# modules/polkit-agent.nix — shows the prompt. Before that agent existed,
+# the workaround was `sudo fprintd-enroll unclebeam`.)
 # Then sanity-check the sensor with: fprintd-verify
 { config, lib, pkgs, ... }:
 
@@ -17,14 +17,16 @@
   services.fprintd.enable = true;
 
   # ── Keep the greeter (and tty login) password-only ─────────────────────
-  # pam_gnome_keyring (wired on the sddm service in modules/niri.nix)
-  # can only auto-unlock the keyring with the password typed at login. A
-  # fingerprint login would leave the keyring locked and every
-  # keyring-backed app prompting separately — so first login stays
-  # password-only, and fingerprint is for the surfaces where the keyring
-  # is already open.
+  # pam_kwallet (wired on the `login` service in modules/kwallet.nix, which
+  # sddm's PAM stack substacks) can only derive the wallet key from the
+  # password typed at login. A fingerprint login would leave the wallet
+  # locked and every secrets-backed app prompting separately — so first
+  # login stays password-only, and fingerprint is for the surfaces where
+  # the wallet is already open. The `login` line is the load-bearing one
+  # (and always was — sddm has no default rules, it just substacks login);
+  # the sddm line is a harmless no-op kept as belt-and-braces.
   security.pam.services.sddm.fprintAuth = false;
-  security.pam.services.login.fprintAuth = false; # tty login: same rule
+  security.pam.services.login.fprintAuth = false;
 
   # Known quirk left as-is: on the gtklock lock screen PAM runs
   # pam_fprintd first, so a typed password is only accepted after the

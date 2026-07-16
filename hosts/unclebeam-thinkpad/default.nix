@@ -9,6 +9,8 @@
     ../../modules/core.nix
     ../../modules/desktop.nix    # greeter (session picker), fonts, Wayland env
     ../../modules/niri.nix       # niri session (the only compositor; won the trial vs hyprland)
+    ../../modules/kwallet.nix    # session keyring: ksecretd + pam_kwallet unlock (replaced gnome-keyring 2026-07)
+    ../../modules/polkit-agent.nix # plasma-polkit-agent (GUI auth prompts; added 2026-07)
     ../../modules/gtklock.nix    # greeter-look lock screen (gtklock + plugin modules + PAM)
     ../../modules/audio.nix
     ../../modules/bluetooth.nix  # bluetoothd + Blueman GUI (built-in Intel adapter)

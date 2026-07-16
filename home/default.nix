@@ -16,7 +16,8 @@
     ./direnv.nix    # per-directory envs (project dev shells via .envrc)
     ./neovim.nix    # Neovim + LazyVim (live-symlinked lua config; LSPs from Nix, no Mason)
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
-    ./dolphin.nix      # file manager (KIO workers, kwallet→keyring bridge) + xdg default for dirs
+    ./dolphin.nix      # file manager (KIO workers) + xdg default for dirs
+    ./kwallet.nix      # session keyring user half: kwalletrc (ksecretd on, no first-run wizard)
     ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
     ./qt.nix           # Breeze widget/icon theming for the Qt apps (Dolphin/Ark/VLC)
     ./vlc.nix          # VLC media player + default video/audio handler

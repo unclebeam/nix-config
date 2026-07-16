@@ -1,10 +1,11 @@
 # home/dolphin.nix — Dolphin (KDE Files) as THE file manager (also the xdg
 # default for opening directories). One file per intent: everything that
 # exists because of Dolphin lives here. It replaced Nautilus 2026-07 by
-# explicit request — reversing the 2026 "GNOME apps only" decision — while
-# the session plumbing deliberately stays GNOME (gnome-keyring + GNOME
-# portals; niri's only screencast backend is the GNOME portal, so that side
-# can't follow).
+# explicit request — reversing the 2026 "GNOME apps only" decision. The
+# session plumbing followed to KDE in 2026-07 (ksecretd keyring in
+# modules/kwallet.nix, KDE portals in modules/niri.nix), so "remember
+# password" flows KIO → ksecretd natively — no bridge needed. Only
+# screencasting stays GNOME (niri's sole capture backend).
 #
 # The system half (avahi discovery, udisks2, ntfs/exfat) lives in
 # modules/dolphin.nix — only NixOS can set those. Removing Dolphin = delete
@@ -42,12 +43,9 @@
     kdePackages.ffmpegthumbs
     kdePackages.kdegraphics-thumbnailers
 
-    # NOT here for local wallet storage: since the 2025 KWallet refactor,
-    # kwalletd6 is a thin wrapper that translates KWallet API calls (KIO's
-    # password server = Dolphin's "remember password" for smb://sftp) into
-    # Secret Service calls. Combined with the kwalletrc below, saved share
-    # passwords land in gnome-keyring — the session's one real keyring.
-    kdePackages.kwallet
+    # (kdePackages.kwallet — where "remember password" secrets go — is
+    # installed system-side by modules/kwallet.nix, as the keyring is its
+    # own intent now, not Dolphin fallout.)
   ];
 
   # udiskie is the piece that makes mounting *automatic*. udisks2 (enabled in
@@ -92,30 +90,5 @@
       <DefaultAppDirs/>
       <Include><All/></Include>
     </Menu>
-  '';
-
-  # ── Route KWallet API traffic into gnome-keyring ─────────────────────────
-  # [KSecretD] Enabled=false stops KWallet's own Secret Service daemon from
-  # ever starting, so it can't fight gnome-keyring over the
-  # org.freedesktop.secrets D-Bus name (gnome-keyring backs niri's Secret
-  # portal and is auto-unlocked at login via PAM — modules/niri.nix).
-  # [Migration] MigrateTo3rdParty=true tells the kwalletd6 wrapper to hand
-  # secrets to whatever Secret Service provider is running instead —
-  # i.e. gnome-keyring. First Use=false suppresses KWallet's first-run
-  # wizard (the "Basic (Blowfish) vs Advanced (GPG)" dialog): with the
-  # bridge no local wallet is ever created, so the wizard is pure noise,
-  # and this guarantees it can't appear even on a fallback path.
-  # This bridge is new (Plasma 6.4-era, 2025); its failure mode is a
-  # password prompt or an unsaved password — never data loss. If it
-  # misbehaves, deleting this file just means passwords aren't remembered.
-  xdg.configFile."kwalletrc".text = ''
-    [Wallet]
-    First Use=false
-
-    [Migration]
-    MigrateTo3rdParty=true
-
-    [KSecretD]
-    Enabled=false
   '';
 }

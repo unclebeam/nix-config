@@ -4,7 +4,9 @@
 #
 # No system-side (modules/) half needed: screen capture on niri goes through
 # xdg-desktop-portal-gnome (pulled in by programs.niri.enable in
-# modules/niri.nix — the only screencast backend niri supports), and audio
+# modules/niri.nix — the only screencast backend niri supports; capture is
+# the one interface that deliberately stayed GNOME through the 2026-07
+# KDE-plumbing migration), and audio
 # capture rides the PipeWire stack from modules/audio.nix. Both are already
 # there for other reasons, so OBS is a plain user package.
 #

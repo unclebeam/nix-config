@@ -183,10 +183,12 @@ in
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   # xdg-desktop-portal is how sandbox-ish desktop APIs work on Wayland:
-  # screen sharing, screenshots, file pickers. The GTK portal covers the
-  # generic interfaces (file chooser…); modules/niri.nix adds the GNOME
-  # portal (niri's ScreenCast backend) plus the niri-portals.conf that
-  # routes each interface to the right backend.
+  # screen sharing, screenshots, file pickers. Since the 2026-07 KDE
+  # migration nothing routes to the GTK portal directly — dialogs go to the
+  # KDE portal, capture to the GNOME one (both via modules/niri.nix's
+  # routing) — it's only the trailing fallback in `default=kde;gtk` for
+  # interfaces neither implements. Kept here (the niri module force-installs
+  # it anyway) so this file stays a working baseline for any compositor.
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
   # ── Fonts ──────────────────────────────────────────────────────────────

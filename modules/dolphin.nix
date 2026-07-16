@@ -4,8 +4,8 @@
 # there is deliberately NO services.gvfs here — Dolphin's remote-protocol
 # layer is KIO (kio-extras + kio-fuse), which ships as plain user packages in
 # home/dolphin.nix and needs no system daemon. (The keyring PAM unlock that
-# used to live here moved to modules/niri.nix, where gnome-keyring itself is
-# enabled — it never belonged to the file manager.)
+# used to live here now lives in modules/kwallet.nix with the rest of the
+# keyring — it never belonged to the file manager.)
 { config, lib, pkgs, ... }:
 
 {

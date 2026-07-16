@@ -9,8 +9,12 @@
 {
   home.pointerCursor = {
     enable = true;
-    package = pkgs.adwaita-icon-theme; # plain GNOME cursor — matches the minimal look
-    name = "Adwaita";
+    # Breeze cursors (KDE's default, the black variant) — switched from
+    # Adwaita 2026-07 with the KDE-plumbing migration. kdePackages.breeze
+    # ships the theme as share/icons/breeze_cursors; the dir name is what
+    # XCURSOR_THEME wants, not the display name ("Breeze Dark").
+    package = pkgs.kdePackages.breeze;
+    name = "breeze_cursors";
     size = 24; # logical px; the compositor multiplies by the output scale (1.5) on screen
 
     # niri picks this up too: home/niri.nix reads this option into the
