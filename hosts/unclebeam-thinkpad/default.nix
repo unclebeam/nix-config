@@ -20,6 +20,7 @@
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
+    ../../modules/brave.nix      # Brave managed policy: Google as default search (user half in home/brave.nix)
     ../../modules/dolphin.nix    # avahi discovery + udisks2 + ntfs/exfat (system half of Dolphin)
     ../../modules/localsend.nix  # LAN file sharing (AirDrop-style) + firewall port
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)

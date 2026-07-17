@@ -28,6 +28,7 @@
     ./onlyoffice.nix   # OnlyOffice desktop editors (alongside LibreOffice in core.nix)
     ./mangohud.nix     # in-game FPS overlay (per-game: `mangohud %command%` in Steam)
     ./google-drive.nix # ~/GoogleDrive rclone mount (one-time: `rclone config`)
+    ./brave.nix        # default browser: web-link handler + $BROWSER (search policy in modules/brave.nix)
     ./claude.nix       # Claude Code CLI + settings + statusline script
     ./insta360-link.nix # Insta360 Link 2 Pro webcam: v4l2-ctl + cameractrls PTZ control
     ./power.nix         # Shutdown/Reboot as fuzzel launcher entries (systemctl via logind)

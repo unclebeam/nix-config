@@ -94,7 +94,8 @@
     # and apps with per-user config live in home/.
     # claude-code moved to home/claude.nix — it grew per-user config
     # (settings + statusline), and apps with per-user config live in home/.
-    brave # Chromium-based; runs native Wayland via NIXOS_OZONE_WL (modules/desktop.nix)
+    # brave moved to home/brave.nix — it grew per-user config (xdg
+    # default-browser handlers), and apps with per-user config live in home/.
     wget
     curl
     # Global Node = whatever nixpkgs calls "latest" at each `nix flake update`
