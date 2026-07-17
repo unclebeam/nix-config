@@ -74,3 +74,27 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+(after! lsp-mode
+  ;; no-Mason: servers come from Nix (home/emacs.nix), never editor-downloaded.
+  (setq lsp-enable-suggest-server-download nil)
+  ;; lsp-mode's built-in Tailwind client (the old lsp-tailwindcss package,
+  ;; merged upstream) registers as an ADD-ON server (add-on-mode defaults to
+  ;; t), so it runs alongside ts-ls in .tsx buffers — className completion,
+  ;; the thing eglot could never do (one server per buffer; the reason this
+  ;; config switched to lsp-mode). Empty server-path would mean an
+  ;; lsp-managed download; point it at the Nix binary instead.
+  (setq lsp-tailwindcss-server-path
+        (executable-find "tailwindcss-language-server")))
+
+;; Tree-sitter grammars come from Nix (home/emacs.nix symlinks them to
+;; ~/.local/share/emacs-tree-sitter-grammars) — Doom's runtime auto-install
+;; can NEVER install the tsx grammar (its ensure logic short-circuits for
+;; ts-modes with no fallback mode, "even if a missing grammar results in a
+;; broken state"), and Nix-built .so's fit the no-Mason rule anyway.
+;; expand-file-name because treesit concatenates dir + libname for dlopen;
+;; after! treesit because the var is defined there, loaded when any ts-mode
+;; activates — before Doom's ensure wrapper calls treesit-ready-p.
+(after! treesit
+  (add-to-list 'treesit-extra-load-path
+               (expand-file-name "~/.local/share/emacs-tree-sitter-grammars")))
