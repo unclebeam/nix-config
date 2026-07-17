@@ -23,10 +23,8 @@
     # generated ~/.config/niri/nix.kdl cursor section — one source of truth.
 
     # Generates the gtk cursor settings so GTK apps pick the same theme/size.
+    # Only *generates* them — the gtk module that actually writes settings.ini
+    # is switched on in home/gtk.nix (which also owns the GTK icon theme).
     gtk.enable = true;
   };
-
-  # home.pointerCursor.gtk.enable only *generates* the gtk settings; the gtk
-  # module itself must be on for them to actually be written out.
-  gtk.enable = true;
 }
