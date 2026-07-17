@@ -72,13 +72,26 @@
   # the upstream ExecStart. Without it ksecretd stays keyed-but-busless
   # (step 2) and every secrets consumer prompts for a password.
   # Upstream's Before=/After= lines reference plasma-* units that don't
-  # exist here and were dropped; ordering is safe because niri-session
-  # imports the PAM environment (incl. PAM_KWALLET5_LOGIN) into the user
-  # manager before graphical-session.target comes up.
+  # exist here and were dropped — but their ROLE (run after the compositor
+  # is up) must be kept, hence after=niri.service. The env-pipe timing is
+  # load-bearing: ksecretd constructs its QApplication the moment the env
+  # arrives, so WAYLAND_DISPLAY in that env must point at a LIVE socket.
+  # Without the ordering this unit raced niri.service (both are merely
+  # Before=graphical-session.target) and on second-and-later logins piped
+  # the user manager's STALE WAYLAND_DISPLAY from the previous session:
+  # ksecretd tried the dead socket, fell back to xcb (no X either),
+  # SIGABRTed — taking the PAM-derived wallet key with it — and a key-less
+  # dbus-activated replacement served the bus, so every secrets consumer
+  # prompted for the wallet password. niri.service is Type=notify and only
+  # signals readiness after the socket exists and WAYLAND_DISPLAY is in
+  # the user manager, so ordering after it closes the race. Naming
+  # niri.service here couples this file to the compositor, deliberately —
+  # this repo is niri-only (see modules/niri.nix).
   systemd.user.services.plasma-kwallet-pam = {
     description = "Unlock kwallet from PAM credentials";
     wantedBy = [ "graphical-session.target" ];
     partOf = [ "graphical-session.target" ];
+    after = [ "niri.service" ];
     serviceConfig = {
       ExecStart = "${pkgs.kdePackages.kwallet-pam}/libexec/pam_kwallet_init";
       Type = "simple";
