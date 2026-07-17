@@ -27,6 +27,15 @@
   #     replacing plasma-polkit-agent.
   programs.dank-material-shell.enable = true;
 
+  # UPower — the D-Bus battery/AC state source. The DMS module enables
+  # power-profiles-daemon etc. but NOT upower, and DMS's battery widget is
+  # hard-wired to it (BatteryService: `isPluggedIn: !UPower.onBattery`) —
+  # without the daemon the bar reports "Plugged In" forever, even on
+  # battery. Both hosts get it (same reasoning as power-profiles-daemon
+  # above): on the PC it's what surfaces Bluetooth mouse/keyboard battery
+  # levels in the same widget.
+  services.upower.enable = true;
+
   # The shell's UI fonts. Neither the HM module nor this one installs them
   # (only the greeter module does, and that's a separate intent that must
   # stay removable on its own): Inter for UI text, Fira Code for mono,
