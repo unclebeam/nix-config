@@ -103,7 +103,6 @@
     # they get theirs from a dev shell activated by direnv (home/direnv.nix),
     # which shadows this one inside the project dir.
     nodejs_latest
-    firefox
     # Electron (native Wayland via NIXOS_OZONE_WL) and unfree.
     obsidian # markdown notes — vaults live in $HOME, nothing for Nix to configure
     slack # also Electron + unfree, same Wayland story as obsidian

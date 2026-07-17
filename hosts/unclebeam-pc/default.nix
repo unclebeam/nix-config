@@ -26,7 +26,6 @@
     ../../modules/localsend.nix  # LAN file sharing (AirDrop-style) + firewall port
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)
     ../../modules/zsa.nix        # ZSA keyboard udev rules (flash via Oryx in browser)
-    ../../modules/xbox-controller.nix # xone driver for the Xbox Wireless Adapter dongle
   ];
 
   # MUST match the attribute name in flake.nix — this is how a bare
