@@ -14,7 +14,8 @@
     pkgs.neovim
 
     # ── LazyVim runtime tools (exist ONLY because of LazyVim) ──
-    pkgs.fd # file finder for pickers (ripgrep/fzf are already in core.nix)
+    # (fd was here, but Doom Emacs became a second consumer — promoted to
+    # core.nix next to ripgrep/fzf, which pickers also use from there.)
     pkgs.gcc # nvim-treesitter compiles parsers at runtime into ~/.local/share/nvim
     pkgs.tree-sitter # tree-sitter CLI, required by nvim-treesitter's main branch
 

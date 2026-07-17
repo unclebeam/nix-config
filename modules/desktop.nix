@@ -197,6 +197,13 @@ in
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
     nerd-fonts.iosevka-term # alacritty's terminal font (home/alacritty.nix)
+    # "Symbols Nerd Font Mono" — the default family of emacs' nerd-icons
+    # (doom-modeline/dired icons, home/emacs.nix). Without it Doom nags to run
+    # M-x nerd-icons-install-fonts, which drops an untracked font in ~/.local.
+    nerd-fonts.symbols-only
+    # Emacs' last-resort glyph fallback (`doom doctor` warns without it) —
+    # missing obscure glyphs can slow emacs badly. Unfree (allowUnfree is on).
+    symbola
     sarabun-font # Thai text font (the fontconfig rules below prefer it)
     th-sarabun-psk # family "TH SarabunPSK" — for Thai official documents
     noto-fonts

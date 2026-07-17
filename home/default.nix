@@ -15,6 +15,7 @@
     ./fish.nix      # shell + prompt
     ./direnv.nix    # per-directory envs (project dev shells via .envrc)
     ./neovim.nix    # Neovim + LazyVim (live-symlinked lua config; LSPs from Nix, no Mason)
+    ./emacs.nix     # Doom Emacs (classic clone; Nix ships emacs-pgtk, doom config live-symlinked)
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
     ./dolphin.nix      # file manager (KIO workers) + xdg default for dirs
     ./kwallet.nix      # session keyring user half: kwalletrc (ksecretd on, no first-run wizard)

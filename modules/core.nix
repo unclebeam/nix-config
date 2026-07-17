@@ -87,6 +87,7 @@
     btop
     fzf
     ripgrep
+    fd # file finder; promoted from home/neovim.nix when Doom Emacs became a second consumer
     pkgs-unstable.lazygit # fast-moving; tracks unstable (see flake.nix)
     git
     # neovim moved to home/neovim.nix — it grew per-user config (LazyVim),
