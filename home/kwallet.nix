@@ -12,6 +12,27 @@
 { config, lib, pkgs, ... }:
 
 {
+  home.packages = [
+    # `kwallet-rekey [wallet]` — pops KWallet's change-password dialog for
+    # the wallet (default: kdewallet). Rekeying has no CLI/GUI entry point
+    # here (kwalletmanager isn't installed), so the D-Bus method is the
+    # only path. Signature sxs = (wallet name, window id, appid).
+    #
+    # ⚠ pam_kwallet (modules/kwallet.nix) derives the wallet key from the
+    # LOGIN password — rekeying to anything else silently breaks
+    # auto-unlock at next login, so change the login password first
+    # (passwd), then rekey the wallet to the same one. The script prints
+    # that reminder before the dialog appears.
+    (pkgs.writeShellScriptBin "kwallet-rekey" ''
+      wallet=''${1:-kdewallet}
+      echo "NOTE: auto-unlock (pam_kwallet) only works if the wallet password" >&2
+      echo "matches your LOGIN password. Keep them in sync — change your login" >&2
+      echo "password first (passwd), then rekey the wallet to the same one." >&2
+      exec busctl --user call org.kde.kwalletd6 /modules/kwalletd6 \
+        org.kde.KWallet changePassword "sxs" "$wallet" 0 ""
+    '')
+  ];
+
   xdg.configFile."kwalletrc".text = ''
     [Wallet]
     # Suppress the first-run wizard (the "Basic (Blowfish) vs Advanced
