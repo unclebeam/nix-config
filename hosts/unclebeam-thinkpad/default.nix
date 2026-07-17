@@ -7,16 +7,16 @@
     ./hardware-configuration.nix # machine-generated; see the placeholder note
     ./disko.nix                  # declarative disk layout (partitions, btrfs, mounts)
     ../../modules/core.nix
-    ../../modules/desktop.nix    # greeter (session picker), fonts, Wayland env
+    ../../modules/desktop.nix    # fonts, Wayland env, GTK portal fallback
     ../../modules/niri.nix       # niri session (the only compositor; won the trial vs hyprland)
+    ../../modules/dms.nix        # DMS shell, system half (service defaults + shell fonts; shell itself in home/dms.nix)
+    ../../modules/dms-greeter.nix # DMS login greeter on greetd (replaced SDDM 2026-07)
     ../../modules/kwallet.nix    # session keyring: ksecretd + pam_kwallet unlock (replaced gnome-keyring 2026-07)
-    ../../modules/polkit-agent.nix # plasma-polkit-agent (GUI auth prompts; added 2026-07)
-    ../../modules/gtklock.nix    # greeter-look lock screen (gtklock + plugin modules + PAM)
     ../../modules/audio.nix
     ../../modules/bluetooth.nix  # bluetoothd + Blueman GUI (built-in Intel adapter)
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
     ../../modules/laptop.nix     # power mgmt, backlight, lid behavior, fwupd
-    ../../modules/fprintd.nix    # fingerprint auth (sudo/polkit/gtklock; greeter stays password)
+    ../../modules/fprintd.nix    # fingerprint auth (sudo/polkit/DMS lock screen; greeter stays password — kwallet)
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension

@@ -1,29 +1,37 @@
-# home/qt.nix — Qt widget/icon theming, so Qt apps don't draw the bare
-# Fusion default under an otherwise GTK session. Promoted to its own file
-# because it now has three consumers (the promotion rule in CLAUDE.md):
-# Dolphin and Ark (Qt6/KF6) and VLC (Qt5). Not tied to any one app — remove
-# it and the apps still run, just visibly unthemed.
+# home/qt.nix — Qt theming, so Qt apps don't draw the bare Fusion default
+# and instead follow DMS's wallpaper-derived (matugen) colors. Promoted to
+# its own file because it has three consumers (the promotion rule in
+# CLAUDE.md): Dolphin and Ark (Qt6/KF6) and VLC (Qt5). Not tied to any one
+# app — remove it and the apps still run, just visibly unthemed.
+#
+# How the colors flow (replaced Breeze 2026-07 with the DMS migration):
+# DMS generates a qt6ct/qt5ct color scheme from the wallpaper when "Apply
+# Qt themes" is toggled on in DMS Settings; QT_QPA_PLATFORMTHEME=qt6ct
+# below makes Qt apps read it. Nothing renders DMS colors until that
+# toggle is flipped once — until then Qt apps show qt6ct's defaults.
 { config, lib, pkgs, ... }:
 
 {
-  qt.enable = true;
+  home.packages = [
+    # qt6ct, the KDE-flavored build: KF6 apps (Dolphin, Ark) resolve their
+    # palette through KColorScheme, which plain qt6ct can't feed — this
+    # variant carries the KDE integration so DMS's generated scheme
+    # actually reaches them. (In nixpkgs the qt6ct-kde fork IS
+    # kdePackages.qt6ct; there is no separate top-level attr.)
+    pkgs.kdePackages.qt6ct
+    # VLC is Qt5; qt5ct reads the same DMS-generated colors for it.
+    pkgs.libsForQt5.qt5ct
+    # KF6 apps hardcode "breeze" as their default icon-theme name; without
+    # the theme actually installed, Dolphin/Ark render missing-icon
+    # placeholders on every toolbar button. (Only the ICONS survive the
+    # Breeze exit — the widget style is qt6ct's now.)
+    pkgs.kdePackages.breeze-icons
+  ];
 
-  # Breeze — KDE's stock widget style, the look Dolphin/Ark are designed
-  # around. Naming it is enough: home-manager resolves the package to
-  # kdePackages.breeze (Qt6) plus its .qt5 variant (so VLC gets it too) and
-  # exports QT_STYLE_OVERRIDE + QT_PLUGIN_PATH into both the session env and
-  # the systemd user env — which is what makes it apply to fuzzel-launched
-  # apps under niri, where no Plasma is around to set anything.
-  qt.style.name = "breeze";
-
-  # KF6 apps hardcode "breeze" as their default icon-theme name; without the
-  # theme actually installed, Dolphin/Ark render missing-icon placeholders
-  # on every toolbar button.
-  home.packages = [ pkgs.kdePackages.breeze-icons ];
-
-  # Deliberately NO qt.platformTheme (restrained-by-default, per repo style):
-  # the style override above covers widgets and that's what shows. If fonts
-  # or file dialogs in Qt apps ever look off, the escalation path is
-  # qt.platformTheme.name = "gtk3" (follow the GTK settings) or "kde"
-  # (full plasma-integration, configured via qt.kde.settings).
+  # Both halves matter: sessionVariables covers login shells, but apps
+  # launched from Spotlight under niri inherit the systemd user
+  # environment — that second line is what the old qt.enable module did
+  # for us and is easy to lose.
+  home.sessionVariables.QT_QPA_PLATFORMTHEME = "qt6ct";
+  systemd.user.sessionVariables.QT_QPA_PLATFORMTHEME = "qt6ct";
 }

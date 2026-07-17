@@ -9,11 +9,11 @@
     ./hardware-configuration.nix # machine-generated; filesystems moved to disko.nix
     ./disko.nix                  # declarative disk layout (partitions, btrfs, mounts)
     ../../modules/core.nix       # users, nix settings, boot loader, networking…
-    ../../modules/desktop.nix    # greeter (session picker), fonts, Wayland env
+    ../../modules/desktop.nix    # fonts, Wayland env, GTK portal fallback
     ../../modules/niri.nix       # niri session (the only compositor; won the trial vs hyprland)
+    ../../modules/dms.nix        # DMS shell, system half (service defaults + shell fonts; shell itself in home/dms.nix)
+    ../../modules/dms-greeter.nix # DMS login greeter on greetd (replaced SDDM 2026-07)
     ../../modules/kwallet.nix    # session keyring: ksecretd + pam_kwallet unlock (replaced gnome-keyring 2026-07)
-    ../../modules/polkit-agent.nix # plasma-polkit-agent (GUI auth prompts; added 2026-07)
-    ../../modules/gtklock.nix    # greeter-look lock screen (gtklock + plugin modules + PAM)
     ../../modules/audio.nix      # pipewire
     ../../modules/bluetooth.nix  # bluez userspace for the MT7925's BT radio
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl

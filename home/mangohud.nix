@@ -4,11 +4,6 @@
 # toggles it while playing.
 { config, lib, pkgs, ... }:
 
-let
-  colors = import ./colors.nix;
-  # MangoHud wants rrggbb WITHOUT the leading '#'; palette entries carry one.
-  hex = c: lib.removePrefix "#" c;
-in
 {
   programs.mangohud = {
     enable = true;
@@ -30,12 +25,9 @@ in
       font_size = 20;
       background_alpha = 0.4; # keep the game visible behind the box
 
-      # Melange palette, same source of truth as every other themed app.
-      background_color = hex colors.a.bg;
-      text_color = hex colors.a.fg;
-      gpu_color = hex colors.c.green;
-      cpu_color = hex colors.c.blue;
-      frametime_color = hex colors.b.green;
+      # Colors stay at MangoHud's defaults. (The old melange overrides left
+      # with colors.nix in the DMS migration — an in-game overlay isn't a
+      # desktop surface, and DMS's dynamic colors can't reach it anyway.)
 
       # MangoHud's stock toggle bind, written out so it's discoverable here.
       toggle_hud = "Shift_R+F12";

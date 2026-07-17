@@ -10,7 +10,9 @@
   home.pointerCursor = {
     enable = true;
     # Breeze cursors (KDE's default, the black variant) — switched from
-    # Adwaita 2026-07 with the KDE-plumbing migration. kdePackages.breeze
+    # Adwaita 2026-07 with the KDE-plumbing migration, and deliberately
+    # KEPT through the DMS migration: a neutral black cursor fits any
+    # matugen palette, and DMS doesn't manage cursors. kdePackages.breeze
     # ships the theme as share/icons/breeze_cursors; the dir name is what
     # XCURSOR_THEME wants, not the display name ("Breeze Dark").
     package = pkgs.kdePackages.breeze;

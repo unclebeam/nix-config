@@ -2,12 +2,9 @@
 # niri's built-in screenshot UI (Print) saves to ~/Pictures/Screenshots,
 # and satty is run BY HAND on a saved file when a shot needs arrows/text:
 #   satty --filename ~/Pictures/Screenshots/<shot>.png
-# Owns everything satty: the package, config.toml, and its palette colors.
+# Owns everything satty: the package and config.toml.
 { config, lib, pkgs, ... }:
 
-let
-  colors = import ./colors.nix;
-in
 {
   programs.satty = {
     enable = true;
@@ -29,10 +26,9 @@ in
         actions-on-enter = [ "save-to-clipboard" ]; # Enter = copy(+save)+exit
         actions-on-escape = [ "exit" ];
       };
-      color-palette = {
-        # Toolbar quick-pick colors — the melange vivid accents.
-        palette = with colors.b; [ red yellow green cyan blue magenta ];
-      };
+      # Toolbar quick-pick colors: satty's stock palette. (The old melange
+      # override left with colors.nix in the DMS migration — annotation
+      # colors want to be legible on any screenshot, not to match a theme.)
     };
   };
 }

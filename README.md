@@ -1,23 +1,26 @@
 # nix-config
 
-NixOS flake for my two machines. One repo, one palette, reinstall = one command.
+NixOS flake for my two machines. One repo, one shell, reinstall = one command.
 
 | Host | Hardware | Role |
 |---|---|---|
 | `unclebeam-pc` | AMD Ryzen 9 + AMD RDNA GPU (mesa/RADV) | Desktop, gaming |
 | `unclebeam-thinkpad` | ThinkPad X1 Carbon Aura (Intel Core Ultra) | Laptop |
 
-Both run NixOS 26.05 + niri + Waybar/fuzzel/mako/gtklock, themed with the
-[melange](https://github.com/savq/melange-nvim) dark palette. The palette is
-defined once in [`home/colors.nix`](home/colors.nix) and every app references it.
+Both run NixOS 26.05 + niri +
+[DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell) (DMS):
+one quickshell process is the bar, launcher, notifications, lock screen,
+greeter, OSD, clipboard history, polkit agent, and power menu. Theming is
+dynamic — DMS/matugen derives Material You colors from the wallpaper and
+applies them to the shell, niri, GTK/Qt apps, and the terminal.
 
 ## Layout
 
 ```
 flake.nix       inputs (nixpkgs 26.05, home-manager) + one nixosConfiguration per host
 hosts/<name>/   thin per-host config + hardware-configuration.nix (machine-generated)
-modules/        shared NixOS modules: core, desktop, niri, audio, gaming, laptop
-home/           shared home-manager config: colors, niri, waybar, alacritty, fish, ...
+modules/        shared NixOS modules: core, desktop, niri, dms, dms-greeter, audio, gaming, laptop
+home/           shared home-manager config: niri, dms, alacritty, fish, ...
 ```
 
 ## Installing a machine

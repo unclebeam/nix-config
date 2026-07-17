@@ -52,10 +52,11 @@
   # modules/dolphin.nix) only exposes removable drives and permits mounting;
   # udiskie runs as a systemd user service in the graphical session, watches for
   # newly-plugged devices, and mounts them the instant they appear under
-  # /run/media/unclebeam/<label>. tray = "never" because this minimal Waybar has
-  # no StatusNotifier tray host — with the default "auto", udiskie would sit
-  # waiting for a tray icon and silently never automount. notify routes toasts
-  # through the notification daemon (home/swaync.nix) on mount/unmount.
+  # /run/media/unclebeam/<label>. tray = "never" is deliberate: with the
+  # default "auto", udiskie waits for a StatusNotifier tray host at startup
+  # and silently never automounts if one is slow to appear — "never" keeps
+  # automount independent of the DMS bar's tray. notify routes toasts
+  # through the notification daemon (the DMS shell) on mount/unmount.
   services.udiskie = {
     enable = true;
     automount = true;

@@ -16,7 +16,7 @@
     # allowUnfree) and hands it to every module as `pkgs-unstable`.
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # home-manager manages per-user config (dotfiles, niri config, waybar css…).
+    # home-manager manages per-user config (dotfiles, niri config, the DMS shell…).
     # Its release branch must match the nixpkgs release.
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
@@ -47,11 +47,16 @@
       };
     };
 
-    # SilentSDDM — the SDDM login theme (Qt6/QML). Unlike zen-browser this
-    # one ships a NixOS module (programs.silentSDDM), so it IS wired into
-    # mkHost below; modules/desktop.nix flips it on and skins it melange.
-    silentSDDM = {
-      url = "github:uiriansan/SilentSDDM";
+    # DankMaterialShell (DMS) — the quickshell-based desktop shell that IS
+    # the whole desktop: bar, launcher, notifications, lock screen, OSD,
+    # clipboard history, polkit agent, power menu, wallpaper + matugen
+    # theming. Ships a home-manager module (the shell itself, enabled in
+    # home/dms.nix) and NixOS modules (system defaults in modules/dms.nix,
+    # greetd login greeter in modules/dms-greeter.nix). `stable` branch per
+    # the official docs. Note: dms-shell builds from source (Go + QML) —
+    # there is no binary cache, so the first rebuild compiles it.
+    dank-material-shell = {
+      url = "github:AvengeMedia/DankMaterialShell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -63,7 +68,7 @@
       nixpkgs-unstable,
       home-manager,
       disko,
-      silentSDDM,
+      dank-material-shell,
       ...
     }@inputs:
     let
@@ -97,10 +102,12 @@
             # Both hosts do, in hosts/<name>/disko.nix.
             disko.nixosModules.disko
 
-            # SilentSDDM's NixOS module. Same deal as disko: loading it only
-            # adds the `programs.silentSDDM` options; modules/desktop.nix is
-            # what actually enables and configures the greeter.
-            silentSDDM.nixosModules.default
+            # DMS's NixOS modules. Same deal as disko: loading them only adds
+            # options. The shell module (system-side service defaults) is
+            # enabled by modules/dms.nix; the greeter module (greetd + DMS
+            # greeter UI) is enabled by modules/dms-greeter.nix.
+            dank-material-shell.nixosModules.dank-material-shell
+            dank-material-shell.nixosModules.greeter
 
             # Wire home-manager in as a NixOS module: `nixos-rebuild switch`
             # builds system AND user config in one transaction.
@@ -115,10 +122,12 @@
               # On rebuild, keep any pre-existing conflicting dotfile as
               # <name>.backup instead of aborting the whole switch.
               home-manager.backupFileExtension = "backup";
-              # Make pkgs-unstable reachable from home/ modules too (mirrors
-              # the system-level specialArgs above), so home/fish.nix etc.
-              # can pull individual packages from unstable.
-              home-manager.extraSpecialArgs = { inherit pkgs-unstable; };
+              # Make pkgs-unstable and inputs reachable from home/ modules too
+              # (mirrors the system-level specialArgs above): home/fish.nix
+              # etc. pull individual packages from unstable, and home/dms.nix
+              # imports the DMS home-manager module out of `inputs` — module
+              # imports can only come from specialArgs, not ordinary args.
+              home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable; };
             }
           ];
         };

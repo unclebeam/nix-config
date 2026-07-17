@@ -81,7 +81,7 @@
 
   # ── Baseline packages ──────────────────────────────────────────────────
   # System-wide CLI + the browser. Desktop apps with per-user *config*
-  # (alacritty, waybar…) live in home/ instead; these are config-less here.
+  # (alacritty, dolphin…) live in home/ instead; these are config-less here.
   environment.systemPackages = with pkgs; [
     fastfetch
     btop

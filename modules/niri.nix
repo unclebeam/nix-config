@@ -1,9 +1,10 @@
 # niri.nix — the SYSTEM half of the niri session. (Niri started as a
 # side-by-side trial next to hyprland — same playbook as the sway→hyprland
-# move — and won; hyprland was removed 2026-07.) The greeter, fonts, and
-# Wayland-wide env stay in modules/desktop.nix (compositor-agnostic). The
-# USER half (config.kdl glue, swayidle) lives in home/niri.nix; the lock
-# screen is gtklock, system-side in modules/gtklock.nix.
+# move — and won; hyprland was removed 2026-07.) Fonts and Wayland-wide env
+# stay in modules/desktop.nix (compositor-agnostic); the greeter is DMS on
+# greetd (modules/dms-greeter.nix). The USER half (config.kdl glue) lives
+# in home/niri.nix; the desktop shell — bar, lock screen, idle policy —
+# is DMS (home/dms.nix).
 { config, lib, pkgs, ... }:
 
 {
@@ -27,10 +28,10 @@
   #  * enables gnome-keyring — overridden back OFF in modules/kwallet.nix,
   #    where ksecretd (KDE) is the session keyring now.
   #  * swaylock PAM (security.pam.services.swaylock) — set by this module
-  #    directly. Unused since the locker became gtklock (whose PAM service
-  #    comes from modules/gtklock.nix), but harmless: it's upstream's
-  #    unconditional default, not something we can or need to turn off.
-  #    Idle/lock invocation is user-side in home/niri.nix.
+  #    directly. Unused since the locker became DMS's (which authenticates
+  #    against /etc/pam.d/login instead — see modules/dms.nix), but
+  #    harmless: it's upstream's unconditional default, not something we
+  #    can or need to turn off.
   # Window-manager *configuration* comes from home-manager.
   programs.niri.enable = true;
 
@@ -46,9 +47,9 @@
   programs.niri.useNautilus = false;
 
   # ── Portal routing: KDE for dialogs, GNOME only for capture ─────────────
-  # The KDE portal serves everything interactive: file dialogs (KIO/Breeze,
+  # The KDE portal serves everything interactive: file dialogs (KIO,
   # matching Dolphin), notifications (forwarded to org.freedesktop.
-  # Notifications, i.e. swaync), Access prompts, and Settings — note that
+  # Notifications, i.e. the DMS shell), Access prompts, and Settings — note that
   # means apps now read the color-scheme preference from kdeglobals, not
   # gsettings (neither is set today; future dark-mode work targets
   # kdeglobals). The niri module hard-sets these keys as plain coerced
@@ -80,7 +81,7 @@
   # X11 apps just fail to connect, nothing crashes.
   environment.systemPackages = [ pkgs.xwayland-satellite ];
 
-  # The polkit authentication agent (upstream-recommended
-  # plasma-polkit-agent) lives in modules/polkit-agent.nix — added 2026-07
-  # with the KDE plumbing, reversing the earlier deliberate no-agent setup.
+  # The polkit authentication agent is built into the DMS shell
+  # (home/dms.nix) — it replaced plasma-polkit-agent in the 2026-07 DMS
+  # migration.
 }

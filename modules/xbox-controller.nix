@@ -64,8 +64,9 @@
       # CAUTION: "confirm" only works with a notification daemon that renders
       # action buttons — Blueman asks via a Confirm/Deny notification and
       # declined to add a dialog fallback (blueman#2477). mako silently broke
-      # this (no buttons, mako#588) and pairing stalled until timeout; swaync
-      # (home/swaync.nix) is what makes it answerable.
+      # this (no buttons, mako#588) and pairing stalled until timeout; the
+      # DMS shell's notifications render action buttons (as swaync did
+      # before the DMS migration), keeping it answerable.
       JustWorksRepairing = "confirm";
     };
     LE = {

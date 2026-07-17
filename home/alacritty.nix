@@ -1,46 +1,18 @@
-# home/alacritty.nix — terminal, themed from colors.nix.
-#
-# The color mapping below reproduces the OFFICIAL melange Alacritty port
-# (melange-nvim repo, term/alacritty/melange_dark.toml) exactly — but
-# generated from our one palette attrset instead of vendoring the file:
-#   normal colors = the muted "c" row (+ UI tones for black/white)
-#   bright colors = the vivid "b" row
+# home/alacritty.nix — terminal, themed by DMS.
 { config, lib, pkgs, ... }:
 
-let
-  colors = import ./colors.nix;
-in
 {
   programs.alacritty = {
     enable = true;
     # `settings` is written out as alacritty.toml.
     settings = {
-      colors = {
-        primary = {
-          background = colors.a.bg;
-          foreground = colors.a.fg;
-        };
-        normal = {
-          black   = colors.a.float;
-          red     = colors.c.red;
-          green   = colors.c.green;
-          yellow  = colors.c.yellow;
-          blue    = colors.c.blue;
-          magenta = colors.c.magenta;
-          cyan    = colors.c.cyan;
-          white   = colors.a.com;
-        };
-        bright = {
-          black   = colors.a.ui;
-          red     = colors.b.red;
-          green   = colors.b.green;
-          yellow  = colors.b.yellow;
-          blue    = colors.b.blue;
-          magenta = colors.b.magenta;
-          cyan    = colors.b.cyan;
-          white   = colors.a.fg;
-        };
-      };
+      # Colors come from DMS: dms (re)writes dank-theme.toml from the
+      # wallpaper's matugen palette on every wallpaper change, and alacritty
+      # live-reloads imports — so the terminal recolors the moment the
+      # wallpaper does. home/dms.nix guarantees an (initially empty)
+      # placeholder exists so the import never dangles before the shell's
+      # first run.
+      general.import = [ "~/.config/alacritty/dank-theme.toml" ];
 
       font = {
         normal.family = "IosevkaTerm Nerd Font Mono";

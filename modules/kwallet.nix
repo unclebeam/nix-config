@@ -48,18 +48,22 @@
   # here so removing this file removes every trace of the KDE keyring.
   xdg.portal.config.niri."org.freedesktop.impl.portal.Secret" = lib.mkForce "kwallet";
 
-  # PAM half of step 1. On `login`, NOT `sddm`: on this nixpkgs the sddm PAM
-  # service is generated with useDefaultRules=false and is just a substack
-  # of `login`, so per-service toggles on sddm are silent no-ops (the old
-  # sddm.enableGnomeKeyring line was one; pam_gnome_keyring really came from
-  # the gnome-keyring module targeting `login`). plasma6.nix targets `login`
-  # for the same reason. pam_kwallet skips sessions without a graphical
-  # XDG_SESSION_TYPE, so tty logins are unaffected; `kwallet.forceRun` is
-  # the escape hatch if that detection ever misfires.
+  # PAM half of step 1. On `greetd` (the DMS greeter's display manager,
+  # modules/dms-greeter.nix). Unlike the old sddm service — which was
+  # generated with useDefaultRules=false as a bare substack of `login`, so
+  # per-service toggles on it were silent no-ops — greetd's PAM service is
+  # generated WITH default rules, and greetd does NOT traverse `login`.
+  # So the hook must sit on `greetd` itself; a hook on `login` would never
+  # fire at graphical login anymore. (tty logins lose nothing: pam_kwallet
+  # skips sessions it doesn't consider graphical anyway.)
+  # Escape hatch: pam_kwallet's graphical-session detection keys off the
+  # session type at PAM time — if the wallet ever stays locked after a
+  # greeter login, force it with:
+  #   security.pam.services.greetd.kwallet.forceRun = true;
   # (modules/fprintd.nix depends on this staying password-driven: the wallet
-  # key can only be derived from a TYPED password, so first login must not
+  # key can only be derived from a TYPED password, so the greeter must not
   # be fingerprint-only.)
-  security.pam.services.login.kwallet.enable = true;
+  security.pam.services.greetd.kwallet.enable = true;
 
   # Step 3. kwallet-pam ships this unit in share/systemd/user — a directory
   # systemd.packages does NOT scan (only etc/ and lib/systemd/user; Plasma
