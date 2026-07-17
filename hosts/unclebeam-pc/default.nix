@@ -62,6 +62,16 @@
     options btusb enable_autosuspend=n
   '';
 
+  # MT7925 power-management failure #3: with WiFi power-save on (the driver
+  # default), the radio dozes between beacons and mt76 chips are known to
+  # miss/delay EAPOL frames — seen here (2026-07) as 4-way handshake timeouts
+  # (deauth reason 15) and mid-session drops, which in turn made
+  # NetworkManager decide the stored PSK was wrong and re-prompt for the
+  # password. A desktop on mains has nothing to gain from radio power-save,
+  # so force it off. (Host-level on purpose: the ThinkPad on battery should
+  # keep its default.)
+  networking.networkmanager.wifi.powersave = false;
+
   # The disk layout (disko.nix) has no swap partition. Instead, use zram:
   # a compressed block device in RAM used as swap. Cheap insurance against
   # memory pressure with no disk wear and nothing to partition.
