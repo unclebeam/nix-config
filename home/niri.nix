@@ -76,5 +76,37 @@ in
     # clipboard, and shell pipelines all exec wl-copy / wl-paste. Lives here
     # because it's Wayland-session infrastructure, not any one app's dep.
     wl-clipboard
+
+    # Backs the Mod+E bind in config.kdl: set every column on the focused
+    # workspace to an equal 100/N % width (3 columns → thirds, 2 → halves).
+    # A script because niri has NO built-in "resize all columns" action —
+    # set-column-width and the presets only touch the focused column, so we
+    # walk the columns over `niri msg` instead. Percent changes go through
+    # the same gaps-aware proportion math as preset-column-widths, which is
+    # why N columns at 100/N % fit the output exactly.
+    # `niri` itself is deliberately NOT in runtimeInputs: the session
+    # already has the real compositor's binary on PATH, and pinning a
+    # second copy here could let `niri msg` version-skew from the running
+    # compositor.
+    (pkgs.writeShellApplication {
+      name = "niri-equalize-columns";
+      runtimeInputs = [ pkgs.jq ];
+      text = ''
+        ws=$(niri msg --json workspaces | jq '.[] | select(.is_focused).id')
+        # One representative window per column: windows stacked in a column
+        # share its width, so dedupe by column index (layout.
+        # pos_in_scrolling_layout[0]) and set each column once. Floating
+        # windows are excluded — they don't occupy a column.
+        ids=$(niri msg --json windows | jq -r --argjson ws "$ws" '
+          [ .[] | select(.workspace_id == $ws and (.is_floating | not)) ]
+          | unique_by(.layout.pos_in_scrolling_layout[0]) | .[].id')
+        n=$(wc -w <<< "$ids")
+        [ "$n" -eq 0 ] && exit 0
+        pct=$(awk "BEGIN { printf \"%.4f\", 100 / $n }")
+        while read -r id; do
+          niri msg action set-window-width --id "$id" "$pct%"
+        done <<< "$ids"
+      '';
+    })
   ];
 }
