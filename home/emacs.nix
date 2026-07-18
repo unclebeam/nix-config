@@ -19,12 +19,27 @@
 # exists, emacs prefers it over ~/.config/emacs and boots VANILLA, no Doom.)
 { config, lib, pkgs, ... }:
 
+let
+  # emacs-pgtk wrapped with the elisp packages whose NATIVE modules the editor
+  # must never build or download itself (the no-Mason rule): :term vterm and
+  # :term ghostel each need a dynamic module, and nixpkgs ships both prebuilt —
+  # vterm-module.so compiled from C, ghostel-module.so compiled from Zig source.
+  # Without this wrapper, first use would try `cmake` in-editor (vterm — fails,
+  # no toolchain on PATH) or download a prebuilt binary from GitHub releases
+  # (ghostel). ghostel finds its module as a sidecar next to ghostel.el, which
+  # is exactly where nixpkgs installs it, so the downloader never fires.
+  # Doom is told to use these copies via `:built-in t` in doom/packages.el —
+  # straight's `:built-in 'prefer` detection only sees Emacs-core built-ins,
+  # never Nix site packages, so the override there is load-bearing.
+  emacsWithModules = (pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages
+    (epkgs: [ epkgs.vterm epkgs.ghostel ]);
+in
 {
   home.packages = [
     # Emacs 30 with the pure-GTK frontend — the build that renders natively
     # on Wayland/niri (the default build runs blurry under Xwayland).
     # Includes native-comp; Doom compiles its packages with it on sync.
-    pkgs.emacs-pgtk
+    emacsWithModules
     # Doom's other hard requirements — git, ripgrep, fd — are in core.nix.
 
     # ── Doom module tools as Nix packages, never editor-installed ──
@@ -62,7 +77,7 @@
   # it silently starts as BARE emacs (same dangle mode as the doom symlink).
   services.emacs = {
     enable = true;
-    package = pkgs.emacs-pgtk; # same build as home.packages — one Emacs
+    package = emacsWithModules; # same build as home.packages — one Emacs
     # Scope to the graphical session, not default.target: the pgtk build
     # needs WAYLAND_DISPLAY to create frames, and that only exists (and is
     # only imported into the systemd user environment) once niri is up.

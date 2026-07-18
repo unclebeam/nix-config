@@ -98,3 +98,13 @@
 (after! treesit
   (add-to-list 'treesit-extra-load-path
                (expand-file-name "~/.local/share/emacs-tree-sitter-grammars")))
+
+;; TRIAL: vterm vs ghostel run side-by-side (same tradition as the compositor
+;; trials — the loser gets deleted). Both Doom modules bind SPC o t / SPC o T,
+;; and vterm silently wins (defined later in +evil-bindings.el), so ghostel
+;; gets its own keys here. When the trial ends, delete this block and the
+;; losing module's line in init.el (+ its package! lines in packages.el).
+(map! :leader
+      (:prefix-map ("o" . "open")
+       :desc "Toggle ghostel popup" "g" #'+ghostel/toggle
+       :desc "Open ghostel here"    "G" #'+ghostel/here))

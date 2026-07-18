@@ -51,3 +51,17 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
+
+
+;; ── :term vterm / :term ghostel — native modules come prebuilt from Nix ──
+;; (home/emacs.nix wraps emacs-pgtk with both packages.) `:built-in t' because
+;; straight's `:built-in 'prefer' detection only sees Emacs-core built-ins,
+;; never Nix site packages — without this straight clones its own copy and
+;; tries to compile the module in-editor (vterm — fails, no cmake on PATH) or
+;; download a prebuilt binary from GitHub (ghostel — no-Mason rule forbids it).
+(package! vterm :built-in t)
+(package! ghostel :built-in t)
+;; evil-ghostel is pure elisp and NOT in nixpkgs, so straight still installs
+;; it — pinned to the exact rev nixpkgs built ghostel from, so the elisp and
+;; the native module can't drift apart. Bump together with `nix flake update'.
+(package! evil-ghostel :pin "5bce751687f3b33978a4244a1611648bbedb7124")
