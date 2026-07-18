@@ -55,6 +55,43 @@
     pkgs.prettier # :editor (format +onsave) — apheleia formats ts/tsx/css/json with it
   ];
 
+  # ── Emacs daemon + client workflow ──────────────────────────────────────
+  # The daemon pays Doom's startup cost once per session; every open after
+  # that is `emacsclient -c` popping a frame instantly. NB: the daemon loads
+  # the same ~/.config/emacs Doom clone — if the bootstrap above is missing,
+  # it silently starts as BARE emacs (same dangle mode as the doom symlink).
+  services.emacs = {
+    enable = true;
+    package = pkgs.emacs-pgtk; # same build as home.packages — one Emacs
+    # Scope to the graphical session, not default.target: the pgtk build
+    # needs WAYLAND_DISPLAY to create frames, and that only exists (and is
+    # only imported into the systemd user environment) once niri is up.
+    # niri-session.target BindsTo graphical-session.target (home/niri.nix),
+    # so the daemon starts with the session and stops at logout.
+    startWithUserSession = "graphical";
+    # Installs an "Emacs Client" launcher entry running emacsclient. The
+    # stock "Emacs" entry is hidden below — a plain `emacs` launch would
+    # silently spawn a SECOND full instance beside the daemon.
+    client.enable = true;
+    # -c: new frame per launch. Deliberately NO `-a ""` fallback: when the
+    # daemon is down, `-a ""` makes emacsclient spawn its OWN `emacs --daemon`
+    # outside systemd — a rogue that inherits the caller's env, survives
+    # session teardown, and keeps the server socket, so the real emacs.service
+    # then crash-loops with "Another instance of Emacs is running the server"
+    # (this exact collision broke first activation on 2026-07-18). The service
+    # auto-restarts on failure, so a down daemon should be a loud error here,
+    # not a silent second daemon.
+    client.arguments = [ "-c" ];
+  };
+
+  # Shadow emacs-pgtk's own emacs.desktop so the DMS launcher shows only
+  # "Emacs Client" (xdg.desktopEntries installs with hiPrio precisely so it
+  # can override a package's entry). The `emacs` binary itself stays on PATH.
+  xdg.desktopEntries.emacs = {
+    name = "Emacs";
+    noDisplay = true;
+  };
+
   # Tree-sitter grammars as Nix-built .so's, NOT Doom's runtime auto-install.
   # That auto-install cannot work here: tsx-ts-mode is registered with no
   # fallback mode, and Doom's ensure-grammar logic short-circuits for such
