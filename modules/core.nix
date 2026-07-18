@@ -106,6 +106,10 @@
     # Electron (native Wayland via NIXOS_OZONE_WL) and unfree.
     obsidian # markdown notes — vaults live in $HOME, nothing for Nix to configure
     slack # also Electron + unfree, same Wayland story as obsidian
+    # Discord via Vesktop: the stock discord client's screenshare can't capture
+    # on Wayland/niri, while Vesktop captures through the xdg-desktop-portal
+    # ScreenCast path (routed to portal-gnome here — niri's only capture path).
+    vesktop
     libreoffice
     # DBeaver Community Edition. nixpkgs only carries the upstream binary
     # release (-bin); there is no from-source `dbeaver` attribute.
