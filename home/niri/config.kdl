@@ -192,7 +192,7 @@ layout {
     // preset-window-heights { }
 
     // You can change the default width of the new windows.
-    default-column-width { proportion 0.5; }
+    default-column-width { proportion 0.333333333; }
     // If you leave the brackets empty, the windows themselves will decide their initial width.
     // default-column-width {}
 
@@ -351,7 +351,7 @@ window-rule {
 // own showcased look. geometry-corner-radius alone rounds the focus
 // ring; clip-to-geometry also rounds the windows themselves.
 window-rule {
-    geometry-corner-radius 12
+    geometry-corner-radius 4
     clip-to-geometry true
 }
 
