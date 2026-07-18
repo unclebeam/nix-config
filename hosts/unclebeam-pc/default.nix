@@ -49,7 +49,26 @@
   # in a low-power state that races the probe; turning ASPM off system-wide
   # lets the handshake complete. If this alone doesn't fix it, the next
   # escalation is adding "pcie_port_pm=off" here as well.
-  boot.kernelParams = [ "pcie_aspm=off" ];
+  #
+  # MT7925 failure #4 — the connect/disconnect loop (fixed 2026-07): the
+  # kernel's default regulatory domain is world ("00"), where 6 GHz is
+  # transmit-forbidden. Our tri-band mesh AP advertises a 6 GHz radio plus a
+  # Thailand country IE; while associated on 5 GHz that IE temporarily
+  # unlocks 6 GHz, wpa_supplicant roams toward the "better" 6 GHz BSSID —
+  # but the instant it drops the 5 GHz link, the country-IE regdom reverts
+  # to world and the kernel refuses the 6 GHz auth ("regulatory prevented
+  # using AP config"). ~10 s of outage while it crawls back onto 5 GHz,
+  # then the loop repeats (137 drops in 48 h). Pinning the regdom to TH at
+  # boot makes 6 GHz persistently legal, so the roam completes instead of
+  # flapping. Host-level on purpose: this desktop never leaves Thailand;
+  # the ThinkPad travels and should keep the country-IE default.
+  boot.kernelParams = [ "pcie_aspm=off" "cfg80211.ieee80211_regdom=TH" ];
+
+  # The regdom pin above is only as good as the signed regulatory.db the
+  # kernel validates TH against. It's currently present via the general
+  # firmware set, but make the dependency explicit so a future firmware
+  # cleanup can't silently turn the kernel param into a no-op.
+  hardware.wirelessRegulatoryDatabase = true;
 
   # The MT7925's OTHER power-management failure: with btusb USB autosuspend
   # active (kernel default Y), the BT radio gets power-cycled mid-session and
