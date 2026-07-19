@@ -126,13 +126,14 @@ output "Dell Inc. DELL U3225QE 27D4834" {
 }
 
 // GIGA-BYTE M28U — 28" 4K gaming panel, the PC's main monitor (DP).
-// scale 1.25 = logical 3072x1728. Position is explicit because the
-// portrait Dell to its left is center-aligned (Dell center y=1280 →
-// 1280 - 1728/2 = 416); niri's auto-placement can only top-align.
+// scale 1.5 = logical 2560x1440 (27"-1440p-sized UI at 4K sharpness).
+// Position is explicit because the portrait Dell to its left is
+// center-aligned (Dell center y=1280 → 1280 - 1440/2 = 560); niri's
+// auto-placement can only top-align.
 output "GIGA-BYTE TECHNOLOGY CO., LTD. M28U 22060B005352" {
     mode "3840x2160"
-    scale 1.25
-    position x=1440 y=416
+    scale 1.5
+    position x=1440 y=560
 }
 
 // Dell S2721DGF — 27" 1440p panel (DP-2 on the PC, 165Hz), rotated to
