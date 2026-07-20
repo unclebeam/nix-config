@@ -79,7 +79,9 @@ in
   # first login or there is no idle lock.)
 
   # Utilities the session shells out to. No grim/slurp: screenshots go
-  # through `dms screenshot` (the Print binds in dms/binds.lua). No
+  # through `dms screenshot`, piped into satty by the `screenshot-annotate`
+  # wrapper (home/satty.nix; Print binds are the DEVIATION block at the
+  # bottom of hypr/hyprland.lua). No
   # brightnessctl: brightness keys go through `dms ipc`. No playerctl
   # anymore either — the niri-era stock media binds used it, but DMS's
   # preset routes media keys through `dms ipc call mpris`.

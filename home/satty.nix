@@ -1,12 +1,29 @@
-# home/satty.nix — screenshot annotator. No keybind launches it anymore:
-# the Print binds run `dms screenshot` (DMS's built-in capture UI, in the
-# DMS-managed ~/.config/hypr/dms/binds.lua), saving to ~/Pictures/Screenshots,
-# and satty is run BY HAND on a saved file when a shot needs arrows/text:
-#   satty --filename ~/Pictures/Screenshots/<shot>.png
-# Owns everything satty: the package and config.toml.
+# home/satty.nix — screenshot annotator. Every screenshot flows through it:
+# the Print binds (the mandatory-feature DEVIATION block at the bottom of
+# home/hypr/hyprland.lua) run the `screenshot-annotate` wrapper below,
+# which captures via DMS's built-in screenshot UI and hands the image
+# straight to satty. Nothing touches disk or clipboard until you commit
+# inside satty (Enter); Escape discards.
+# Owns everything satty: the package, config.toml, and the wrapper script.
 { config, lib, pkgs, ... }:
 
 {
+  home.packages = [
+    # Capture with DMS's screenshot UI, hand the result to satty. Mode
+    # passes through: `screenshot-annotate` = region, `… full` = focused
+    # output, `… window` = focused window (the three Print binds).
+    (pkgs.writeShellScriptBin "screenshot-annotate" ''
+      # --no-file/--no-clipboard/--no-notify: satty is the ONLY output —
+      # the raw capture is kept nowhere, and DMS's "saved!" toast would lie.
+      # Buffer through a temp file instead of a raw pipe so a cancelled
+      # region-select (empty stdout) never launches satty on a blank image.
+      img=$(mktemp --suffix=.png)
+      trap 'rm -f "$img"' EXIT
+      dms screenshot "$@" --stdout --no-file --no-clipboard --no-notify > "$img"
+      [ -s "$img" ] && satty --filename "$img"
+    '')
+  ];
+
   programs.satty = {
     enable = true;
     # Rendered to ~/.config/satty/config.toml.
