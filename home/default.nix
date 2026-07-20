@@ -5,8 +5,8 @@
 
 {
   imports = [
-    ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + cursor via nix.lua + session target
-    ./dms.nix       # DMS user glue: adw-gtk3 + placeholders for dms-written configs (the shell itself: modules/dms.nix)
+    ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + session target
+    ./dms.nix       # DMS user glue: adw-gtk3 + symlinked hypr/dms fragments (the shell itself: modules/dms.nix)
     ./satty.nix     # screenshot annotator (run by hand on saved screenshots)
     ./alacritty.nix # terminal
     ./tmux.nix      # terminal multiplexer (plain tmux.conf; nvim navigation pairing)
