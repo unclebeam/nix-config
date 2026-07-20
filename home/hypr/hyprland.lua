@@ -15,6 +15,10 @@ hl.config({
 		kb_layout = "",
 		numlock_by_default = true,
 		follow_mouse = 0,
+		-- DEVIATION: natural scrolling on mice too (the touchpad option below
+		-- only covers touchpads; without this the PC's mouse wheel scrolls
+		-- the traditional direction while the thinkpad's touchpad doesn't)
+		natural_scroll = true,
 		touchpad = {
 			tap_to_click = true,
 			natural_scroll = true,
