@@ -50,11 +50,14 @@
     # DankMaterialShell (DMS) — the quickshell-based desktop shell that IS
     # the whole desktop: bar, launcher, notifications, lock screen, OSD,
     # clipboard history, polkit agent, power menu, wallpaper + matugen
-    # theming. Ships a home-manager module (the shell itself, enabled in
-    # home/dms.nix) and NixOS modules (system defaults in modules/dms.nix,
-    # greetd login greeter in modules/dms-greeter.nix). `stable` branch per
-    # the official docs. Note: dms-shell builds from source (Go + QML) —
-    # there is no binary cache, so the first rebuild compiles it.
+    # theming. Upstream ships both a home-manager module and a NixOS module
+    # and says to pick ONE — we use the NixOS module (shell + its dms.service
+    # enabled in modules/dms.nix; greetd login greeter in
+    # modules/dms-greeter.nix; home/dms.nix holds only user-side glue, no
+    # module import). `stable` branch per the official docs; nixpkgs 26.05
+    # does carry its own dms-shell, but at 1.4.x — too old for the hyprland
+    # Lua config, which needs 1.5+. Note: dms-shell builds from source
+    # (Go + QML) — there is no binary cache, so the first rebuild compiles it.
     dank-material-shell = {
       url = "github:AvengeMedia/DankMaterialShell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -124,9 +127,10 @@
               home-manager.backupFileExtension = "backup";
               # Make pkgs-unstable and inputs reachable from home/ modules too
               # (mirrors the system-level specialArgs above): home/fish.nix
-              # etc. pull individual packages from unstable, and home/dms.nix
-              # imports the DMS home-manager module out of `inputs` — module
-              # imports can only come from specialArgs, not ordinary args.
+              # etc. pull individual packages from unstable, and any future
+              # home/ module that imports out of `inputs` needs it here —
+              # module imports can only come from specialArgs, not ordinary
+              # args.
               home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable; };
             }
           ];

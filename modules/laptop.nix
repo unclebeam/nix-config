@@ -14,7 +14,7 @@
   hardware.cpu.intel.updateMicrocode = true;
 
   # ── Lid & suspend ──────────────────────────────────────────────────────
-  # logind handles the lid; DMS (home/dms.nix) listens for the suspend
+  # logind handles the lid; DMS (modules/dms.nix) listens for the suspend
   # signal and locks the session before the sleep actually happens.
   services.logind.settings.Login = {
     HandleLidSwitch = "suspend";

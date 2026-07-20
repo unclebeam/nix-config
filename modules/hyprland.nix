@@ -5,7 +5,7 @@
 # env stay in modules/desktop.nix (compositor-agnostic); the greeter is DMS
 # on greetd (modules/dms-greeter.nix). The USER half (hyprland.lua glue)
 # lives in home/hyprland.nix; the desktop shell — bar, lock screen, idle
-# policy — is DMS (home/dms.nix).
+# policy — is DMS (modules/dms.nix).
 { config, lib, pkgs, ... }:
 
 {
@@ -64,6 +64,6 @@
   };
 
   # The polkit authentication agent is built into the DMS shell
-  # (home/dms.nix) — it replaced plasma-polkit-agent in the 2026-07 DMS
+  # (modules/dms.nix) — it replaced plasma-polkit-agent in the 2026-07 DMS
   # migration.
 }

@@ -6,7 +6,7 @@
 {
   imports = [
     ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + cursor via nix.lua + session target
-    ./dms.nix       # DMS: bar + launcher + notifications + lock + idle + OSD + clipboard + polkit agent + power menu — one shell
+    ./dms.nix       # DMS user glue: adw-gtk3 + placeholders for dms-written configs (the shell itself: modules/dms.nix)
     ./satty.nix     # screenshot annotator (run by hand on saved screenshots)
     ./alacritty.nix # terminal
     ./tmux.nix      # terminal multiplexer (plain tmux.conf; nvim navigation pairing)

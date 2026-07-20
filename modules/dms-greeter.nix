@@ -24,6 +24,9 @@
 {
   programs.dank-material-shell.greeter = {
     enable = true; # sets services.greetd.enable under the hood
+    # (package: deliberately unset — it defaults to the shell's package
+    # because modules/dms.nix enables programs.dank-material-shell, so
+    # greeter and desktop always render from the same DMS build.)
     # Which compositor the greeter kiosk runs in. Reuses
     # programs.hyprland's package, so greeter and session render with the
     # same hyprland build.

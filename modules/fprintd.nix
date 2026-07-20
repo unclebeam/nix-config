@@ -3,7 +3,7 @@
 # first switch with:
 #   fprintd-enroll
 # (enrollment needs polkit auth; the DMS shell carries its own polkit
-# agent — home/dms.nix — which shows the prompt.)
+# agent — modules/dms.nix — which shows the prompt.)
 # Then sanity-check the sensor with: fprintd-verify
 { config, lib, pkgs, ... }:
 
