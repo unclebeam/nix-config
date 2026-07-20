@@ -140,10 +140,11 @@ hl.layer_rule({ match = { namespace = "^dms:.*" }, no_anim = true })
 -- The DMS-owned fragments — keybinds (dms ipc, screenshots, workspaces),
 -- matugen colors, GUI-configured monitors/cursor/window-rules. Order is
 -- load-bearing: they load LAST so GUI-made settings override this file's
--- defaults. All seven exist from first rebuild (home/dms.nix's activation
--- script, which runs `dms setup` to seed DMS's real defaults into the
--- missing-or-empty ones — no manual first-login step) — an empty Lua chunk
--- loads fine, a MISSING file would hard-fail the whole config.
+-- defaults. All seven exist from first rebuild, but only as EMPTY
+-- placeholders (home/dms.nix's activation script touches them — an empty
+-- Lua chunk loads fine, a MISSING file would hard-fail the whole config).
+-- The real content arrives via the manual first-login `dms setup` (see
+-- CLAUDE.md for the exact flow) — until then there are NO keybinds.
 require("dms.colors")
 require("dms.outputs")
 require("dms.layout")
