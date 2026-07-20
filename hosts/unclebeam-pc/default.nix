@@ -24,6 +24,7 @@
     ../../modules/brave.nix      # Brave managed policy: Google as default search (user half in home/brave.nix)
     ../../modules/dolphin.nix    # avahi discovery + udisks2 + ntfs/exfat (system half of Dolphin)
     ../../modules/localsend.nix  # LAN file sharing (AirDrop-style) + firewall port
+    ../../modules/syncthing.nix  # continuous file sync between machines (P2P; GUI-owned config)
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)
     ../../modules/zsa.nix        # ZSA keyboard udev rules (flash via Oryx in browser)
   ];
