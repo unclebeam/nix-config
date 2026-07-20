@@ -3,9 +3,10 @@
 # exists because of Dolphin lives here. It replaced Nautilus 2026-07 by
 # explicit request — reversing the 2026 "GNOME apps only" decision. The
 # session plumbing followed to KDE in 2026-07 (ksecretd keyring in
-# modules/kwallet.nix, KDE portals in modules/niri.nix), so "remember
+# modules/kwallet.nix, KDE portals in modules/hyprland.nix), so "remember
 # password" flows KIO → ksecretd natively — no bridge needed. Only
-# screencasting stays GNOME (niri's sole capture backend).
+# screencasting goes elsewhere (xdg-desktop-portal-hyprland, the
+# compositor's native capture backend).
 #
 # The system half (avahi discovery, udisks2, ntfs/exfat) lives in
 # modules/dolphin.nix — only NixOS can set those. Removing Dolphin = delete
@@ -76,7 +77,7 @@
 
   # ── "Open With" fix for non-Plasma sessions (nixpkgs issue #409986) ──────
   # KService's app cache (kbuildsycoca6) refuses to index ANY .desktop file
-  # unless an XDG menu file exists — Plasma ships one, bare niri ships none,
+  # unless an XDG menu file exists — Plasma ships one, bare hyprland ships none,
   # and the symptom is a completely empty "Open With" list in Dolphin. This
   # minimal menu just says "index every installed application". Deliberately
   # NOT plasma-workspace's plasma-applications.menu: that would drag Plasma

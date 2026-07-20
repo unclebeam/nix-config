@@ -5,7 +5,7 @@
 
 {
   imports = [
-    ./niri.nix      # niri glue: symlinks niri/config.kdl + cursor include
+    ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + cursor via nix.lua + session target
     ./dms.nix       # DMS: bar + launcher + notifications + lock + idle + OSD + clipboard + polkit agent + power menu — one shell
     ./satty.nix     # screenshot annotator (run by hand on saved screenshots)
     ./alacritty.nix # terminal

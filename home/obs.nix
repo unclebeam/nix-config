@@ -2,11 +2,10 @@
 # One file per intent: everything that exists because of OBS lives here.
 # Removing OBS = delete this file + its import line in default.nix.
 #
-# No system-side (modules/) half needed: screen capture on niri goes through
-# xdg-desktop-portal-gnome (pulled in by programs.niri.enable in
-# modules/niri.nix — the only screencast backend niri supports; capture is
-# the one interface that deliberately stayed GNOME through the 2026-07
-# KDE-plumbing migration), and audio
+# No system-side (modules/) half needed: screen capture goes through
+# xdg-desktop-portal-hyprland (pulled in by programs.hyprland.enable in
+# modules/hyprland.nix — hyprland's native wlr-screencopy backend; the
+# ScreenCast/Screenshot routing lives there too), and audio
 # capture rides the PipeWire stack from modules/audio.nix. Both are already
 # there for other reasons, so OBS is a plain user package.
 #

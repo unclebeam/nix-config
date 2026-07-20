@@ -37,7 +37,7 @@ in
 {
   home.packages = [
     # Emacs 30 with the pure-GTK frontend — the build that renders natively
-    # on Wayland/niri (the default build runs blurry under Xwayland).
+    # on Wayland (the default build runs blurry under Xwayland).
     # Includes native-comp; Doom compiles its packages with it on sync.
     emacsWithModules
     # Doom's other hard requirements — git, ripgrep, fd — are in core.nix.
@@ -80,9 +80,10 @@ in
     package = emacsWithModules; # same build as home.packages — one Emacs
     # Scope to the graphical session, not default.target: the pgtk build
     # needs WAYLAND_DISPLAY to create frames, and that only exists (and is
-    # only imported into the systemd user environment) once niri is up.
-    # niri-session.target BindsTo graphical-session.target (home/niri.nix),
-    # so the daemon starts with the session and stops at logout.
+    # only imported into the systemd user environment) once hyprland is up.
+    # hyprland-session.target BindsTo graphical-session.target
+    # (home/hyprland.nix), so the daemon starts with the session and stops
+    # at logout.
     startWithUserSession = "graphical";
     # Installs an "Emacs Client" launcher entry running emacsclient. The
     # stock "Emacs" entry is hidden below — a plain `emacs` launch would

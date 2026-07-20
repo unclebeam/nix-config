@@ -29,7 +29,7 @@
   ];
 
   # Both halves matter: sessionVariables covers login shells, but apps
-  # launched from Spotlight under niri inherit the systemd user
+  # launched from Spotlight inherit the systemd user
   # environment — that second line is what the old qt.enable module did
   # for us and is easy to lose.
   home.sessionVariables.QT_QPA_PLATFORMTHEME = "qt6ct";

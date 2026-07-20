@@ -23,7 +23,8 @@
   };
 
   # ── Backlight ──────────────────────────────────────────────────────────
-  # The XF86 brightness keys go through `dms ipc` (home/niri/config.kdl);
+  # The XF86 brightness keys go through `dms ipc` (the DMS-managed binds in
+  # ~/.config/hypr/dms/binds.lua);
   # brightness handling is built into the dms binary, which talks to logind
   # — no extra permissions or udev rules needed for users with an active
   # session.

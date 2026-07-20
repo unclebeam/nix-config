@@ -27,7 +27,7 @@
     # (trap: the TypeScript extra wants vtsls, not typescript-language-server).
   ];
 
-  # DELIBERATE deviation from the niri store-symlink pattern:
+  # DELIBERATE deviation from the store-symlink pattern (hyprland.lua & co):
   # ~/.config/nvim is an out-of-store symlink to this repo checkout, because
   # (a) LazyVim writes INTO its config dir (lazy-lock.json plugin lockfile,
   #     lazyvim.json extras state) and those belong in git for reproducible

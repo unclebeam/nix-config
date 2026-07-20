@@ -8,7 +8,7 @@
     ./disko.nix                  # declarative disk layout (partitions, btrfs, mounts)
     ../../modules/core.nix
     ../../modules/desktop.nix    # fonts, Wayland env, GTK portal fallback
-    ../../modules/niri.nix       # niri session (the only compositor; won the trial vs hyprland)
+    ../../modules/hyprland.nix   # hyprland session (re-trial vs niri, 2026-07; full replacement on this branch)
     ../../modules/dms.nix        # DMS shell, system half (service defaults + shell fonts; shell itself in home/dms.nix)
     ../../modules/dms-greeter.nix # DMS login greeter on greetd (replaced SDDM 2026-07)
     ../../modules/kwallet.nix    # session keyring: ksecretd + pam_kwallet unlock (replaced gnome-keyring 2026-07)

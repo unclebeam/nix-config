@@ -19,8 +19,10 @@
     name = "breeze_cursors";
     size = 24; # logical px; the compositor multiplies by the output scale (1.5) on screen
 
-    # niri picks this up too: home/niri.nix reads this option into the
-    # generated ~/.config/niri/nix.kdl cursor section — one source of truth.
+    # hyprland picks this up too: home/hyprland.nix reads this option into
+    # the generated ~/.config/hypr/nix.lua — one source of truth. (A cursor
+    # picked in the DMS Settings GUI overrides it in-compositor via
+    # dms/cursor.lua; this stays the before-first-run baseline.)
 
     # Generates the gtk cursor settings so GTK apps pick the same theme/size.
     # Only *generates* them — the gtk module that actually writes settings.ini

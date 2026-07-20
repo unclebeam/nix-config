@@ -1,5 +1,6 @@
 # home/satty.nix — screenshot annotator. No keybind launches it anymore:
-# niri's built-in screenshot UI (Print) saves to ~/Pictures/Screenshots,
+# the Print binds run `dms screenshot` (DMS's built-in capture UI, in the
+# DMS-managed ~/.config/hypr/dms/binds.lua), saving to ~/Pictures/Screenshots,
 # and satty is run BY HAND on a saved file when a shot needs arrows/text:
 #   satty --filename ~/Pictures/Screenshots/<shot>.png
 # Owns everything satty: the package and config.toml.

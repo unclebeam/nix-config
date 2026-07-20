@@ -7,20 +7,20 @@ NixOS flake for my two machines. One repo, one shell, reinstall = one command.
 | `unclebeam-pc` | AMD Ryzen 9 + AMD RDNA GPU (mesa/RADV) | Desktop, gaming |
 | `unclebeam-thinkpad` | ThinkPad X1 Carbon Aura (Intel Core Ultra) | Laptop |
 
-Both run NixOS 26.05 + niri +
+Both run NixOS 26.05 + Hyprland (0.55+, Lua config) +
 [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell) (DMS):
 one quickshell process is the bar, launcher, notifications, lock screen,
 greeter, OSD, clipboard history, polkit agent, and power menu. Theming is
 dynamic — DMS/matugen derives Material You colors from the wallpaper and
-applies them to the shell, niri, GTK/Qt apps, and the terminal.
+applies them to the shell, Hyprland, GTK/Qt apps, and the terminal.
 
 ## Layout
 
 ```
 flake.nix       inputs (nixpkgs 26.05, home-manager) + one nixosConfiguration per host
 hosts/<name>/   thin per-host config + hardware-configuration.nix (machine-generated)
-modules/        shared NixOS modules: core, desktop, niri, dms, dms-greeter, audio, gaming, laptop
-home/           shared home-manager config: niri, dms, alacritty, fish, ...
+modules/        shared NixOS modules: core, desktop, hyprland, dms, dms-greeter, audio, gaming, laptop
+home/           shared home-manager config: hyprland, dms, alacritty, fish, ...
 ```
 
 ## Installing a machine

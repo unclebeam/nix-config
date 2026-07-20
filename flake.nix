@@ -16,7 +16,7 @@
     # allowUnfree) and hands it to every module as `pkgs-unstable`.
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # home-manager manages per-user config (dotfiles, niri config, the DMS shell…).
+    # home-manager manages per-user config (dotfiles, hyprland config, the DMS shell…).
     # Its release branch must match the nixpkgs release.
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";

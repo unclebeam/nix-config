@@ -107,8 +107,10 @@
     obsidian # markdown notes — vaults live in $HOME, nothing for Nix to configure
     slack # also Electron + unfree, same Wayland story as obsidian
     # Discord via Vesktop: the stock discord client's screenshare can't capture
-    # on Wayland/niri, while Vesktop captures through the xdg-desktop-portal
-    # ScreenCast path (routed to portal-gnome here — niri's only capture path).
+    # on Wayland, while Vesktop captures through the xdg-desktop-portal
+    # ScreenCast path (routed to xdg-desktop-portal-hyprland here — see
+    # modules/hyprland.nix; the restore-token tuning in hypr/xdph.conf keeps
+    # re-shares picker-free).
     vesktop
     libreoffice
     # DBeaver Community Edition. nixpkgs only carries the upstream binary

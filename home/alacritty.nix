@@ -24,8 +24,9 @@
         y = 6;
       };
 
-      # The one translucent surface in the setup. (No blur behind it —
-      # niri draws whatever is underneath straight through.)
+      # The one translucent surface in the setup. (Under hyprland the stock
+      # blur — which the DMS template leaves at its enabled default — shows
+      # through it.)
       window.opacity = 0.92;
 
       # Shift+Enter normally sends the exact same bytes as plain Enter, so
