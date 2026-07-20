@@ -48,28 +48,41 @@
   # read-only STORE symlink is forbidden here — but an OUT-OF-STORE symlink
   # (same rule and same hardcoded ~/nix-config base path as hypr/hyprland.lua
   # and home/neovim.nix) stays writable: dms writes land *through* the link
-  # in the git working tree, where they're version-controlled like
-  # hyprland.lua's. Expect churn: matugen rewrites colors.lua on every
-  # wallpaper change — review/commit it like any other edit. Never generate
-  # these files' CONTENT from Nix; the Settings GUI stays the editor.
+  # in the git working tree. Never generate these files' CONTENT from Nix;
+  # the Settings GUI stays the editor.
   #
-  # Tracking the fragments in git also replaces the old activation-script
-  # `touch` placeholders: Lua's require() HARD-FAILS on a missing file
-  # (unlike niri's `include optional=true`) and takes the whole compositor
-  # config with it, but a fresh clone now already contains real content.
-  # (`dms setup` refuses to touch files that already have content, so a
-  # fresh install inherits these instead of the stock templates.)
+  # Five of the seven are git-tracked (binds/binds-user/layout/cursor/
+  # windowrules — shared preferences, identical on both machines). Tracking
+  # them replaces the old activation-script `touch` placeholders: Lua's
+  # require() HARD-FAILS on a missing file (unlike niri's `include
+  # optional=true`) and takes the whole compositor config with it, but a
+  # fresh clone already contains real content. (`dms setup` refuses to touch
+  # files that already have content, so a fresh install inherits these
+  # instead of the stock templates.)
+  #
+  # The other two — outputs.lua (THIS machine's monitors, from the Displays
+  # GUI) and colors.lua (THIS machine's wallpaper palette, from matugen) —
+  # are MACHINE-DERIVED and gitignored: syncing them would apply one host's
+  # monitors/palette to the other, and each host's DMS writes would fight
+  # over the shared file. For those two the activation placeholders below
+  # come back: seeded empty so require() finds a file (an empty Lua chunk
+  # loads fine — hyprland just uses auto monitor config / default border
+  # colors until DMS writes real content on this machine).
   xdg.configFile."hypr/dms".source =
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nix-config/home/hypr/dms";
 
-  # Empty placeholder for the one remaining file dms writes imperatively
-  # OUTSIDE the symlinked dir: home/alacritty.nix imports a theme file dms
-  # rewrites on every wallpaper change; an empty placeholder keeps alacritty
-  # from starting against a dangling import before the shell's first run.
-  # (`[ -e ]` means a file that exists — even empty — is never touched
-  # again.)
+  # Empty placeholders for the machine-local files dms writes imperatively:
+  # the two gitignored fragments above (touched THROUGH the ~/.config/hypr/dms
+  # symlink — it exists by writeBoundary — so they land in the working tree,
+  # where .gitignore hides them), and the alacritty theme file OUTSIDE the
+  # symlinked dir that home/alacritty.nix imports (dms rewrites it on every
+  # wallpaper change; the placeholder keeps alacritty from starting against a
+  # dangling import before the shell's first run). (`[ -e ]` means a file
+  # that exists — even empty — is never touched again.)
   home.activation.dmsPlaceholders = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    [ -e ~/.config/hypr/dms/outputs.lua ] || touch ~/.config/hypr/dms/outputs.lua
+    [ -e ~/.config/hypr/dms/colors.lua ] || touch ~/.config/hypr/dms/colors.lua
     mkdir -p ~/.config/alacritty
     [ -e ~/.config/alacritty/dank-theme.toml ] || touch ~/.config/alacritty/dank-theme.toml
   '';

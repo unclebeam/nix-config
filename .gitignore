@@ -7,3 +7,13 @@ result-*
 
 # Direnv, if you ever adopt it
 .direnv/
+
+# Machine-derived DMS fragments: outputs.lua (Displays GUI — THIS machine's
+# monitors) and colors.lua (matugen — THIS machine's wallpaper palette).
+# Syncing them between hosts would apply one machine's monitors/palette to
+# the other, so they're local-only; home/dms.nix's activation script seeds
+# them empty on a fresh clone (require() hard-fails on a missing file, but
+# an empty Lua chunk is fine). The other five fragments stay tracked —
+# they're shared preferences.
+home/hypr/dms/outputs.lua
+home/hypr/dms/colors.lua
