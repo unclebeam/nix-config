@@ -14,7 +14,7 @@
     ../../modules/kwallet.nix    # session keyring: ksecretd + pam_kwallet unlock (replaced gnome-keyring 2026-07)
     ../../modules/audio.nix
     ../../modules/bluetooth.nix  # bluetoothd + Blueman GUI (built-in Intel adapter)
-    ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
+    ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl; f/j: hold = shift
     ../../modules/laptop.nix     # power mgmt, backlight, lid behavior, fwupd
     ../../modules/fprintd.nix    # fingerprint auth (sudo/polkit/DMS lock screen; greeter stays password — kwallet)
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)

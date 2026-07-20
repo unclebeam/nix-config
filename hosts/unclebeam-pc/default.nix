@@ -16,7 +16,6 @@
     ../../modules/kwallet.nix    # session keyring: ksecretd + pam_kwallet unlock (replaced gnome-keyring 2026-07)
     ../../modules/audio.nix      # pipewire
     ../../modules/bluetooth.nix  # bluez userspace for the MT7925's BT radio
-    ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl
     ../../modules/gaming.nix     # steam + gamemode (importing it = enabling it)
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
