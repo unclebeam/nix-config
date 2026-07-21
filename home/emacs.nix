@@ -6,11 +6,14 @@
 # `doom sync` — never nix-doom-emacs or other Nix-generated equivalents
 # (same "editor configs stay plain files" rule as nvim, see CLAUDE.md).
 #
-# One-time bootstrap on each machine (imperative state Nix can't create):
-#   git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
-#   ~/.config/emacs/bin/doom install   # writes init/config/packages.el through
-#                                      # the symlink below into home/doom/
+# The framework clone into ~/.config/emacs is AUTOMATIC (clone-doom-emacs
+# service below). What remains manual, once per machine on first login:
+#   doom install                       # builds Doom's packages (~minutes);
+#                                      # our tracked home/doom/ already exists,
+#                                      # so it skips generating a config
 #   doom doctor                        # sanity check (new shell for the PATH entry)
+#   systemctl --user restart emacs.service  # the daemon started BARE before
+#                                      # install; restart so it loads Doom
 #
 # Removing emacs = delete this file, home/doom/, the import line in
 # default.nix, symbola in modules/desktop.nix, and `rm -rf ~/.config/emacs
@@ -127,6 +130,32 @@ in
       g.tree-sitter-javascript
       g.tree-sitter-jsdoc
     ])}/lib";
+
+  # Doom's framework clone is the one bootstrap half a fresh install can't
+  # get from the repo (imperative state, like ~/nix-config itself — see
+  # modules/nix-config.nix for the system-level twin of this pattern). This
+  # oneshot clones it on the first login where it's missing;
+  # ConditionPathExists makes it a permanent no-op afterwards, so it can
+  # never touch a live install. If the clone fails (no network yet), git
+  # deletes the half-made dir, the condition stays true, and it simply
+  # retries next login. `doom install` stays MANUAL (header comment): it
+  # builds Doom's ~300 packages for minutes and is upstream's supported
+  # interactive path — same reasoning that keeps `dms setup` manual
+  # (home/dms.nix). No sha pin, latest Doom at install time: Doom pins its
+  # own package commits, so only the framework itself drifts (same
+  # trade-off as the nix-config clone). %h is systemd for $HOME, and the
+  # absolute store path to git means no PATH dependence at all.
+  systemd.user.services.clone-doom-emacs = {
+    Unit = {
+      Description = "Clone Doom Emacs on first login (bootstrap target of doom install)";
+      ConditionPathExists = "!%h/.config/emacs";
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.git}/bin/git clone --depth 1 https://github.com/doomemacs/doomemacs %h/.config/emacs";
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
 
   # Doom's CLI lives inside the clone; put it on PATH so `doom sync`,
   # `doom upgrade`, `doom doctor` work from any shell.
