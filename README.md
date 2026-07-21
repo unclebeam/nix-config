@@ -24,6 +24,7 @@ home/           shared home-manager config: hyprland, dms, alacritty, fish, ...
 ```
 
 ## Installing a machine
+### Normal installation
 
 1. Boot the NixOS installer, partition and mount your disks at `/mnt` as usual.
 2. Generate the real hardware config and copy it into this repo, replacing the placeholder:
@@ -40,6 +41,22 @@ home/           shared home-manager config: hyprland, dms, alacritty, fish, ...
    nixos-install --flake .#unclebeam-pc        # desktop
    nixos-install --flake .#unclebeam-thinkpad  # laptop
    ```
+
+### NixOS Anywhere installation
+1. Boot the NixOS installer, connect to the internet.
+2. Add password to sudo by `sudo passwd`
+3. Run `ip a` to see the current ip
+4. Run nixos anywhere command
+``` sh
+nix run github:nix-community/nixos-anywhere -- --flake github:unclebeam/nix-config#unclebeam-pc root@10.2.98.30
+```
+5. After nixos-anywhere was successfully run, the target machine will be auto restarted
+6. At the login screen, let's login to tty by using `ctrl+atl+F3` and login with your username and password
+7. Change the password by using `passwd`
+8. Reboot
+9. Getting Emacs to work
+ 9.1 run `doom install` and then `doom sync`
+ 9.2 Restart emacs daemon by `systemctl --user restart emacs`
 
 ## Day-to-day
 
