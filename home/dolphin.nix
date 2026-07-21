@@ -23,6 +23,17 @@
   home.packages = with pkgs; [
     kdePackages.dolphin
 
+    # The KIO framework itself. Everything below already links it as a
+    # library, but ONLY an explicit install puts its D-Bus activation files
+    # on the session bus's search path — most critically
+    # org.kde.kpasswdserver6, the kiod6 module KIO workers call the "local
+    # password server": it runs the credential prompt/cache and hands
+    # "remember password" to the wallet. Without this line every remote
+    # share dies with "Communication with the local password server failed"
+    # (journal: Can't communicate with kiod_kpasswdserver — "The name is
+    # not activatable"). Also brings kiod6/kioexecd6/kssld6 activation.
+    kdePackages.kio
+
     # The KIO worker set: smb://, sftp://, mtp://, trash, thumbnails-over-
     # network. This is the gvfs replacement — without it Dolphin can only
     # browse local files and "Network" is an empty shell.
