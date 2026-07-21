@@ -9,6 +9,7 @@
     ./hardware-configuration.nix # machine-generated; filesystems moved to disko.nix
     ./disko.nix                  # declarative disk layout (partitions, btrfs, mounts)
     ../../modules/core.nix       # users, nix settings, boot loader, networking…
+    ../../modules/nix-config.nix # clone ~/nix-config on first boot (out-of-store symlink target)
     ../../modules/desktop.nix    # fonts, Wayland env, GTK portal fallback
     ../../modules/hyprland.nix   # hyprland session (re-trial vs niri, 2026-07; full replacement on this branch)
     ../../modules/dms.nix        # DMS shell, system half (service defaults + shell fonts; shell itself in home/dms.nix)

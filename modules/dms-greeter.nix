@@ -6,11 +6,12 @@
 # it.
 #
 # Sessions: greetd's session, once authenticated, execs the chosen session
-# from the same wayland-sessions dir SDDM scanned — the .desktop files that
-# programs.hyprland installs appear with zero wiring here. ⚠ Pick plain
-# "Hyprland", never "Hyprland (uwsm-managed)": the package ships both
-# entries unconditionally, and without uwsm units the latter just bounces
-# back to the greeter (withUWSM is deliberately off — modules/hyprland.nix).
+# from the same wayland-sessions dir SDDM scanned. The menu shows exactly
+# ONE entry — plain "Hyprland" — because modules/hyprland.nix force-filters
+# services.displayManager.sessionPackages: the package's second entry,
+# "Hyprland (uwsm-managed)", had no uwsm units behind it (withUWSM is off)
+# and provably bounced first-attempt logins back to this greeter
+# (journal 2026-07-20: uwsm → systemctl exit status 5 → session closed).
 #
 # PAM: greetd authenticates via security.pam.services.greetd — a service
 # generated WITH default rules, so per-service toggles on it actually work

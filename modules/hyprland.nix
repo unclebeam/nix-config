@@ -10,11 +10,8 @@
 
 {
   # System-level enable does things home-manager can't:
-  #  * installs the wayland-session .desktop files the greeter menu finds.
-  #    ⚠ The package unconditionally ships TWO entries: "Hyprland" (plain
-  #    exec — the one to use) and "Hyprland (uwsm-managed)", which is a trap
-  #    here: withUWSM stays off (see below), so the uwsm entry has no units
-  #    behind it and bounces back to the greeter.
+  #  * installs the wayland-session .desktop files the greeter menu finds
+  #    (filtered below — see the sessionPackages override).
   #  * a cap_sys_nice security wrapper for the Hyprland binary.
   #  * xdg-desktop-portal-hyprland — THE screencast/screenshot backend now
   #    (rerouted onto explicitly below).
@@ -29,6 +26,34 @@
   # user manager and starts hyprland-session.target itself (the same
   # explicit-anchor design niri-session.target had). uwsm would fight that
   # by managing graphical-session.target on its own.
+
+  # ── Session list: expose ONLY the plain "Hyprland" entry ────────────────
+  # The hyprland package unconditionally ships TWO session files:
+  # hyprland.desktop (plain start-hyprland — the working one) and
+  # hyprland-uwsm.desktop, whose Exec is a bundled uwsm binary. With
+  # withUWSM off, uwsm's systemd user units don't exist, so picking that
+  # entry PROVABLY kills the login: journal 2026-07-20 shows uwsm running
+  # `systemctl --user start wayland-session-bindpid@….service` → exit
+  # status 5 (no such unit) → session closed after ~1s → bounced back to
+  # the greeter. The DMS greeter builds its session menu from
+  # services.displayManager.sessionPackages (merged into sessionData.
+  # desktops, which /etc/pam/environment prepends to every session's
+  # XDG_DATA_DIRS), so overriding the list here removes the landmine at
+  # the source. The link-farm re-exports just hyprland.desktop from the
+  # real package — no Hyprland rebuild (overrideAttrs would compile from
+  # source; there's no cache for a modified derivation).
+  services.displayManager.sessionPackages = lib.mkForce [
+    (pkgs.runCommand "hyprland-session-only"
+      { passthru.providedSessions = [ "hyprland" ]; } ''
+        mkdir -p $out/share/wayland-sessions
+        ln -s ${config.programs.hyprland.package}/share/wayland-sessions/hyprland.desktop \
+          $out/share/wayland-sessions/
+      '')
+  ];
+  # With one session in the list this is belt-and-braces (nothing else to
+  # fall back to), but it keeps the greeter's preselection deterministic
+  # and is required if autoLogin is ever enabled.
+  services.displayManager.defaultSession = "hyprland";
 
   # ── Portal routing: KDE for dialogs, hyprland for capture ───────────────
   # The KDE portal serves everything interactive: file dialogs (KIO,
