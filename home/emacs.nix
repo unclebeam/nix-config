@@ -49,10 +49,15 @@ in
     # (same rule as nvim's no-Mason: `doom doctor` names what a module wants,
     # and enabling a Doom module later = add its external tools HERE first.)
     pkgs.shellcheck # :lang sh — shell script linting
+    pkgs.shfmt # :lang sh — shfmt, apheleia formats shell scripts with it
     pkgs.multimarkdown # :lang markdown — compiler for markdown-preview
     # Same server nvim uses (home/neovim.nix); listed here TOO because each
     # editor's file declares its own tools (atomic removal — buildEnv dedupes).
     pkgs.nil # :lang nix +lsp — Nix language server; lsp-mode finds it on PATH
+    # The RFC-style formatter is now the default `nixfmt` binary (the old
+    # `nixfmt-rfc-style` attr is a deprecated alias that eval-warns). Command
+    # name `nixfmt` — exactly what :lang nix's nix-format-buffer invokes.
+    pkgs.nixfmt # :lang nix — nixfmt formatter
 
     # ── Next.js/TypeScript stack (:lang (javascript +lsp +tree-sitter)) ──
     # lsp-mode's ts-ls client for js/ts/tsx modes — no elisp config needed,
