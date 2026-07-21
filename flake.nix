@@ -62,6 +62,31 @@
       url = "github:AvengeMedia/DankMaterialShell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # hyprland-preview-share-picker — an alternative xdph screen-share picker
+    # that shows live window/monitor THUMBNAILS before you pick (the default
+    # hyprland-share-picker is a flat Qt title list with no visuals). Rust +
+    # GTK4. Not in nixpkgs; it ships ONLY a package (no NixOS module), so —
+    # exactly like zen-browser above — nothing wires into mkHost;
+    # home/hyprland.nix pulls the package straight out of `inputs` and points
+    # xdph's screencopy:custom_picker_binary at it.
+    #
+    # It follows nixpkgs-unstable, NOT our 26.05 nixpkgs: 26.05's rustc SIGABRTs
+    # (`double free or corruption`) compiling this picker's `unsafe-libyaml`
+    # dependency, while unstable's newer rustc builds it cleanly. This is
+    # exactly what the curated nixpkgs-unstable input exists for (a fast-moving
+    # package that stable can't build) — and following it reuses an input we
+    # already evaluate rather than pulling a third nixpkgs.
+    #
+    # Fetched via the git+https scheme (NOT `github:`) with `?submodules=1`:
+    # the repo vendors git submodules, and this Nix rejects the `submodules`
+    # attribute under the github scheme (`not supported by scheme 'github'` on
+    # any re-lock) — the git scheme accepts it as a query param and pulls the
+    # submodules the build needs.
+    hyprland-preview-share-picker = {
+      url = "git+https://github.com/WhySoBad/hyprland-preview-share-picker?submodules=1";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
   };
 
   outputs =

@@ -11,9 +11,17 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
+let
+  # The thumbnail-preview share picker (flake input, wired in flake.nix). Bound
+  # once here so both the xdph.conf reference and home.packages use the same
+  # store path. `inputs` reaches this file via home-manager.extraSpecialArgs.
+  previewSharePicker =
+    inputs.hyprland-preview-share-picker.packages.${pkgs.stdenv.hostPlatform.system}.default;
+in
 {
   # Hyprland 0.55+ loads ~/.config/hypr/hyprland.lua INSTEAD of
   # hyprland.conf whenever the .lua file exists (hyprlang is deprecated
@@ -44,15 +52,26 @@
   # vars (home/cursor.nix); an in-compositor override belongs to the
   # DMS-owned dms/cursor.lua.)
 
-  # xdph tuning (the screencast portal, modules/hyprland.nix): auto-grant
-  # restore tokens, so a site/app that already screenshared re-shares
-  # silently instead of re-opening the picker every time (fixes the
-  # Meet/Brave double-picker annoyance). The portal reads this at startup —
-  # `systemctl --user restart xdg-desktop-portal-hyprland` after changing.
-  # DMS never touches xdph.conf, so a store symlink is safe here.
+  # xdph tuning (the screencast portal, modules/hyprland.nix). The portal reads
+  # this at startup — `systemctl --user restart xdg-desktop-portal-hyprland`
+  # after changing. DMS never touches xdph.conf, so a store symlink is safe.
+  #
+  # allow_token_by_default: auto-grant restore tokens, so a site/app that
+  # already screenshared re-shares silently instead of re-opening the picker
+  # every time (fixes the Meet/Brave double-picker annoyance). The preview
+  # picker accepts xdph's `--allow-token` flag, so this behavior is preserved.
+  #
+  # custom_picker_binary: replace xdph's default hyprland-share-picker (a flat
+  # Qt title list) with hyprland-preview-share-picker, which shows live
+  # window/monitor THUMBNAILS. Referenced by ABSOLUTE store path, NOT the bare
+  # name: xdph runs as a systemd user service, and the picker's one known
+  # failure mode (`SHAREDATA returned selection -1`) is the binary not
+  # resolving on PATH — an absolute path removes that class of bug. To revert
+  # to the default Qt picker, comment out this one line.
   xdg.configFile."hypr/xdph.conf".text = ''
     screencopy {
       allow_token_by_default = true
+      custom_picker_binary = ${previewSharePicker}/bin/hyprland-preview-share-picker
     }
   '';
 
@@ -91,5 +110,9 @@
     # clipboard, and shell pipelines all exec wl-copy / wl-paste. Lives here
     # because it's Wayland-session infrastructure, not any one app's dep.
     wl-clipboard
-  ];
+  ]
+  # The screencast picker (wired into xdph.conf above via absolute path). Also
+  # installed on PATH here so it's runnable by hand for testing/debugging
+  # (`hyprland-preview-share-picker --help`).
+  ++ [ previewSharePicker ];
 }
