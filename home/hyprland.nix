@@ -75,6 +75,27 @@ in
     }
   '';
 
+  # The preview picker's own config (YAML). It's plain GTK4 and there's no
+  # gtk.css on this machine, so out of the box it renders in stock LIGHT
+  # libadwaita — jarring on the dark DMS desktop. `stylesheets` points at our
+  # tracked stylesheet, which restyles it dark/rounded/accent and @imports DMS's
+  # matugen dank-colors.css so it tracks the wallpaper (see share-picker.css).
+  #
+  # We point at the working-tree file directly (like hyprland.lua) so CSS edits
+  # apply on the next picker launch with NO rebuild — only this config.yaml is a
+  # store symlink, so changes to IT do need a rebuild. Store symlink is safe:
+  # the picker reads its config, never writes it.
+  xdg.configFile."hyprland-preview-share-picker/config.yaml".text = ''
+    stylesheets:
+      - ${config.home.homeDirectory}/nix-config/home/hypr/share-picker.css
+    default_page: windows
+    window:
+      width: 1100
+      height: 640
+    outputs:
+      show_label: true
+  '';
+
   # ── hyprland-session.target — the session anchor ────────────────────────
   # Started explicitly by hyprland.lua's startup hook, stopped via BindsTo
   # when graphical-session.target goes down at logout. Deliberately NO

@@ -1,0 +1,218 @@
+/* home/hypr/share-picker.css — the look of hyprland-preview-share-picker (the
+ * screen-share window/output chooser). Plain, tracked, GTK4 CSS — same "stay
+ * plain files" rule as hyprland.lua, and read straight from the working tree
+ * (config.yaml's `stylesheets:` points here), so edits apply on the NEXT picker
+ * launch with no rebuild. Wired in home/hyprland.nix.
+ *
+ * WHY this file exists: the picker is plain GTK4, and there is no
+ * ~/.config/gtk-4.0/gtk.css on this machine, so out of the box it renders in
+ * stock LIGHT libadwaita — a light-grey tab bar and square, unstyled
+ * thumbnails that clash with the dark DMS desktop. This restyles it dark,
+ * rounded, and accent-tinted to match.
+ *
+ * COLORS come from DMS: its matugen hook writes ~/.config/gtk-4.0/dank-colors.css
+ * (the same wallpaper-derived Material-You palette the rest of DMS uses) and
+ * rewrites it whenever the wallpaper changes. We @import it below and reference
+ * its @define-color names, so the picker tracks the wallpaper automatically —
+ * the "let DMS reach the colors, don't hardcode" rule from CLAUDE.md. The path
+ * is hardcoded (a plain .css can't interpolate Nix; a GTK @import needs a
+ * literal file:// URL) — consistent with the repo's other /home/unclebeam
+ * hardcoding, and the user is `unclebeam` on both hosts.
+ *
+ * DEPENDS ON DMS's matugen GTK template staying enabled (matugenTemplateGtk,
+ * on by default). If dank-colors.css ever goes missing the @import is a no-op
+ * and the @define-color vars fall back to GTK's built-ins (the picker still
+ * works, just unthemed) — nothing hard-fails.
+ *
+ * The `stylesheets` provider loads at STYLE_PROVIDER_PRIORITY_APPLICATION, so
+ * these rules layer on top of the GTK default theme. Iterate live with
+ * `hyprland-preview-share-picker --inspect` (opens the GTK Inspector) to confirm
+ * node names/states. Class names come from the picker's default `classes` map.
+ */
+
+/* Must be first (GTK requires @import before other rules). Registers the
+ * @define-color palette (accent/bg/fg/card/…) into THIS provider so every rule
+ * below can resolve them. */
+@import url("file:///home/unclebeam/.config/gtk-4.0/dank-colors.css");
+
+/* ── Window shell ─────────────────────────────────────────────────────────
+ * The picker is a gtk4-layer-shell surface. Paint the toplevel transparent and
+ * put the real (rounded) background on the content box, so the corners read as
+ * rounded instead of a square opaque block. If the compositor still shows hard
+ * corners, this is the first knob to adjust (see plan's "known iteration
+ * point"). */
+window,
+window.background,
+.window {
+  background-color: transparent;
+  color: @window_fg_color;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+}
+
+/* The direct child Box of the window is the content surface — give IT the
+ * rounded dark background. */
+window > box {
+  background-color: @window_bg_color;
+  border-radius: 16px;
+  padding: 8px;
+}
+
+/* ── Tab bar (GtkNotebook: Windows / Outputs / Region) ────────────────────── */
+.notebook,
+notebook {
+  background-color: transparent;
+}
+
+.notebook > header,
+notebook > header {
+  background-color: transparent;
+  border: none;
+  padding: 2px 4px 8px 4px;
+}
+
+/* The tabs themselves — pill-ish, muted until active. */
+.notebook > header tab,
+notebook > header tab {
+  background-color: transparent;
+  border: none;
+  border-radius: 10px;
+  margin: 0 2px;
+  padding: 2px;
+  min-height: 0;
+  color: @window_fg_color;
+}
+
+.tab-label {
+  padding: 8px 18px;
+  font-weight: 600;
+  opacity: 0.55;
+  color: @window_fg_color;
+}
+
+.notebook > header tab:hover .tab-label,
+notebook > header tab:hover .tab-label {
+  opacity: 0.85;
+}
+
+/* Active tab: full-opacity accent text + an accent underline. */
+.notebook > header tab:checked .tab-label,
+notebook > header tab:checked .tab-label {
+  opacity: 1;
+  color: @accent_bg_color;
+}
+
+.notebook > header tab:checked,
+notebook > header tab:checked {
+  box-shadow: inset 0 -2px @accent_bg_color;
+}
+
+/* ── Scroll / page area ───────────────────────────────────────────────────── */
+.page,
+scrolledwindow {
+  background-color: transparent;
+  padding: 6px;
+}
+
+flowbox {
+  background-color: transparent;
+  padding: 4px;
+}
+
+/* ── Thumbnail cards ──────────────────────────────────────────────────────── */
+/* The FlowBoxChild is the focus/selection target; keep it padded and let the
+ * inner .card carry the visible surface so the accent ring hugs the card. */
+flowboxchild {
+  border-radius: 14px;
+  padding: 4px;
+  background-color: transparent;
+}
+
+flowboxchild:focus,
+flowboxchild:selected {
+  outline: none;
+  box-shadow: none;
+}
+
+.card {
+  background-color: @card_bg_color;
+  border-radius: 12px;
+  padding: 6px;
+  border: 2px solid transparent;
+  transition: border-color 150ms ease, background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+/* The thumbnail image inside the card. */
+.card .image,
+.image {
+  border-radius: 8px;
+  background-color: @view_bg_color;
+}
+
+/* While the preview is still decoding. */
+.card-loading {
+  background-color: @view_bg_color;
+}
+
+/* Hover: gentle warm-up. */
+flowboxchild:hover .card {
+  background-color: @view_bg_color;
+  border-color: alpha(@accent_bg_color, 0.45);
+}
+
+/* Selected/focused: accent ring + soft glow. */
+flowboxchild:selected .card,
+flowboxchild:focus .card {
+  border-color: @accent_bg_color;
+  box-shadow: 0 0 0 3px alpha(@accent_bg_color, 0.35);
+}
+
+/* Window/output title under each thumbnail. */
+.image-label {
+  padding: 6px 4px 2px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: @window_fg_color;
+  opacity: 0.9;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+/* "Select region" — a filled accent (Material-ish) button. */
+.region-button {
+  background-color: @accent_bg_color;
+  color: @accent_fg_color;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 22px;
+  margin: 12px;
+  font-weight: 600;
+  min-height: 0;
+  transition: box-shadow 150ms ease;
+}
+
+.region-button:hover {
+  box-shadow: 0 0 0 3px alpha(@accent_bg_color, 0.35);
+}
+
+.region-button:active {
+  background-color: alpha(@accent_bg_color, 0.85);
+}
+
+/* "Allow a restore token" checkbox row. */
+.restore-button {
+  padding: 8px;
+  color: @window_fg_color;
+}
+
+.restore-button check {
+  border-radius: 6px;
+  min-width: 18px;
+  min-height: 18px;
+}
+
+.restore-button check:checked {
+  background-color: @accent_bg_color;
+  color: @accent_fg_color;
+  border-color: @accent_bg_color;
+}
