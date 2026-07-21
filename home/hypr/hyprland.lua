@@ -11,8 +11,12 @@ end)
 
 hl.config({
 	input = {
-		-- empty inherits XKB_DEFAULT_LAYOUT (libxkbcommon), falls back to "us"
-		kb_layout = "",
+		-- MACHINE FACT (deviation): US + Thai. The template leaves kb_layout
+		-- empty (inherits XKB_DEFAULT_LAYOUT). Binds resolve against the
+		-- FIRST layout, so SUPER binds keep working under the Thai layout.
+		-- Switching is the Ctrl+Space bind below — deliberately NOT a
+		-- `grp:` xkb option (the two mechanisms must never coexist).
+		kb_layout = "us,th",
 		numlock_by_default = true,
 		follow_mouse = 0,
 		-- DEVIATION: natural scrolling on mice too (the touchpad option below
@@ -53,6 +57,14 @@ hl.config({
 		mfact = 0.5,
 	},
 })
+
+-- DEVIATION (machine fact): keyboard-layout toggle on Ctrl+Space, same key
+-- as the niri setup. Hyprland 0.55's Lua dispatcher table has no xkb-layout
+-- entry — the mechanism is hyprctl. `all` (not `current`) keeps every
+-- keyboard in sync: the thinkpad's internal, externals, AND kanata's
+-- virtual keyboard, mirroring niri's applies-to-every-keyboard behavior.
+-- No reverse-cycle bind on purpose: with two layouts, `next` IS the toggle.
+hl.bind("CTRL + space", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"))
 
 hl.animation({ leaf = "windowsIn", enabled = true, speed = 3, bezier = "default" })
 hl.animation({ leaf = "windowsOut", enabled = true, speed = 3, bezier = "default" })
