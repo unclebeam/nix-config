@@ -78,6 +78,19 @@ hl.config({
 	},
 })
 
+-- DEVIATION (machine fact): both this host's outputs are 4K at scale 1.5
+-- (see dms/outputs.lua). Without this, XWayland apps (Steam, other X11)
+-- render at the logical resolution and Hyprland bitmap-upscales them 1.5x
+-- => blurry. force_zero_scaling makes XWayland own native pixels (crisp);
+-- per-app scaling then restores correct size (Steam: STEAM_FORCE_DESKTOPUI_
+-- SCALING in modules/gaming.nix). Harmless on the thinkpad if it runs at
+-- scale 1 (zero scaling == no scaling there).
+hl.config({
+	xwayland = {
+		force_zero_scaling = true,
+	},
+})
+
 -- DEVIATION (machine fact): keyboard-layout toggle on Ctrl+Space, same key
 -- as the niri setup. Hyprland 0.55's Lua dispatcher table has no xkb-layout
 -- entry — the mechanism is hyprctl. `all` (not `current`) keeps every

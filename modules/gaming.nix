@@ -20,6 +20,15 @@
     extraCompatPackages = [ pkgs.proton-ge-bin ];
   };
 
+  # Steam's desktop UI is XWayland; with force_zero_scaling on (home/hypr/
+  # hyprland.lua) it renders at native pixels = sharp but tiny. This env var
+  # (the equivalent of Steam's `-forcedesktopscaling` launch flag) restores
+  # correct size by drawing the UI at 1.5x. MUST match the monitor scale in
+  # home/hypr/dms/outputs.lua — only Steam reads it, so it's harmless session-
+  # wide. This module is PC-only (the ThinkPad import is commented), so the
+  # hardcoded 1.5 always matches this host.
+  environment.sessionVariables.STEAM_FORCE_DESKTOPUI_SCALING = "1.5";
+
   # GameMode: games (or `gamemoderun %command%` in Steam launch options)
   # request CPU governor/priority tweaks while running.
   programs.gamemode.enable = true;
