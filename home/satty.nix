@@ -17,6 +17,18 @@
       # the raw capture is kept nowhere, and DMS's "saved!" toast would lie.
       # Buffer through a temp file instead of a raw pipe so a cancelled
       # region-select (empty stdout) never launches satty on a blank image.
+      #
+      # Chromium quirk (verified 2026-07-21, DMS 1.5.2): when a Chromium-
+      # family window (brave) OWNS the clipboard, dms's region UI touching
+      # the selection during init makes the browser fire an xdg-activation
+      # request — hyprland honors it and yanks focus AND the workspace to
+      # the browser mid-capture. Re-owning the clipboard first (same
+      # content, owner becomes wl-copy) keeps dms away from the browser.
+      # Only the top mime type survives the re-own, which is fine: a
+      # committed satty run replaces the clipboard with the screenshot
+      # anyway. Drop this if upstream fixes the clipboard init.
+      t=$(wl-paste --list-types 2>/dev/null | head -n1)
+      [ -n "$t" ] && wl-paste -t "$t" 2>/dev/null | wl-copy -t "$t" 2>/dev/null
       img=$(mktemp --suffix=.png)
       trap 'rm -f "$img"' EXIT
       dms screenshot "$@" --stdout --no-file --no-clipboard --no-notify > "$img"
