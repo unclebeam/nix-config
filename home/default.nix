@@ -5,6 +5,7 @@
 
 {
   imports = [
+    ./directories.nix # home skeleton: XDG dirs (Documents/Downloads/Pictures) + ~/org + ~/.ssh
     ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + session target
     ./dms.nix       # DMS user glue: adw-gtk3 + symlinked hypr/dms fragments (the shell itself: modules/dms.nix)
     ./satty.nix     # screenshot annotator (run by hand on saved screenshots)
