@@ -104,3 +104,17 @@ require("dms.cursor")
 require("dms.binds")
 require("dms.binds-user")
 require("dms.windowrules")
+
+-- DEVIATION (mandatory feature): screenshot → satty annotation. These
+-- binds live HERE, not in the dms.* fragments, so they exist on a fresh
+-- install and can't be lost to a Settings-GUI rewrite of binds-user.lua.
+-- Must stay BELOW the require()s: hl.unbind removes the DMS template's
+-- Print binds (which exist only after dms.binds loads — duplicate binds
+-- fire BOTH dispatchers), and loading last means these always win.
+-- screenshot-annotate is the wrapper from home/satty.nix.
+hl.unbind("Print")
+hl.unbind("CTRL + Print")
+hl.unbind("ALT + Print")
+hl.bind("Print", hl.dsp.exec_cmd("screenshot-annotate"))
+hl.bind("CTRL + Print", hl.dsp.exec_cmd("screenshot-annotate full"))
+hl.bind("ALT + Print", hl.dsp.exec_cmd("screenshot-annotate window"))
