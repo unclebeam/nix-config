@@ -91,6 +91,20 @@
   # keep its default.)
   networking.networkmanager.wifi.powersave = false;
 
+  # External monitors have no kernel backlight — brightness is set over
+  # DDC/CI, which rides the GPU's I2C buses. hardware.i2c loads the i2c-dev
+  # module and udev-tags /dev/i2c-* into the "i2c" group; the membership
+  # below lets the dms binary (native DDC support, no ddcutil needed) talk
+  # to the monitors, so the DMS brightness slider / `dms ipc call
+  # brightness` drive them directly. Without either half, DDC silently
+  # doesn't work: no i2c-dev = no /dev/i2c-* nodes at all, no group = dms
+  # gets EACCES and just lists zero brightness devices. DDC/CI must also be
+  # enabled in each monitor's own OSD menu (usually is by default).
+  # Host-level on purpose: the ThinkPad's panel uses its kernel backlight
+  # via logind and needs none of this.
+  hardware.i2c.enable = true;
+  users.users.unclebeam.extraGroups = [ "i2c" ]; # merges with core.nix's list
+
   # The disk layout (disko.nix) has no swap partition. Instead, use zram:
   # a compressed block device in RAM used as swap. Cheap insurance against
   # memory pressure with no disk wear and nothing to partition.
