@@ -14,6 +14,7 @@
       # abbreviations expand inline (you SEE the real command before enter)
       nrs = "sudo nixos-rebuild switch --flake .";
       nfc = "git add -A && nix flake check"; # flakes only see tracked files!
+      nixconfig = "cd ~/nix-config"; # repo checkout lives here on every machine
     };
   };
 
