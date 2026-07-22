@@ -47,9 +47,9 @@ home/           shared home-manager config: hyprland, dms, alacritty, fish, ...
 2. Add password to sudo by `sudo passwd`
 3. Run `ip a` to see the current ip
 4. Run nixos anywhere command
-``` sh
-nix run github:nix-community/nixos-anywhere -- --flake github:unclebeam/nix-config#unclebeam-pc root@10.2.98.30
-```
+   ``` sh
+   nix run github:nix-community/nixos-anywhere -- --flake github:unclebeam/nix-config#unclebeam-pc root@10.2.98.30
+   ```
 5. After nixos-anywhere was successfully run, the target machine will be auto restarted
 6. At the login screen, let's login to tty by using `ctrl+atl+F3` and login with your username and password
 7. Change the password by using `passwd`
