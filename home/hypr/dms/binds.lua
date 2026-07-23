@@ -31,12 +31,28 @@ hl.bind("XF86AudioPause", hl.dsp.exec_cmd("dms ipc call mpris playPause"), { loc
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("dms ipc call mpris playPause"), { locked = true })
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("dms ipc call mpris previous"), { locked = true })
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("dms ipc call mpris next"), { locked = true })
-hl.bind("CTRL + XF86AudioRaiseVolume", hl.dsp.exec_cmd("dms ipc call mpris increment 3"), { locked = true, repeating = true })
-hl.bind("CTRL + XF86AudioLowerVolume", hl.dsp.exec_cmd("dms ipc call mpris decrement 3"), { locked = true, repeating = true })
+hl.bind(
+	"CTRL + XF86AudioRaiseVolume",
+	hl.dsp.exec_cmd("dms ipc call mpris increment 3"),
+	{ locked = true, repeating = true }
+)
+hl.bind(
+	"CTRL + XF86AudioLowerVolume",
+	hl.dsp.exec_cmd("dms ipc call mpris decrement 3"),
+	{ locked = true, repeating = true }
+)
 
 -- === Brightness Controls ===
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd([[dms ipc call brightness increment 5 ""]]), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd([[dms ipc call brightness decrement 5 ""]]), { locked = true, repeating = true })
+hl.bind(
+	"XF86MonBrightnessUp",
+	hl.dsp.exec_cmd([[dms ipc call brightness increment 5 ""]]),
+	{ locked = true, repeating = true }
+)
+hl.bind(
+	"XF86MonBrightnessDown",
+	hl.dsp.exec_cmd([[dms ipc call brightness decrement 5 ""]]),
+	{ locked = true, repeating = true }
+)
 
 -- === Window Management ===
 hl.bind("SUPER + Q", hl.dsp.window.close())
@@ -91,8 +107,8 @@ hl.bind("SUPER + SHIFT + CTRL + L", hl.dsp.window.move({ monitor = "r" }))
 -- === Workspace Navigation ===
 hl.bind("SUPER + Page_Down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind("SUPER + Page_Up", hl.dsp.focus({ workspace = "e-1" }))
-hl.bind("SUPER + U", hl.dsp.focus({ workspace = "e+1" }))
-hl.bind("SUPER + I", hl.dsp.focus({ workspace = "e-1" }))
+hl.bind("SUPER + I", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind("SUPER + U", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind("SUPER + CTRL + down", hl.dsp.window.move({ workspace = "e+1" }))
 hl.bind("SUPER + CTRL + up", hl.dsp.window.move({ workspace = "e-1" }))
 hl.bind("SUPER + CTRL + U", hl.dsp.window.move({ workspace = "e+1" }))
@@ -150,8 +166,16 @@ hl.bind("SUPER + CTRL + F", hl.dsp.window.fullscreen({ mode = "maximized", actio
 hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true, description = "Move window" })
 hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Resize window" })
 
-hl.bind("SUPER + code:20", hl.dsp.window.resize({ x = -100, y = 0, relative = true }), { description = "Expand window left" })
-hl.bind("SUPER + code:21", hl.dsp.window.resize({ x = 100, y = 0, relative = true }), { description = "Shrink window left" })
+hl.bind(
+	"SUPER + code:20",
+	hl.dsp.window.resize({ x = -100, y = 0, relative = true }),
+	{ description = "Expand window left" }
+)
+hl.bind(
+	"SUPER + code:21",
+	hl.dsp.window.resize({ x = 100, y = 0, relative = true }),
+	{ description = "Shrink window left" }
+)
 
 -- === Manual Sizing ===
 hl.bind("SUPER + minus", hl.dsp.window.resize({ x = -100, y = 0, relative = true }), { repeating = true })
