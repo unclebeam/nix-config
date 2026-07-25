@@ -56,6 +56,25 @@
   # CLI: `nmcli device wifi connect <ssid> --ask`, or `nmtui` for a TUI.
   networking.networkmanager.enable = true;
 
+  # The wifi supplicant is iwd, not the default wpa_supplicant (switched
+  # 2026-07-25). Why: MT7925 failure #5 on the pc — at cold boot the radio
+  # intermittently times out the WPA 4-way handshake (deauth reason 15,
+  # ~4s after firmware load, mid regdom/channel-list churn; see the numbered
+  # MT7925 failure comments in hosts/unclebeam-pc/default.nix).
+  # wpa_supplicant surfaces that timeout to NetworkManager, which reads it
+  # as "wrong password", invalidates the stored PSK for the attempt, and —
+  # since no secret agent exists pre-login — fails the activation and later
+  # makes the DMS agent re-prompt for a password that was on disk and
+  # correct all along. iwd retries failed handshakes internally instead of
+  # bubbling a bad-password verdict up, so a flaky first handshake becomes
+  # a silent retry, not a prompt. NM stays the manager: existing profiles,
+  # nmcli, and the DMS network widget all keep working — iwd only replaces
+  # wpa_supplicant underneath (this option auto-enables iwd's service; iwd's
+  # own network/DHCP config stays off, NM keeps doing IP). iwd caches
+  # network state under /var/lib/iwd; NM hands it the profile PSK on first
+  # connect, so at most a one-time re-prompt right after the switch.
+  networking.networkmanager.wifi.backend = "iwd";
+
   # ── Locale / time ──────────────────────────────────────────────────────
   time.timeZone = "Asia/Bangkok";
   i18n.defaultLocale = "en_US.UTF-8";

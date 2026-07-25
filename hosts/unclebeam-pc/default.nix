@@ -89,6 +89,14 @@
   # password. A desktop on mains has nothing to gain from radio power-save,
   # so force it off. (Host-level on purpose: the ThinkPad on battery should
   # keep its default.)
+  #
+  # MT7925 failure #5 — the cold-boot variant of the same handshake timeout
+  # (reason 15 ~4s after firmware load, while the regdom/channel list is
+  # still churning; powersave-off doesn't cover it, and pre-login there is
+  # no secret agent, so NM's "wrong password" misread became a DMS password
+  # prompt on ~3 of 5 boots, 2026-07). Handled by switching the wifi
+  # supplicant to iwd — which retries handshakes internally instead of
+  # reporting bad-password — in modules/core.nix (wifi.backend = "iwd").
   networking.networkmanager.wifi.powersave = false;
 
   # External monitors have no kernel backlight — brightness is set over
