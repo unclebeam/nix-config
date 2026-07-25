@@ -76,6 +76,20 @@ in
     # (doom/config.el points lsp-tailwindcss-server-path at this binary).
     pkgs.tailwindcss-language-server
     pkgs.prettier # :editor (format +onsave) — apheleia formats ts/tsx/css/json with it
+
+    # :checkers (spell +flyspell) — Doom probes PATH for aspell → hunspell →
+    # enchant and prefers aspell (its config tunes it: --sug-mode=ultra, a
+    # personal dictionary under doom-data-dir). aspellWithDicts because the
+    # bare aspell package ships ZERO dictionaries — on PATH but dictionary-less
+    # it fails at first use instead of at startup, a quieter breakage than
+    # today's "Can't find ispell" warning.
+    (pkgs.aspellWithDicts (ds: with ds; [ en ]))
+    # :checkers grammar — langtool's detection order tries the
+    # `languagetool-commandline` binary FIRST (the branch is literally
+    # commented "for nixpkgs.languagetool" upstream), which is exactly what
+    # this package puts on PATH, JRE-wrapped so no Java setup needed.
+    # writegood-mode, the module's other half, needs no external tool.
+    pkgs.languagetool
   ];
 
   # ── Emacs daemon + client workflow ──────────────────────────────────────
