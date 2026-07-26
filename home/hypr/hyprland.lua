@@ -155,15 +155,22 @@ hl.bind("ALT + Print", hl.dsp.exec_cmd("screenshot-annotate window"))
 -- DEVIATION (machine fact, unclebeam-pc): pin workspaces to monitors.
 -- 1-5 live on the MSI (main, horizontal), 6-9 on the vertical Gigabyte.
 -- Matched by DESCRIPTION, not DP port: ports can renumber across
--- replugs/BIOS updates, and on the thinkpad neither description exists,
--- so these rules are harmless no-ops there (workspaces behave as before).
--- `default` on 1 and 6 makes each monitor start on its first bound
--- workspace at login/monitor-connect.
-local main = "desc:Micro-Star Int'l Co. Ltd. PM271UPXW12G 0x01010101" -- MSI, horizontal
-local secondary = "desc:GIGA-BYTE TECHNOLOGY CO. LTD. M28U 22060B005352" -- Gigabyte, vertical
-for ws = 1, 5 do
-	hl.workspace_rule({ workspace = tostring(ws), monitor = main, default = (ws == 1) })
-end
-for ws = 6, 9 do
-	hl.workspace_rule({ workspace = tostring(ws), monitor = secondary, default = (ws == 6) })
+-- replugs/BIOS updates. Guarded by HOSTNAME because desc rules for
+-- absent monitors are NOT no-ops: on the thinkpad they claimed
+-- workspaces 1-9 as "belonging elsewhere", so eDP-1's default
+-- workspace became 10 instead of 1. `default` on 1 and 6 makes each
+-- monitor start on its first bound workspace at login/monitor-connect.
+local f = io.open("/etc/hostname")
+local host = f and f:read("*l") or ""
+if f then f:close() end
+
+if host == "unclebeam-pc" then
+	local main = "desc:Micro-Star Int'l Co. Ltd. PM271UPXW12G 0x01010101" -- MSI, horizontal
+	local secondary = "desc:GIGA-BYTE TECHNOLOGY CO. LTD. M28U 22060B005352" -- Gigabyte, vertical
+	for ws = 1, 5 do
+		hl.workspace_rule({ workspace = tostring(ws), monitor = main, default = (ws == 1) })
+	end
+	for ws = 6, 9 do
+		hl.workspace_rule({ workspace = tostring(ws), monitor = secondary, default = (ws == 6) })
+	end
 end
