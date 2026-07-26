@@ -43,6 +43,21 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
+;; Doom defaults org-agenda-files to (list org-directory), and org expands a
+;; directory entry NON-recursively — so files in the PARA subfolders
+;; (0. Inbox, 1. Projects, …) were invisible to the agenda. List every
+;; non-hidden subdirectory alongside ~/org itself: directory entries are
+;; re-scanned on every agenda build, so new FILES in these folders appear
+;; immediately; only a brand-new top-level FOLDER needs a daemon restart.
+;; The "^[^.]" filter also keeps Syncthing's .stfolder out. after! because
+;; Doom's default assignment runs when org loads — set any earlier and the
+;; list would exist before the subfolders' final state is interesting anyway.
+(after! org
+  (setq org-agenda-files
+        (cons org-directory
+              (seq-filter #'file-directory-p
+                          (directory-files org-directory t "^[^.]")))))
+
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `with-eval-after-load' block, otherwise Doom's defaults may override your
