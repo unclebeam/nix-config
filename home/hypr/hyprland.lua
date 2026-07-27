@@ -162,11 +162,13 @@ hl.bind("ALT + Print", hl.dsp.exec_cmd("screenshot-annotate window"))
 -- monitor start on its first bound workspace at login/monitor-connect.
 local f = io.open("/etc/hostname")
 local host = f and f:read("*l") or ""
-if f then f:close() end
+if f then
+	f:close()
+end
 
 if host == "unclebeam-pc" then
 	local main = "desc:Micro-Star Int'l Co. Ltd. PM271UPXW12G 0x01010101" -- MSI, horizontal
-	local secondary = "desc:GIGA-BYTE TECHNOLOGY CO. LTD. M28U 22060B005352" -- Gigabyte, vertical
+	local secondary = "desc:Dell Inc. DELL S2725QS 3V7S364" -- Dell, vertical
 	for ws = 1, 5 do
 		hl.workspace_rule({ workspace = tostring(ws), monitor = main, default = (ws == 1) })
 	end
