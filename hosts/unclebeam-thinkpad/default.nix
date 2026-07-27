@@ -23,6 +23,7 @@
     ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
     ../../modules/brave.nix      # Brave managed policy: Google as default search (user half in home/brave.nix)
     ../../modules/dolphin.nix    # avahi discovery + udisks2 + ntfs/exfat (system half of Dolphin)
+    ../../modules/printing.nix   # CUPS + SANE, driverless network printing/scanning
     ../../modules/localsend.nix  # LAN file sharing (AirDrop-style) + firewall port
     ../../modules/syncthing.nix  # continuous file sync between machines (P2P; GUI-owned config)
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)
