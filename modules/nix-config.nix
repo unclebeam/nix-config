@@ -2,10 +2,11 @@
 #
 # The repo checkout at ~/nix-config is a load-bearing invariant (see
 # CLAUDE.md): every out-of-store symlink hardcodes it — hyprland.lua, the
-# whole hypr/dms fragment dir, and the neovim config. On a fresh
-# nixos-anywhere install the checkout doesn't exist yet, so all of those
-# links dangle and the FIRST login is broken (no compositor config, no DMS
-# fragments, configless nvim) until someone remembers to clone. This
+# hypr/binds.lua + hypr/local fragments, the noctalia config dir, and the
+# neovim config. On a fresh nixos-anywhere install the checkout doesn't
+# exist yet, so all of those links dangle and the FIRST login is broken
+# (no compositor config, no shell config, configless nvim) until someone
+# remembers to clone. This
 # oneshot closes that gap: it clones the repo on the first boot that has
 # network, then never runs again.
 #

@@ -12,8 +12,8 @@
     ../../modules/nix-config.nix # clone ~/nix-config on first boot (out-of-store symlink target)
     ../../modules/desktop.nix    # fonts, Wayland env, GTK portal fallback
     ../../modules/hyprland.nix   # hyprland session (re-trial vs niri, 2026-07; full replacement on this branch)
-    ../../modules/dms.nix        # DMS shell, system half (service defaults + shell fonts; shell itself in home/dms.nix)
-    ../../modules/dms-greeter.nix # DMS login greeter on greetd (replaced SDDM 2026-07)
+    ../../modules/noctalia.nix   # Noctalia shell, system half (service + cachix + fonts; config in home/noctalia.nix)
+    ../../modules/noctalia-greeter.nix # Noctalia login greeter on greetd (took over from DMS greeter 2026-07)
     ../../modules/kwallet.nix    # session keyring: ksecretd + pam_kwallet unlock (replaced gnome-keyring 2026-07)
     ../../modules/audio.nix      # pipewire
     ../../modules/bluetooth.nix  # bluez userspace for the MT7925's BT radio
@@ -94,8 +94,8 @@
   # MT7925 failure #5 — the cold-boot variant of the same handshake timeout
   # (reason 15 ~4s after firmware load, while the regdom/channel list is
   # still churning; powersave-off doesn't cover it, and pre-login there is
-  # no secret agent, so NM's "wrong password" misread became a DMS password
-  # prompt on ~3 of 5 boots, 2026-07). Handled by switching the wifi
+  # no secret agent, so NM's "wrong password" misread became a shell
+  # password prompt on ~3 of 5 boots, 2026-07). Handled by switching the wifi
   # supplicant to iwd — which retries handshakes internally instead of
   # reporting bad-password — in modules/core.nix (wifi.backend = "iwd").
   networking.networkmanager.wifi.powersave = false;
@@ -103,16 +103,18 @@
   # External monitors have no kernel backlight — brightness is set over
   # DDC/CI, which rides the GPU's I2C buses. hardware.i2c loads the i2c-dev
   # module and udev-tags /dev/i2c-* into the "i2c" group; the membership
-  # below lets the dms binary (native DDC support, no ddcutil needed) talk
-  # to the monitors, so the DMS brightness slider / `dms ipc call
-  # brightness` drive them directly. Without either half, DDC silently
-  # doesn't work: no i2c-dev = no /dev/i2c-* nodes at all, no group = dms
-  # gets EACCES and just lists zero brightness devices. DDC/CI must also be
+  # below plus the ddcutil package let Noctalia (which shells out to
+  # ddcutil, unlike dms's native DDC) talk to the monitors, so the shell's
+  # brightness slider / `noctalia msg brightness-*` drive them. Without
+  # any of the three halves, DDC silently doesn't work: no i2c-dev = no
+  # /dev/i2c-* nodes at all, no group = EACCES and zero brightness devices,
+  # no ddcutil = nothing for the shell to call. DDC/CI must also be
   # enabled in each monitor's own OSD menu (usually is by default).
   # Host-level on purpose: the ThinkPad's panel uses its kernel backlight
   # via logind and needs none of this.
   hardware.i2c.enable = true;
   users.users.unclebeam.extraGroups = [ "i2c" ]; # merges with core.nix's list
+  environment.systemPackages = [ pkgs.ddcutil ];
 
   # The disk layout (disko.nix) has no swap partition. Instead, use zram:
   # a compressed block device in RAM used as swap. Cheap insurance against

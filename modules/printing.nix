@@ -33,7 +33,7 @@
 
   # SANE gates device access on the "scanner" group ("lp" too, for
   # multifunction devices reached through the printer side). extraGroups
-  # lists merge across modules (same pattern as modules/dms.nix's "input").
+  # lists merge across modules (same pattern as hosts/unclebeam-pc's "i2c").
   users.users.unclebeam.extraGroups = [ "scanner" "lp" ];
 
   # Scanning GUI — the KDE app, matching the Dolphin/Ark app layer. It is

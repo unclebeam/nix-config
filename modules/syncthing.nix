@@ -19,7 +19,8 @@
 #
 # CONFIG IS GUI-OWNED, NOT NIX. Folders and paired devices are added at
 # http://localhost:8384 and stored in Syncthing's own config — the same rule as
-# editor configs, DMS settings, and the rclone token in home/google-drive.nix.
+# editor configs, Noctalia's GUI state, and the rclone token in
+# home/google-drive.nix.
 # This is why overrideDevices/overrideFolders are forced to false below: both
 # default to TRUE in nixpkgs, which would make every rebuild re-PUT the (here
 # empty) Nix-declared device/folder set and WIPE everything added in the GUI.

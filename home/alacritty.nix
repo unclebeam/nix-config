@@ -1,4 +1,4 @@
-# home/alacritty.nix — terminal, themed by DMS.
+# home/alacritty.nix — terminal, themed by Noctalia.
 { config, lib, pkgs, ... }:
 
 {
@@ -6,13 +6,17 @@
     enable = true;
     # `settings` is written out as alacritty.toml.
     settings = {
-      # Colors come from DMS: dms (re)writes dank-theme.toml from the
-      # wallpaper's matugen palette on every wallpaper change, and alacritty
+      # Colors come from Noctalia: its alacritty template (builtin_ids in
+      # home/noctalia/config.toml) rewrites themes/noctalia.toml from the
+      # wallpaper palette on every palette change, and alacritty
       # live-reloads imports — so the terminal recolors the moment the
-      # wallpaper does. home/dms.nix guarantees an (initially empty)
-      # placeholder exists so the import never dangles before the shell's
-      # first run.
-      general.import = [ "~/.config/alacritty/dank-theme.toml" ];
+      # wallpaper does. home/noctalia.nix seeds an (initially empty)
+      # placeholder so the import never dangles before the first render.
+      # NB: importing this exact path is also what keeps the template's
+      # apply.sh away from our read-only alacritty.toml — the script only
+      # tries to ADD an import when none referencing noctalia.toml exists
+      # (against the store symlink that write would die with EROFS).
+      general.import = [ "~/.config/alacritty/themes/noctalia.toml" ];
 
       font = {
         normal.family = "IosevkaTerm Nerd Font Mono";
@@ -25,8 +29,7 @@
       };
 
       # The one translucent surface in the setup. (Under hyprland the stock
-      # blur — which the DMS template leaves at its enabled default — shows
-      # through it.)
+      # blur — enabled by default — shows through it.)
       window.opacity = 0.92;
 
       # Shift+Enter normally sends the exact same bytes as plain Enter, so

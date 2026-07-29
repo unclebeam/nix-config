@@ -48,8 +48,8 @@
   # this file removes every trace of the KDE keyring.
   xdg.portal.config.hyprland."org.freedesktop.impl.portal.Secret" = "kwallet";
 
-  # PAM half of step 1. On `greetd` (the DMS greeter's display manager,
-  # modules/dms-greeter.nix). Unlike the old sddm service — which was
+  # PAM half of step 1. On `greetd` (the Noctalia greeter's display manager,
+  # modules/noctalia-greeter.nix). Unlike the old sddm service — which was
   # generated with useDefaultRules=false as a bare substack of `login`, so
   # per-service toggles on it were silent no-ops — greetd's PAM service is
   # generated WITH default rules, and greetd does NOT traverse `login`.

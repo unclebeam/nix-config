@@ -4,8 +4,9 @@
 # only draw the tiny symbolic set bundled inside GTK/libadwaita itself
 # (chevrons, hamburger, close) and rendered missing-image placeholder
 # boxes for everything else (Cameractrls' warning triangles were the
-# giveaway). adw-gtk3 (home/dms.nix) doesn't help here: it's the
-# widget/COLOR theme DMS recolors, and ships zero icons.
+# giveaway). adw-gtk3 (home/noctalia.nix) doesn't help here: it's the
+# widget/COLOR theme the shell's gtk templates recolor, and ships zero
+# icons.
 #
 # Deliberately Adwaita, not Breeze: GTK apps are designed against the
 # Adwaita icon names, so every lookup resolves; Qt/KDE apps keep Breeze
@@ -21,8 +22,9 @@
 
   # Installs the theme into the user profile (already on XDG_DATA_DIRS)
   # and writes gtk-icon-theme-name=Adwaita into settings.ini. No conflict
-  # with DMS: its "Apply GTK Themes" toggle writes colors via a separate
-  # dank-colors.css, never settings.ini.
+  # with Noctalia: its gtk templates write colors via a separate
+  # noctalia.css (@imported from gtk.css) and switch the theme through
+  # gsettings, never settings.ini.
   gtk.iconTheme = {
     name = "Adwaita";
     package = pkgs.adwaita-icon-theme;

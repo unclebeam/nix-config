@@ -4,25 +4,25 @@
  * (config.yaml's `stylesheets:` points here), so edits apply on the NEXT picker
  * launch with no rebuild. Wired in home/hyprland.nix.
  *
- * WHY this file exists: the picker is plain GTK4, and there is no
- * ~/.config/gtk-4.0/gtk.css on this machine, so out of the box it renders in
- * stock LIGHT libadwaita — a light-grey tab bar and square, unstyled
- * thumbnails that clash with the dark DMS desktop. This restyles it dark,
- * rounded, and accent-tinted to match.
+ * WHY this file exists: the picker is plain GTK4, and out of the box it
+ * renders in stock LIGHT libadwaita — a light-grey tab bar and square,
+ * unstyled thumbnails that clash with the dark desktop. This restyles it
+ * dark, rounded, and accent-tinted to match.
  *
- * COLORS come from DMS: its matugen hook writes ~/.config/gtk-4.0/dank-colors.css
- * (the same wallpaper-derived Material-You palette the rest of DMS uses) and
- * rewrites it whenever the wallpaper changes. We @import it below and reference
- * its @define-color names, so the picker tracks the wallpaper automatically —
- * the "let DMS reach the colors, don't hardcode" rule from CLAUDE.md. The path
- * is hardcoded (a plain .css can't interpolate Nix; a GTK @import needs a
- * literal file:// URL) — consistent with the repo's other /home/unclebeam
+ * COLORS come from Noctalia: its gtk4 template writes
+ * ~/.config/gtk-4.0/noctalia.css (the wallpaper-derived Material-You
+ * palette, libadwaita-standard @define-color names) and rewrites it on
+ * every palette change. We @import it below and reference those names, so
+ * the picker tracks the wallpaper automatically — the "let the shell reach
+ * the colors, don't hardcode" rule from CLAUDE.md. The path is hardcoded
+ * (a plain .css can't interpolate Nix; a GTK @import needs a literal
+ * file:// URL) — consistent with the repo's other /home/unclebeam
  * hardcoding, and the user is `unclebeam` on both hosts.
  *
- * DEPENDS ON DMS's matugen GTK template staying enabled (matugenTemplateGtk,
- * on by default). If dank-colors.css ever goes missing the @import is a no-op
- * and the @define-color vars fall back to GTK's built-ins (the picker still
- * works, just unthemed) — nothing hard-fails.
+ * DEPENDS ON the gtk4 template staying in builtin_ids
+ * (home/noctalia/config.toml). If noctalia.css ever goes missing the
+ * @import is a no-op and the @define-color vars fall back to GTK's
+ * built-ins (the picker still works, just unthemed) — nothing hard-fails.
  *
  * The `stylesheets` provider loads at STYLE_PROVIDER_PRIORITY_APPLICATION, so
  * these rules layer on top of the GTK default theme. Iterate live with
@@ -33,7 +33,7 @@
 /* Must be first (GTK requires @import before other rules). Registers the
  * @define-color palette (accent/bg/fg/card/…) into THIS provider so every rule
  * below can resolve them. */
-@import url("file:///home/unclebeam/.config/gtk-4.0/dank-colors.css");
+@import url("file:///home/unclebeam/.config/gtk-4.0/noctalia.css");
 
 /* ── Window shell ─────────────────────────────────────────────────────────
  * The picker is a gtk4-layer-shell surface. Paint the toplevel transparent and

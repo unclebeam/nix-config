@@ -7,8 +7,8 @@
   imports = [
     ./directories.nix # home skeleton: XDG dirs (Documents/Downloads/Pictures) + ~/org + ~/.ssh
     ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + session target
-    ./dms.nix       # DMS user glue: adw-gtk3 + symlinked hypr/dms fragments (the shell itself: modules/dms.nix)
-    ./satty.nix     # screenshot annotator (run by hand on saved screenshots)
+    ./noctalia.nix  # Noctalia user glue: adw-gtk3 + symlinked config dir (the shell itself: modules/noctalia.nix)
+    ./satty.nix     # screenshot annotator (fed by noctalia's screenshot pipe)
     ./alacritty.nix # terminal
     ./tmux.nix      # terminal multiplexer (plain tmux.conf; nvim navigation pairing)
     ./fish.nix      # shell + prompt
@@ -20,7 +20,7 @@
     ./dolphin.nix      # file manager (KIO workers) + xdg default for dirs
     ./kwallet.nix      # session keyring user half: kwalletrc (ksecretd on, no first-run wizard)
     ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
-    ./qt.nix           # Qt theming via qt6ct + DMS matugen colors (Dolphin/Ark/VLC)
+    ./qt.nix           # Qt theming via qt6ct + noctalia's KColorScheme (Dolphin/Ark/VLC)
     ./vlc.nix          # VLC media player + default video/audio handler
     ./obs.nix          # OBS Studio (screencast via GNOME portal, audio via PipeWire)
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)

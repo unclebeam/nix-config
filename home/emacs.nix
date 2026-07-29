@@ -122,7 +122,7 @@ in
     client.arguments = [ "-c" ];
   };
 
-  # Shadow emacs-pgtk's own emacs.desktop so the DMS launcher shows only
+  # Shadow emacs-pgtk's own emacs.desktop so the app launcher shows only
   # "Emacs Client" (xdg.desktopEntries installs with hiPrio precisely so it
   # can override a package's entry). The `emacs` binary itself stays on PATH.
   xdg.desktopEntries.emacs = {
@@ -159,8 +159,9 @@ in
   # deletes the half-made dir, the condition stays true, and it simply
   # retries next login. `doom install` stays MANUAL (header comment): it
   # builds Doom's ~300 packages for minutes and is upstream's supported
-  # interactive path — same reasoning that keeps `dms setup` manual
-  # (home/dms.nix). No sha pin, latest Doom at install time: Doom pins its
+  # interactive path — an activation script is the wrong place for an
+  # interactive, minutes-long bootstrap. No sha pin, latest Doom at
+  # install time: Doom pins its
   # own package commits, so only the framework itself drifts (same
   # trade-off as the nix-config clone). %h is systemd for $HOME, and the
   # absolute store path to git means no PATH dependence at all.

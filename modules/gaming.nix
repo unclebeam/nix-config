@@ -24,9 +24,9 @@
   # hyprland.lua) it renders at native pixels = sharp but tiny. This env var
   # (the equivalent of Steam's `-forcedesktopscaling` launch flag) restores
   # correct size by drawing the UI at 1.5x. MUST match the monitor scale in
-  # home/hypr/dms/outputs.lua — only Steam reads it, so it's harmless session-
-  # wide. This module is PC-only (the ThinkPad import is commented), so the
-  # hardcoded 1.5 always matches this host.
+  # home/hypr/local/outputs.lua — only Steam reads it, so it's harmless
+  # session-wide. This module is PC-only (the ThinkPad import is commented),
+  # so the hardcoded 1.5 always matches this host.
   environment.sessionVariables.STEAM_FORCE_DESKTOPUI_SCALING = "1.5";
 
   # GameMode: games (or `gamemoderun %command%` in Steam launch options)
@@ -60,11 +60,11 @@
   #   then turn HDR on in the game's own video settings.
   # One more trap: cm_auto_hdr only fires on a COMPOSITOR-fullscreen window.
   # Games with only borderless/windowed modes need Super+Shift+F (the real
-  # fullscreen toggle in dms/binds.lua; Super+F is merely "maximized" and
-  # does not count).
+  # fullscreen toggle in home/hypr/binds.lua; Super+F is merely "maximized"
+  # and does not count).
   # Verify it took: while the game is fullscreen, `hyprctl monitors -j` shows
   # the output's color preset leave "srgb". If it never flips, the fallback
-  # is forcing the monitor to HDR in DMS Settings → Displays (Color
-  # Management → HDR + tune SDR brightness) — that lives in the GUI-owned
-  # dms/outputs.lua, never in Nix.
+  # is forcing the monitor to HDR via hl.monitor options (bitdepth/cm/
+  # sdrbrightness) in the machine-local home/hypr/local/outputs.lua —
+  # hand-maintained there, never in Nix.
 }

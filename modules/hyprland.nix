@@ -2,10 +2,10 @@
 # hyprland lost to niri once and was removed 2026-07-11; this branch re-runs
 # the comparison on hyprland 0.55's new Lua config, as a FULL replacement
 # this time — the niri modules are gone, not parked.) Fonts and Wayland-wide
-# env stay in modules/desktop.nix (compositor-agnostic); the greeter is DMS
-# on greetd (modules/dms-greeter.nix). The USER half (hyprland.lua glue)
-# lives in home/hyprland.nix; the desktop shell — bar, lock screen, idle
-# policy — is DMS (modules/dms.nix).
+# env stay in modules/desktop.nix (compositor-agnostic); the greeter is
+# Noctalia's on greetd (modules/noctalia-greeter.nix). The USER half
+# (hyprland.lua glue) lives in home/hyprland.nix; the desktop shell — bar,
+# lock screen, idle policy — is Noctalia (modules/noctalia.nix).
 { config, lib, pkgs, ... }:
 
 {
@@ -21,8 +21,8 @@
   #    (hyprland's Lua API stubs live there).
   # Window-manager *configuration* comes from home-manager.
   programs.hyprland.enable = true;
-  # withUWSM deliberately OFF: DMS's recommended session plumbing replaces
-  # it — hyprland.lua's startup hook pushes the session env into the systemd
+  # withUWSM deliberately OFF: our own session plumbing replaces it —
+  # hyprland.lua's startup hook pushes the session env into the systemd
   # user manager and starts hyprland-session.target itself (the same
   # explicit-anchor design niri-session.target had). uwsm would fight that
   # by managing graphical-session.target on its own.
@@ -35,7 +35,7 @@
   # entry PROVABLY kills the login: journal 2026-07-20 shows uwsm running
   # `systemctl --user start wayland-session-bindpid@….service` → exit
   # status 5 (no such unit) → session closed after ~1s → bounced back to
-  # the greeter. The DMS greeter builds its session menu from
+  # the greeter. The greeter builds its session menu from
   # services.displayManager.sessionPackages (merged into sessionData.
   # desktops, which /etc/pam/environment prepends to every session's
   # XDG_DATA_DIRS), so overriding the list here removes the landmine at
@@ -58,7 +58,7 @@
   # ── Portal routing: KDE for dialogs, hyprland for capture ───────────────
   # The KDE portal serves everything interactive: file dialogs (KIO,
   # matching Dolphin), notifications (forwarded to org.freedesktop.
-  # Notifications, i.e. the DMS shell), Access prompts, and Settings — apps
+  # Notifications, i.e. the Noctalia shell), Access prompts, and Settings — apps
   # read the color-scheme preference from kdeglobals, not gsettings.
   # Unlike the old niri module — which hard-set portal-config keys, forcing
   # mkForce on every override — programs.hyprland writes NO xdg.portal.config
@@ -88,7 +88,8 @@
     "org.freedesktop.impl.portal.RemoteDesktop" = "none";
   };
 
-  # The polkit authentication agent is built into the DMS shell
-  # (modules/dms.nix) — it replaced plasma-polkit-agent in the 2026-07 DMS
-  # migration.
+  # The polkit authentication agent is built into the Noctalia shell —
+  # off by default upstream, switched on in home/noctalia/config.toml
+  # (polkit_agent). It replaced DMS's agent, which had replaced
+  # plasma-polkit-agent in the 2026-07 migration.
 }

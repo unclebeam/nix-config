@@ -16,7 +16,7 @@
     # allowUnfree) and hands it to every module as `pkgs-unstable`.
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # home-manager manages per-user config (dotfiles, hyprland config, the DMS shell…).
+    # home-manager manages per-user config (dotfiles, hyprland config, alacritty…).
     # Its release branch must match the nixpkgs release.
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
@@ -47,20 +47,32 @@
       };
     };
 
-    # DankMaterialShell (DMS) — the quickshell-based desktop shell that IS
-    # the whole desktop: bar, launcher, notifications, lock screen, OSD,
-    # clipboard history, polkit agent, power menu, wallpaper + matugen
-    # theming. Upstream ships both a home-manager module and a NixOS module
-    # and says to pick ONE — we use the NixOS module (shell + its dms.service
-    # enabled in modules/dms.nix; greetd login greeter in
-    # modules/dms-greeter.nix; home/dms.nix holds only user-side glue, no
-    # module import). `stable` branch per the official docs; nixpkgs 26.05
-    # does carry its own dms-shell, but at 1.4.x — too old for the hyprland
-    # Lua config, which needs 1.5+. Note: dms-shell builds from source
-    # (Go + QML) — there is no binary cache, so the first rebuild compiles it.
-    dank-material-shell = {
-      url = "github:AvengeMedia/DankMaterialShell/stable";
-      inputs.nixpkgs.follows = "nixpkgs";
+    # Noctalia v5 — the native desktop shell that IS the whole desktop: bar,
+    # launcher, notifications, lock screen, idle policy, OSD, clipboard
+    # history, polkit agent, power menu, wallpaper + its own wallpaper-derived
+    # theming engine (replaced DMS 2026-07). v5 is a ground-up C++ rewrite —
+    # nixpkgs' `noctalia-shell` package is the OLD v4 Quickshell app and must
+    # never be substituted for this input. The flake ships a NixOS module and
+    # a home-manager module; we use the NixOS module only (enabled in
+    # modules/noctalia.nix; home/noctalia.nix holds only user-side glue, no
+    # module import).
+    #
+    # Deliberately NO `inputs.nixpkgs.follows` here (and on the greeter
+    # below), unlike every other input: noctalia.cachix.org only caches the
+    # build against upstream's own nixpkgs pin — following ours would change
+    # the derivation hash and silently recompile the whole C++ shell from
+    # source on every machine. The cache substituter/key live in
+    # modules/noctalia.nix. The cost is a second nixpkgs closure in the
+    # lock, which is exactly the trade the binary cache pays for.
+    noctalia = {
+      url = "github:noctalia-dev/noctalia";
+    };
+
+    # The matching login greeter (greetd UI) — a separate upstream project
+    # with its own flake. Same no-follows reasoning as the shell above.
+    # Enabled in modules/noctalia-greeter.nix.
+    noctalia-greeter = {
+      url = "github:noctalia-dev/noctalia-greeter";
     };
 
     # hyprland-preview-share-picker — an alternative xdph screen-share picker
@@ -96,7 +108,8 @@
       nixpkgs-unstable,
       home-manager,
       disko,
-      dank-material-shell,
+      noctalia,
+      noctalia-greeter,
       ...
     }@inputs:
     let
@@ -130,12 +143,12 @@
             # Both hosts do, in hosts/<name>/disko.nix.
             disko.nixosModules.disko
 
-            # DMS's NixOS modules. Same deal as disko: loading them only adds
-            # options. The shell module (system-side service defaults) is
-            # enabled by modules/dms.nix; the greeter module (greetd + DMS
-            # greeter UI) is enabled by modules/dms-greeter.nix.
-            dank-material-shell.nixosModules.dank-material-shell
-            dank-material-shell.nixosModules.greeter
+            # Noctalia's NixOS modules. Same deal as disko: loading them only
+            # adds options. The shell module (programs.noctalia) is enabled
+            # by modules/noctalia.nix; the greeter module (greetd + Noctalia
+            # greeter UI) is enabled by modules/noctalia-greeter.nix.
+            noctalia.nixosModules.default
+            noctalia-greeter.nixosModules.default
 
             # Wire home-manager in as a NixOS module: `nixos-rebuild switch`
             # builds system AND user config in one transaction.

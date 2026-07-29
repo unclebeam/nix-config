@@ -7,7 +7,7 @@
 #    prompts, and `xdg-user-dir` actually consult — so declaring the dir HERE
 #    also points every app at it.
 #  * a plain activation script for the two non-XDG dirs (~/org, ~/.ssh),
-#    following the dmsPlaceholders pattern in home/dms.nix.
+#    following the placeholder pattern in home/noctalia.nix.
 { config, lib, pkgs, ... }:
 
 {
@@ -17,7 +17,7 @@
 
     # Only these three exist by decision (2026-07-21): Documents and
     # Downloads for the obvious reasons, Pictures because screenshots
-    # (DMS/satty) and wallpapers conventionally land there.
+    # (satty) and wallpapers conventionally land there.
     documents = "${config.home.homeDirectory}/Documents";
     download = "${config.home.homeDirectory}/Downloads";
     pictures = "${config.home.homeDirectory}/Pictures";

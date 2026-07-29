@@ -11,18 +11,17 @@
     enable = true;
     # Breeze cursors (KDE's default, the black variant) — switched from
     # Adwaita 2026-07 with the KDE-plumbing migration, and deliberately
-    # KEPT through the DMS migration: a neutral black cursor fits any
-    # matugen palette, and DMS doesn't manage cursors. kdePackages.breeze
-    # ships the theme as share/icons/breeze_cursors; the dir name is what
-    # XCURSOR_THEME wants, not the display name ("Breeze Dark").
+    # KEPT through the DMS and Noctalia migrations: a neutral black cursor
+    # fits any wallpaper-derived palette, and neither shell manages
+    # cursors. kdePackages.breeze ships the theme as
+    # share/icons/breeze_cursors; the dir name is what XCURSOR_THEME
+    # wants, not the display name ("Breeze Dark").
     package = pkgs.kdePackages.breeze;
     name = "breeze_cursors";
     size = 24; # logical px; the compositor multiplies by the output scale (1.5) on screen
 
     # hyprland picks this up too, via the XCURSOR_* env vars above — no
-    # compositor-side config needed. (A cursor picked in the DMS Settings
-    # GUI overrides it in-compositor via dms/cursor.lua; this stays the
-    # baseline.)
+    # compositor-side config needed.
 
     # Generates the gtk cursor settings so GTK apps pick the same theme/size.
     # Only *generates* them — the gtk module that actually writes settings.ini

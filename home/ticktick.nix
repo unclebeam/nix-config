@@ -2,8 +2,8 @@
 # One file per intent: everything that exists because of TickTick lives here.
 # Removing TickTick = delete this file + its import line in default.nix.
 # (Its old SUPER+O scratchpad keybind lived in the pre-niri hyprland config
-# and left with it — the DMS-recommended config carries no app scratchpads,
-# and SUPER+O now belongs to DMS's overview toggle in dms/binds.lua.)
+# and left with it — the current config carries no app scratchpads, and
+# SUPER+O now belongs to the window switcher in home/hypr/binds.lua.)
 #
 # Unfree package — covered by the allowUnfree set in modules/core.nix
 # (home-manager runs with useGlobalPkgs, so the system nixpkgs config

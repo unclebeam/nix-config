@@ -64,11 +64,11 @@
   # wpa_supplicant surfaces that timeout to NetworkManager, which reads it
   # as "wrong password", invalidates the stored PSK for the attempt, and —
   # since no secret agent exists pre-login — fails the activation and later
-  # makes the DMS agent re-prompt for a password that was on disk and
+  # made the shell's agent re-prompt for a password that was on disk and
   # correct all along. iwd retries failed handshakes internally instead of
   # bubbling a bad-password verdict up, so a flaky first handshake becomes
   # a silent retry, not a prompt. NM stays the manager: existing profiles,
-  # nmcli, and the DMS network widget all keep working — iwd only replaces
+  # nmcli, and the shell's network widget all keep working — iwd only replaces
   # wpa_supplicant underneath (this option auto-enables iwd's service; iwd's
   # own network/DHCP config stays off, NM keeps doing IP). iwd caches
   # network state under /var/lib/iwd; NM hands it the profile PSK on first

@@ -15,10 +15,11 @@
   # power on` after every reboot before anything reconnects.
   hardware.bluetooth.powerOnBoot = true;
 
-  # There is deliberately no pairing GUI here: the DMS shell's bluetooth
-  # panel (control center) is the pairing/connection UI, including answering
-  # BlueZ agent prompts. Blueman filled that role until 2026-07 — removed as
-  # a redundant second GUI (and second tray applet) once DMS covered it.
+  # There is deliberately no pairing GUI here: the Noctalia shell's
+  # bluetooth panel (control center) is the pairing/connection UI, including
+  # answering BlueZ agent prompts. Blueman filled that role until 2026-07 —
+  # removed as a redundant second GUI (and second tray applet) once the
+  # shell covered it.
   # `bluetoothctl` (installed by hardware.bluetooth.enable) remains the CLI
   # fallback for anything the panel can't express.
 }

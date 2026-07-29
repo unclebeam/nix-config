@@ -1,0 +1,87 @@
+# Noctalia — the tracked, curated config layer (see home/noctalia.nix for
+# the full layering story). Only settings that must hold on BOTH machines
+# for the desktop to work belong here; taste-level tweaks live in the
+# Settings GUI (SUPER+comma), whose state file overrides this one.
+# Hot-reloaded on save — no rebuild, no reload command.
+#
+# Key reference: `example.toml` in the noctalia source tree documents every
+# option at its default. `noctalia config validate` checks this file.
+
+[shell]
+# The ONE polkit agent on this session's bus (upstream default is false —
+# without this, fprintd-enroll / systctl edits / any privileged GUI action
+# has no prompt UI and just fails). The engine half (security.polkit) comes
+# from programs.hyprland; see modules/noctalia.nix.
+polkit_agent = true
+
+[shell.screenshot]
+# Screenshots flow into satty and NOWHERE else — the raw capture never
+# touches disk or clipboard until you commit inside satty (Enter copies +
+# saves via home/satty.nix's save-after-copy; Escape discards). Same
+# contract as the old DMS screenshot-annotate wrapper, now first-class:
+# a cancelled region select simply never spawns the pipe command.
+save_to_file = false
+copy_to_clipboard = false
+pipe_to_command = true
+pipe_command = "satty -f -"
+
+[theme]
+# Material-You palette derived from the wallpaper (matugen's old job, now
+# built into the shell). Pick the wallpaper in the GUI / SUPER+Y; the
+# palette and every template below re-render on each change.
+source = "wallpaper"
+
+[theme.templates]
+# App theming via the shell's built-in template catalog (replaces DMS's
+# matugen glue). Deliberately opt-in and minimal — each id below has a
+# consumer wired in this repo; add ids only WITH their consumer:
+#  * alacritty     → ~/.config/alacritty/themes/noctalia.toml, imported by
+#                    home/alacritty.nix (live-reloads on rewrite)
+#  * gtk3/gtk4     → ~/.config/gtk-{3,4}.0/noctalia.css + apply.sh, which
+#                    @imports it into gtk.css, sets the adw-gtk3(-dark)
+#                    theme and the org.gnome color-scheme (the old DMS
+#                    "Apply GTK Themes" toggle, automated); gtk4's css is
+#                    also @imported by home/hypr/share-picker.css
+#  * kcolorscheme  → ~/.local/share/color-schemes/noctalia.colors, the
+#                    KColorScheme home/qt.nix points qt6ct/qt5ct at
+#                    (Dolphin/Ark/VLC colors)
+#  * hyprland      → ~/.config/hypr/noctalia.lua (border colors), loaded by
+#                    the guarded require in home/hypr/hyprland.lua; the
+#                    colors_changed hook below makes hyprland actually
+#                    re-read it
+# Community templates stay off: nothing here consumes them, and off means
+# no fetches from api.noctalia.dev.
+enable_builtin_templates = true
+builtin_ids = ["alacritty", "gtk3", "gtk4", "kcolorscheme", "hyprland"]
+enable_community_templates = false
+
+[brightness]
+# Let the shell drive external monitors over DDC/CI through ddcutil (the
+# dms binary spoke DDC natively; noctalia shells out). Load-bearing on the
+# PC (two DDC monitors; i2c group + ddcutil package in hosts/unclebeam-pc),
+# a quiet no-op on the thinkpad, whose panel uses its kernel backlight.
+enable_ddcutil = true
+
+# ── Idle policy ─────────────────────────────────────────────────────────
+# Replaces the DMS Settings-GUI idle config (and swayidle before that).
+# Upstream ships both behaviors DISABLED — that silent default is exactly
+# the "fresh install has no idle lock" trap, so they're declared here.
+# lock_before_suspend defaults to true, so lid-close suspend (logind,
+# modules/laptop.nix) locks first with no extra config.
+
+[idle.behavior.lock]
+timeout = 600 # seconds idle → lock screen
+action = "lock"
+enabled = true
+
+[idle.behavior.screen-off]
+timeout = 660 # one minute after the lock, screens power down
+action = "screen_off"
+enabled = true
+
+[hooks]
+# hyprland does not watch its config files: after the hyprland template
+# rewrites ~/.config/hypr/noctalia.lua (every palette change), reload so
+# the new border colors actually apply. All other template consumers pick
+# up their rewrite on their own (alacritty live-reloads, GTK/Qt re-read).
+colors_changed = "hyprctl reload"
