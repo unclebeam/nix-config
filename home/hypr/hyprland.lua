@@ -56,25 +56,38 @@ hl.config({
 		},
 	},
 	general = {
-		-- gaps/border/rounding were the DMS-era look (its layout.lua wrote
-		-- gaps 4 / border 2 / rounding 12); folded in here when that
-		-- fragment died with the migration.
-		gaps_in = 4,
-		gaps_out = 4,
+		-- Gaps/rounding/shadow/blur follow Noctalia's recommended
+		-- compositor settings (docs.noctalia.dev/v5/compositor-settings/
+		-- hyprland/), replacing the DMS-era template values that survived
+		-- the 2026-07 migration. Anything else the docs don't set
+		-- (animations, opacity) is deliberately left at Hyprland's defaults.
+		gaps_in = 5,
+		gaps_out = 10,
+		-- Hyprland's default 1 px focus border is too thin to spot; 2 px
+		-- matches what this setup always ran, and eyeballing 3 and 4 px
+		-- against rounding 20 read as a frame, not a focus hint (colors
+		-- come from noctalia's template, required at the bottom of this
+		-- file).
 		border_size = 2,
 		resize_on_border = false,
 		layout = "dwindle",
 	},
 	decoration = {
-		rounding = 12,
-		active_opacity = 1.0,
-		inactive_opacity = 1.0,
+		rounding = 20,
+		rounding_power = 2,
 		shadow = {
 			enabled = true,
-			range = 30,
-			render_power = 5,
-			offset = "0 5",
-			color = "rgba(00000070)",
+			range = 4,
+			render_power = 3,
+			color = 0xee1a1a1a,
+		},
+		-- Window blur (Noctalia's shell surfaces get theirs from the
+		-- layer rule below, which works even without this block).
+		blur = {
+			enabled = true,
+			size = 3,
+			passes = 2,
+			vibrancy = 0.1696,
 		},
 	},
 	misc = {
@@ -110,12 +123,23 @@ hl.config({
 -- bind on purpose: with two layouts, `next` IS the toggle.
 hl.bind("CTRL + space", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"))
 
-hl.animation({ leaf = "windowsIn", enabled = true, speed = 3, bezier = "default" })
-hl.animation({ leaf = "windowsOut", enabled = true, speed = 3, bezier = "default" })
-hl.animation({ leaf = "workspaces", enabled = true, speed = 5, bezier = "default" })
-hl.animation({ leaf = "windowsMove", enabled = true, speed = 4, bezier = "default" })
-hl.animation({ leaf = "fade", enabled = true, speed = 3, bezier = "default" })
-hl.animation({ leaf = "border", enabled = true, speed = 3, bezier = "default" })
+-- Snappy animations. Hyprland's built-in fallback is ONE `global` tree
+-- node at speed 8 (800 ms) — every animation inherits it, and it feels
+-- sluggish. `speed` is in deciseconds (2 = 200 ms). Overriding `global`
+-- retunes everything at once (unset leaves inherit the nearest set
+-- ancestor); the leaves below get faster still. The curve must be
+-- registered BEFORE the hl.animation calls that name it — only "default"
+-- and "linear" exist without registration. cubic-bezier(0.15, 0, 0.1, 1)
+-- starts fast and eases out hard, which is what reads as "snappy".
+-- Beware: hl.animation silently ignores misspelled field names.
+hl.curve("quick", { type = "bezier", points = { { 0.15, 0 }, { 0.1, 1 } } })
+
+hl.animation({ leaf = "global", enabled = true, speed = 2.5, bezier = "quick" })
+hl.animation({ leaf = "windowsIn", enabled = true, speed = 2, bezier = "quick" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 1.5, bezier = "quick" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 1.8, bezier = "quick" })
+hl.animation({ leaf = "fade", enabled = true, speed = 1.5, bezier = "quick" })
+hl.animation({ leaf = "border", enabled = true, speed = 2, bezier = "quick" })
 
 hl.window_rule({ match = { class = "^(org\\.wezfurlong\\.wezterm)$" }, tile = true })
 hl.window_rule({ match = { class = "^(org\\.gnome\\.)" }, rounding = 12 })
@@ -149,9 +173,14 @@ hl.layer_rule({
 	no_anim = true,
 	ignore_alpha = 0.5,
 	blur = true,
+	blur_popups = true,
 })
 hl.layer_rule({ match = { namespace = "^noctalia-bar-.+$" }, xray = true })
-hl.window_rule({ match = { class = "^(dev\\.noctalia\\.Noctalia)$" }, float = true })
+hl.window_rule({
+	match = { class = "^(dev\\.noctalia\\.Noctalia)$" },
+	float = true,
+	size = { 1080, 920 },
+})
 
 require("binds") -- tracked: home/hypr/binds.lua
 require("local.outputs") -- machine-local monitors: home/hypr/local/ (gitignored)
