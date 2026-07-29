@@ -173,7 +173,7 @@ if ok and type(noctalia) == "table" then
 end
 
 -- MACHINE FACT (unclebeam-pc): pin workspaces to monitors.
--- 1-5 live on the MSI (main, horizontal), 6-9 on the vertical Gigabyte.
+-- 1-5 live on the MSI (main, horizontal), 6-9 on the vertical Dell.
 -- Matched by DESCRIPTION, not DP port: ports can renumber across
 -- replugs/BIOS updates. Guarded by HOSTNAME because desc rules for
 -- absent monitors are NOT no-ops: on the thinkpad they claimed
