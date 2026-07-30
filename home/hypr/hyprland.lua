@@ -45,7 +45,9 @@ hl.config({
 		-- (the two mechanisms must never coexist).
 		kb_layout = "us,th",
 		numlock_by_default = true,
-		follow_mouse = 0,
+		-- Focus follows the mouse: hovering a window focuses it (0 was
+		-- click-to-focus).
+		follow_mouse = 1,
 		-- Natural scrolling on mice too (the touchpad option below only
 		-- covers touchpads; without this the PC's mouse wheel scrolls the
 		-- traditional direction while the thinkpad's touchpad doesn't)
