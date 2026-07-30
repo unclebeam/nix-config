@@ -135,6 +135,7 @@ hl.bind("SUPER + 6", hl.dsp.focus({ workspace = "6" }))
 hl.bind("SUPER + 7", hl.dsp.focus({ workspace = "7" }))
 hl.bind("SUPER + 8", hl.dsp.focus({ workspace = "8" }))
 hl.bind("SUPER + 9", hl.dsp.focus({ workspace = "9" }))
+hl.bind("SUPER + 0", hl.dsp.focus({ workspace = "10" }))
 
 -- === Move to Numbered Workspaces ===
 hl.bind("SUPER + SHIFT + 1", hl.dsp.window.move({ workspace = "1" }))
@@ -146,6 +147,7 @@ hl.bind("SUPER + SHIFT + 6", hl.dsp.window.move({ workspace = "6" }))
 hl.bind("SUPER + SHIFT + 7", hl.dsp.window.move({ workspace = "7" }))
 hl.bind("SUPER + SHIFT + 8", hl.dsp.window.move({ workspace = "8" }))
 hl.bind("SUPER + SHIFT + 9", hl.dsp.window.move({ workspace = "9" }))
+hl.bind("SUPER + SHIFT + 0", hl.dsp.window.move({ workspace = "10" }))
 
 -- === Column Management ===
 hl.bind("SUPER + bracketleft", hl.dsp.layout("preselect l"))

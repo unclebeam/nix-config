@@ -201,12 +201,13 @@ if ok and type(noctalia) == "table" then
 	noctalia.apply_theme()
 end
 
--- MACHINE FACT (unclebeam-pc): pin workspaces to monitors.
--- 1-5 live on the MSI (main, horizontal), 6-9 on the vertical Dell.
--- Matched by DESCRIPTION, not DP port: ports can renumber across
--- replugs/BIOS updates. Guarded by HOSTNAME because desc rules for
--- absent monitors are NOT no-ops: on the thinkpad they claimed
--- workspaces 1-9 as "belonging elsewhere", so eDP-1's default
+-- MACHINE FACTS: pin workspaces to monitors, per host.
+-- PC: 1-5 on the MSI (main, horizontal), 6-9 on the vertical Dell.
+-- Thinkpad: 1-5 on the built-in panel, 6-10 on the docked Dell above it.
+-- Externals matched by DESCRIPTION, not DP port: ports can renumber
+-- across replugs/BIOS updates. Guarded by HOSTNAME because desc rules
+-- for absent monitors are NOT no-ops: on the thinkpad the PC's rules
+-- claimed workspaces 1-9 as "belonging elsewhere", so eDP-1's default
 -- workspace became 10 instead of 1. `default` on 1 and 6 makes each
 -- monitor start on its first bound workspace at login/monitor-connect.
 local f = io.open("/etc/hostname")
@@ -223,5 +224,19 @@ if host == "unclebeam-pc" then
 	end
 	for ws = 6, 9 do
 		hl.workspace_rule({ workspace = tostring(ws), monitor = secondary, default = (ws == 6) })
+	end
+elseif host == "unclebeam-thinkpad" then
+	-- eDP-1 by connector (built-in, never renumbers); Dell by description
+	-- (USB-C dock ports do — it's DP-5 today). When the Dell is unplugged
+	-- its workspaces just fall back to eDP-1; the absent-monitor bug above
+	-- needed the internal panel's OWN workspaces claimed elsewhere, and
+	-- 1-5 are pinned right here, so eDP-1's default stays 1.
+	local internal = "eDP-1"
+	local external = "desc:Dell Inc. DELL U3225QE 27D4834"
+	for ws = 1, 5 do
+		hl.workspace_rule({ workspace = tostring(ws), monitor = internal, default = (ws == 1) })
+	end
+	for ws = 6, 10 do
+		hl.workspace_rule({ workspace = tostring(ws), monitor = external, default = (ws == 6) })
 	end
 end
