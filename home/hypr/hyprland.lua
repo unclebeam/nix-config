@@ -58,24 +58,26 @@ hl.config({
 		},
 	},
 	general = {
-		-- Gaps/rounding/shadow/blur follow Noctalia's recommended
-		-- compositor settings (docs.noctalia.dev/v5/compositor-settings/
-		-- hyprland/), replacing the DMS-era template values that survived
-		-- the 2026-07 migration. Anything else the docs don't set
-		-- (animations, opacity) is deliberately left at Hyprland's defaults.
+		-- Gaps/shadow/blur follow Noctalia's recommended compositor
+		-- settings (docs.noctalia.dev/v5/compositor-settings/hyprland/),
+		-- replacing the DMS-era template values that survived the 2026-07
+		-- migration. Anything else the docs don't set (animations, opacity)
+		-- is deliberately left at Hyprland's defaults.
 		gaps_in = 5,
 		gaps_out = 10,
 		-- Hyprland's default 1 px focus border is too thin to spot; 2 px
 		-- matches what this setup always ran, and eyeballing 3 and 4 px
-		-- against rounding 20 read as a frame, not a focus hint (colors
-		-- come from noctalia's template, required at the bottom of this
-		-- file).
+		-- read as a frame, not a focus hint (colors come from noctalia's
+		-- template, required at the bottom of this file).
 		border_size = 2,
 		resize_on_border = false,
 		layout = "dwindle",
 	},
 	decoration = {
-		rounding = 20,
+		-- Noctalia's docs recommend 20, but that read too round in
+		-- practice (and so did 12, the old GNOME-app window rule's value,
+		-- which that deviation had made redundant); 8 is deliberate.
+		rounding = 8,
 		rounding_power = 2,
 		shadow = {
 			enabled = true,
@@ -144,7 +146,6 @@ hl.animation({ leaf = "fade", enabled = true, speed = 1.5, bezier = "quick" })
 hl.animation({ leaf = "border", enabled = true, speed = 2, bezier = "quick" })
 
 hl.window_rule({ match = { class = "^(org\\.wezfurlong\\.wezterm)$" }, tile = true })
-hl.window_rule({ match = { class = "^(org\\.gnome\\.)" }, rounding = 12 })
 hl.window_rule({ match = { class = "^(gnome-control-center)$" }, tile = true })
 hl.window_rule({ match = { class = "^(pavucontrol)$" }, tile = true })
 hl.window_rule({ match = { class = "^(nm-connection-editor)$" }, tile = true })
