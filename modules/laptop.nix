@@ -27,8 +27,8 @@
   # The XF86 brightness keys go through `noctalia msg brightness-up/-down`
   # (home/hypr/binds.lua); brightness handling is built into the shell,
   # which talks to logind — no extra permissions or udev rules needed for
-  # users with an active session. (External DDC monitors are the PC's
-  # concern — see hosts/unclebeam-pc.)
+  # users with an active session. (External DDC monitors — including the
+  # docked Dell here — are modules/ddc.nix's concern.)
 
   # ── Firmware updates ───────────────────────────────────────────────────
   # ThinkPads publish firmware on LVFS. When you want firmware updates,

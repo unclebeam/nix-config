@@ -17,6 +17,7 @@
     ../../modules/bluetooth.nix  # bluetoothd + Blueman GUI (built-in Intel adapter)
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl; f/j: hold = shift
     ../../modules/laptop.nix     # power mgmt, backlight, lid behavior, fwupd
+    ../../modules/ddc.nix        # DDC/CI brightness for the docked Dell (i2c + ddcutil; panel stays on kernel backlight)
     ../../modules/fprintd.nix    # fingerprint auth (sudo/polkit; greeter + lock stay password — kwallet)
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
