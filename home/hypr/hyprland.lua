@@ -205,7 +205,7 @@ if ok and type(noctalia) == "table" then
 end
 
 -- MACHINE FACTS: pin workspaces to monitors, per host.
--- PC: 1-5 on the MSI (main, horizontal), 6-9 on the vertical Dell.
+-- PC: 1-5 on the Alienware (main, horizontal), 6-9 on the vertical Dell.
 -- Thinkpad: 1-5 on the built-in panel, 6-10 on the docked Dell above it.
 -- Externals matched by DESCRIPTION, not DP port: ports can renumber
 -- across replugs/BIOS updates. Guarded by HOSTNAME because desc rules
@@ -220,7 +220,7 @@ if f then
 end
 
 if host == "unclebeam-pc" then
-	local main = "desc:Micro-Star Int'l Co. Ltd. PM271UPXW12G 0x01010101" -- MSI, horizontal
+	local main = "desc:Dell Inc. AW2725Q 4KTF174" -- Alienware, horizontal
 	local secondary = "desc:Dell Inc. DELL S2725QS 3V7S364" -- Dell, vertical
 	for ws = 1, 5 do
 		hl.workspace_rule({ workspace = tostring(ws), monitor = main, default = (ws == 1) })
