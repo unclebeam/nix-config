@@ -230,12 +230,22 @@ if host == "unclebeam-pc" then
 	end
 elseif host == "unclebeam-thinkpad" then
 	-- eDP-1 by connector (built-in, never renumbers); Dell by description
-	-- (USB-C dock ports do — it's DP-5 today). When the Dell is unplugged
-	-- its workspaces just fall back to eDP-1; the absent-monitor bug above
-	-- needed the internal panel's OWN workspaces claimed elsewhere, and
-	-- 1-5 are pinned right here, so eDP-1's default stays 1.
+	-- (USB-C dock ports do — the U3225QE came up as DP-5, the U2725QE as
+	-- DP-1). When the Dell is unplugged its workspaces just fall back to
+	-- eDP-1; the absent-monitor bug above needed the internal panel's OWN
+	-- workspaces claimed elsewhere, and 1-5 are pinned right here, so
+	-- eDP-1's default stays 1.
 	local internal = "eDP-1"
-	local external = "desc:Dell Inc. DELL U3225QE 27D4834"
+	-- A PREFIX, deliberately: `desc:` is compared with starts_with (hyprland's
+	-- CMonitor::matchesStaticSelector), so "Dell Inc. DELL U" catches whichever
+	-- docked Dell is plugged in — U3225QE 27D4834 or U2725QE 5R1YC34. Two rules
+	-- for the same workspace would NOT work as an alternative: the FIRST match
+	-- wins and the second is silently dropped, so the absent monitor's rule
+	-- would win half the time. Safe across hosts: this branch is hostname-
+	-- guarded, and both of the PC's Dell-branded panels are outside this
+	-- prefix anyway — "Dell Inc. AW2725Q …" and "Dell Inc. DELL S2725QS …".
+	-- Keep the "DELL U" in mind if a Dell U-series ever lands on the PC.
+	local external = "desc:Dell Inc. DELL U"
 	for ws = 1, 5 do
 		hl.workspace_rule({ workspace = tostring(ws), monitor = internal, default = (ws == 1) })
 	end
