@@ -21,7 +21,8 @@
     ./kwallet.nix      # session keyring user half: kwalletrc (ksecretd on, no first-run wizard)
     ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
     ./qt.nix           # Qt theming via qt6ct + noctalia's KColorScheme (Dolphin/Ark/VLC)
-    ./vlc.nix          # VLC media player + default video/audio handler
+    ./vlc.nix          # VLC media player + default audio handler
+    ./mpv.nix          # mpv: HDR-capable video player + default video handler
     ./obs.nix          # OBS Studio (screencast via GNOME portal, audio via PipeWire)
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
     ./ticktick.nix     # TickTick task manager (unfree; allowUnfree in core.nix)
