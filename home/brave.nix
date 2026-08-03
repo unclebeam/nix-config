@@ -11,10 +11,13 @@
 #  - modules/onepassword.nix writes the policy that force-installs the
 #    1Password extension — it exists because of 1Password, so it lives there.
 #  - Native Wayland comes from NIXOS_OZONE_WL in modules/desktop.nix.
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgs-unstable, ... }:
 
 {
-  home.packages = with pkgs; [ brave ];
+  # Fast-moving; tracks unstable so browser updates aren't gated on the
+  # 26.05 branch (same pattern as lazygit/starship/claude-code). Still
+  # only moves when `nix flake update` bumps the nixpkgs-unstable pin.
+  home.packages = [ pkgs-unstable.brave ];
 
   # Register Brave as the default browser: clicking a link anywhere
   # (Slack, Obsidian, terminal xdg-open) opens Brave. Merges with the

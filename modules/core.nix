@@ -124,7 +124,9 @@
     nodejs_latest
     # Electron (native Wayland via NIXOS_OZONE_WL) and unfree.
     obsidian # markdown notes — vaults live in $HOME, nothing for Nix to configure
-    slack # also Electron + unfree, same Wayland story as obsidian
+    # Also Electron + unfree, same Wayland story as obsidian; fast-moving,
+    # so it tracks unstable (updates at each `nix flake update`).
+    pkgs-unstable.slack
     # Discord via Vesktop: the stock discord client's screenshare can't capture
     # on Wayland, while Vesktop captures through the xdg-desktop-portal
     # ScreenCast path (routed to xdg-desktop-portal-hyprland here — see
