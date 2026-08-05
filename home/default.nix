@@ -8,6 +8,7 @@
     ./directories.nix # home skeleton: XDG dirs (Documents/Downloads/Pictures) + ~/org + ~/.ssh
     ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + session target
     ./noctalia.nix  # Noctalia user glue: adw-gtk3 + symlinked config dir (the shell itself: modules/noctalia.nix)
+    ./wallpapers.nix # tracked wallpaper images -> ~/Pictures/Wallpapers (picked via SUPER+Y)
     ./satty.nix     # screenshot annotator (fed by noctalia's screenshot pipe)
     ./alacritty.nix # terminal
     ./tmux.nix      # terminal multiplexer (plain tmux.conf; nvim navigation pairing)
