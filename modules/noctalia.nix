@@ -67,13 +67,15 @@
   # UI fonts. Noctalia renders via Fontconfig (its font_family defaults to
   # "sans-serif"), so nothing here is hard-required by the shell itself —
   # but Inter IS hard-required by home/qt.nix (the qt6ct seed pins it as
-  # the Qt UI font) and Fira Code is the mono font across the desktop.
+  # the Qt UI font). (fira-code was removed 2026-08: its comment claimed
+  # it was "the mono font across the desktop", but nothing referenced it —
+  # alacritty uses IosevkaTerm NF, Doom IosevkaTermNerdFont, qt.nix's
+  # fixed font JetBrainsMono NF, all installed by modules/desktop.nix.)
   # material-symbols (DMS's icon font) left with DMS: v5 draws its own
   # icons. If any shell UI renders tofu boxes, that call was wrong —
   # re-add it here.
   fonts.packages = with pkgs; [
     inter
-    fira-code
   ];
 
   # PAM note: the Noctalia lock screen does NOT get a hand-rolled PAM

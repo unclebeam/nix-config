@@ -20,8 +20,8 @@
     ../../modules/gaming.nix     # steam + gamemode (importing it = enabling it)
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
-    ../../modules/onepassword.nix # 1Password app + op CLI + Brave extension
-    ../../modules/brave.nix      # Brave managed policy: Google as default search (user half in home/brave.nix)
+    ../../modules/onepassword.nix # 1Password app + op CLI + browser extension (Chrome + Brave)
+    ../../modules/chromium-policies.nix # managed policy for ALL Chromium-family browsers (Chrome + Brave): Google as default search
     ../../modules/ddc.nix        # DDC/CI brightness for the two external monitors (i2c + ddcutil)
     ../../modules/dolphin.nix    # avahi discovery + udisks2 + ntfs/exfat (system half of Dolphin)
     ../../modules/printing.nix   # CUPS + SANE, driverless network printing/scanning

@@ -11,9 +11,10 @@
   # wireplumber once bluetoothd is running — no extra wiring needed.
   hardware.bluetooth.enable = true;
 
-  # Power the adapter at boot; without this you'd have to `bluetoothctl
-  # power on` after every reboot before anything reconnects.
-  hardware.bluetooth.powerOnBoot = true;
+  # powerOnBoot (adapter powered at boot, so devices reconnect without a
+  # manual `bluetoothctl power on`) is nixpkgs' DEFAULT — documenting it
+  # here rather than restating it. Set `hardware.bluetooth.powerOnBoot =
+  # false` if a machine should ever boot radio-off.
 
   # There is deliberately no pairing GUI here: the Noctalia shell's
   # bluetooth panel (control center) is the pairing/connection UI, including

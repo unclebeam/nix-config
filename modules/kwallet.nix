@@ -28,8 +28,9 @@
   # Nothing enables gnome-keyring anymore (the old niri module did with
   # mkDefault; programs.hyprland doesn't), so this is a pure guard: if some
   # future module flips it back on, everything it wires — pam_gnome_keyring
-  # on the `login` PAM service, its Secret portal backend, the D-Bus
-  # activation, the CAP_IPC_LOCK wrapper — would fight ksecretd for
+  # on the `greetd` PAM service (the greetd module's enableGnomeKeyring
+  # follows this option via mkDefault), its Secret portal backend, the
+  # D-Bus activation, the CAP_IPC_LOCK wrapper — would fight ksecretd for
   # org.freedesktop.secrets. Two keyrings on one bus is breakage, not choice.
   services.gnome.gnome-keyring.enable = false;
 

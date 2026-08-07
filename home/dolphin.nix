@@ -78,13 +78,10 @@
 
   # Make Dolphin the session-wide default for opening directories — file
   # managers register the inode/directory pseudo-MIME type, and this is what
-  # xdg-open (and hence every other app) consults. NB: this is the one place
-  # xdg.mimeApps is *enabled*; ark.nix and vlc.nix merge their defaults into
-  # it without re-setting enable.
-  xdg.mimeApps = {
-    enable = true;
-    defaultApplications."inode/directory" = "org.kde.dolphin.desktop";
-  };
+  # xdg-open (and hence every other app) consults. (xdg.mimeApps itself is
+  # enabled in home/default.nix — shared infrastructure, since ark/vlc/mpv/
+  # chrome all merge defaults into it; this file only contributes its entry.)
+  xdg.mimeApps.defaultApplications."inode/directory" = "org.kde.dolphin.desktop";
 
   # ── "Open With" fix for non-Plasma sessions (nixpkgs issue #409986) ──────
   # KService's app cache (kbuildsycoca6) refuses to index ANY .desktop file

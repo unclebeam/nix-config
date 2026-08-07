@@ -28,11 +28,12 @@ home/           shared home-manager config: hyprland, noctalia, alacritty, fish,
 ### Normal installation
 
 1. Boot the NixOS installer, partition and mount your disks at `/mnt` as usual.
-2. Generate the real hardware config and copy it into this repo, replacing the placeholder:
+2. Generate the real hardware config and copy it into this repo, replacing the placeholder — **then delete every `fileSystems.*` and `swapDevices` entry from the copy**: disko (`hosts/<host>/disko.nix`) generates the mount config, and the generated entries conflict with it (each tracked `hardware-configuration.nix` carries a NOTE saying exactly this):
 
    ```sh
    nixos-generate-config --root /mnt
    cp /mnt/etc/nixos/hardware-configuration.nix hosts/<host>/hardware-configuration.nix
+   # edit: strip fileSystems.* / swapDevices — disko owns them
    git add hosts/<host>/hardware-configuration.nix   # flakes only see tracked files!
    ```
 
@@ -47,9 +48,11 @@ home/           shared home-manager config: hyprland, noctalia, alacritty, fish,
 1. Boot the NixOS installer, connect to the internet.
 2. Add password to sudo by `sudo passwd`
 3. Run `ip a` to see the current ip
-4. Run nixos anywhere command
+4. Run nixos anywhere command — **always pin the exact commit sha** (`/<sha>`), never a bare branch ref: Nix caches flake tarballs for up to an hour, so a branch ref can silently install a stale commit that is *not* the one you just pushed:
    ``` sh
-   nix run github:nix-community/nixos-anywhere -- --flake github:unclebeam/nix-config#unclebeam-pc root@10.2.98.30
+   # get the sha of the pushed commit you intend to install:
+   #   git rev-parse HEAD
+   nix run github:nix-community/nixos-anywhere -- --flake github:unclebeam/nix-config/<sha>#unclebeam-pc root@10.2.98.30
    ```
 5. After nixos-anywhere was successfully run, the target machine will be auto restarted
 6. At the login screen, let's login to tty by using `ctrl+atl+F3` and login with your username and password

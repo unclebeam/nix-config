@@ -42,6 +42,10 @@
   # a failure mode that presents as "my key stopped working".
   home.activation.homeSkeleton = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     mkdir -p ~/org  # org-mode notes — matches Doom's org-directory (home/doom/config.el)
+    # satty's fullscreen filename template writes here (home/satty.nix) and
+    # does NOT create parent dirs — without this a fresh install's first
+    # annotated screenshot save just fails.
+    mkdir -p ~/Pictures/Screenshots
     mkdir -p ~/.ssh
     chmod 700 ~/.ssh
   '';

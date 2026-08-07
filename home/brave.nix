@@ -1,15 +1,15 @@
 # home/brave.nix — Brave browser (secondary; the default-browser role —
 # web-link handlers + $BROWSER — moved to home/chrome.nix).
 # One file per intent: everything that exists because of Brave lives here.
-# Removing Brave = delete this file + its import line in default.nix
-# (plus the system half, modules/brave.nix, and its host import lines —
-# but note programs.chromium there also feeds Chrome's policy dir now).
+# Removing Brave = delete this file + its import line in default.nix.
+# (modules/chromium-policies.nix stays — it governs Chrome too, which is
+# why it's no longer named after Brave.)
 # (Moved from modules/core.nix when it grew per-user config — same story
 # as neovim and claude-code.)
 #
 # System-side halves that stay elsewhere on purpose:
-#  - modules/brave.nix sets Google as the default search engine via managed
-#    policy — /etc is NixOS territory, not home-manager's.
+#  - modules/chromium-policies.nix sets Google as the default search engine
+#    via managed policy — /etc is NixOS territory, not home-manager's.
 #  - modules/onepassword.nix writes the policy that force-installs the
 #    1Password extension — it exists because of 1Password, so it lives there.
 #  - Native Wayland comes from NIXOS_OZONE_WL in modules/desktop.nix.

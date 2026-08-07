@@ -5,7 +5,7 @@
 # exactly one file may own the mime handlers and $BROWSER).
 #
 # System-side halves that come for free (no new module needed):
-#  - programs.chromium (modules/brave.nix + modules/onepassword.nix) writes
+#  - programs.chromium (modules/chromium-policies.nix + modules/onepassword.nix) writes
 #    managed policy for the whole Chromium family, including Chrome's
 #    /etc/opt/chrome/policies/managed/ — so the Google-search policy and
 #    the force-installed 1Password extension apply here too.
@@ -20,7 +20,7 @@
 
   # Register Chrome as the default browser: clicking a link anywhere
   # (Slack, Obsidian, terminal xdg-open) opens Chrome. Merges with the
-  # dolphin/vlc/ark defaults (xdg.mimeApps is enabled in home/dolphin.nix;
+  # dolphin/vlc/ark defaults (xdg.mimeApps is enabled in home/default.nix;
   # don't re-set enable here). Chrome's desktop id is `google-chrome.desktop`
   # — NOT `com.google.Chrome.desktop`, the reverse-DNS alias shipped
   # alongside it (same trap as Brave's com.brave.Browser.desktop).

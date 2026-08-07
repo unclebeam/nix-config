@@ -1,4 +1,4 @@
-# 1Password — desktop app, `op` CLI, and the Brave browser extension.
+# 1Password — desktop app, `op` CLI, and the browser extension (Chrome + Brave).
 #
 # These are NixOS modules, not plain packages in systemPackages, because
 # 1Password needs privileged wrappers a normal package can't provide:
@@ -25,11 +25,14 @@
     polkitPolicyOwners = [ "unclebeam" ];
   };
 
-  # Auto-install the 1Password extension in Brave via managed browser
-  # policy (ExtensionInstallForcelist). programs.chromium installs no
-  # browser — it only writes policy files under /etc that Chromium-family
-  # browsers (Brave reads /etc/brave/policies/managed/) pick up on
-  # startup. Brave itself stays a plain package in core.nix.
+  # Auto-install the 1Password extension via managed browser policy
+  # (ExtensionInstallForcelist). programs.chromium installs no browser —
+  # it only writes policy files under /etc that every Chromium-family
+  # browser picks up on startup (Chrome reads /etc/opt/chrome, Brave
+  # /etc/brave), so this covers Chrome AND Brave (home/chrome.nix,
+  # home/brave.nix). Merges with modules/chromium-policies.nix's search
+  # policy; both set `enable = true` on purpose so either file can be
+  # removed alone (atomic removal).
   programs.chromium = {
     enable = true;
     # "1Password – Password Manager" (Chrome Web Store ID).

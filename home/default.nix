@@ -24,14 +24,14 @@
     ./qt.nix           # Qt theming via qt6ct + noctalia's KColorScheme (Dolphin/Ark/VLC)
     ./vlc.nix          # VLC media player + default audio handler
     ./mpv.nix          # mpv: HDR-capable video player + default video handler
-    ./obs.nix          # OBS Studio (screencast via GNOME portal, audio via PipeWire)
+    ./obs.nix          # OBS Studio (screencast via the hyprland portal, audio via PipeWire)
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
     ./ticktick.nix     # TickTick task manager (unfree; allowUnfree in core.nix)
     ./onlyoffice.nix   # OnlyOffice desktop editors (alongside LibreOffice in core.nix)
     ./mangohud.nix     # in-game FPS overlay (per-game: `mangohud %command%` in Steam)
     ./google-drive.nix # ~/GoogleDrive rclone mount (one-time: `rclone config`)
-    ./chrome.nix       # default browser: web-link handler + $BROWSER (policies via modules/brave.nix + onepassword.nix)
-    ./brave.nix        # secondary browser (search policy in modules/brave.nix)
+    ./chrome.nix       # default browser: web-link handler + $BROWSER (policies via modules/chromium-policies.nix + onepassword.nix)
+    ./brave.nix        # secondary browser (search policy in modules/chromium-policies.nix)
     ./claude.nix       # Claude Code CLI + settings + statusline script
     ./insta360-link.nix # Insta360 Link 2 Pro webcam: v4l2-ctl + cameractrls PTZ control
   ];
@@ -45,6 +45,14 @@
 
   # Let home-manager manage itself (provides the `home-manager` CLI).
   programs.home-manager.enable = true;
+
+  # The xdg default-application registry (~/.config/mimeapps.list). Enabled
+  # HERE, not in any app's file: dolphin (inode/directory), ark (archives),
+  # vlc (audio), mpv (video), and chrome (web links — the default browser!)
+  # all merge their defaultApplications into it. It used to live in
+  # dolphin.nix, which meant deleting the file manager would have silently
+  # killed every other app's mime defaults too.
+  xdg.mimeApps.enable = true;
 
   programs.git = {
     enable = true;

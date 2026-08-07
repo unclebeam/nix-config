@@ -26,7 +26,7 @@
   ];
 
   # Make double-clicking an archive in Dolphin open Ark. Merges with the
-  # inode/directory default in dolphin.nix (mimeApps is enabled there).
+  # inode/directory default in dolphin.nix (mimeApps is enabled in default.nix).
   xdg.mimeApps.defaultApplications = {
     "application/zip" = "org.kde.ark.desktop";
     "application/vnd.rar" = "org.kde.ark.desktop";
