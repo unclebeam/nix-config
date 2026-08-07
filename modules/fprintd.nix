@@ -9,10 +9,11 @@
 
 {
   # fprintd is the D-Bus daemon PAM talks to. CAREFUL: enabling it flips
-  # security.pam.services.*.fprintAuth on BY DEFAULT for EVERY PAM service
-  # (sudo, polkit, greetd, tty login) — the opt-outs below are as
-  # load-bearing as this line. What we keep: fingerprint for sudo and
-  # polkit prompts.
+  # security.pam.services.*.fprintAuth on BY DEFAULT for EVERY PAM service —
+  # evaluated, that's ~20 services: not just sudo/polkit-1 but also passwd,
+  # chpasswd, su, systemd-run0, vlock, the `other` catch-all, and more.
+  # The opt-outs below are as load-bearing as this line. What we KEEP after
+  # them: fingerprint for sudo, polkit prompts, su-l/runuser, systemd-user.
   services.fprintd.enable = true;
 
   # ── Keep the greeter (and tty login) password-only — BY DESIGN ─────────
@@ -25,10 +26,37 @@
   # sudo and polkit. `login` also stays password-only because the Noctalia
   # lock screen authenticates against /etc/pam.d/login on NixOS —
   # pam_fprintd there would gate the LOCK SCREEN's password path behind a
-  # finger-scan prompt (and tty logins with it). Noctalia does have its own
-  # [lockscreen] fingerprint option; wiring it up is a deliberate follow-up
-  # experiment, NOT part of the DMS→Noctalia migration — verify on-machine
-  # how it interacts with this opt-out before flipping anything.
+  # finger-scan prompt (and tty logins with it).
+  #
+  # (Noctalia's own [lockscreen] fingerprint option is ORTHOGONAL to these
+  # opt-outs: the shell talks to fprintd directly over D-Bus
+  # (net.reactivated.Fprint.*), not through PAM, so `login.fprintAuth`
+  # neither enables nor blocks it. The lock screen is password-only today
+  # because Noctalia's default is off; the opt-out here still matters for
+  # the lock screen's PASSWORD path and for tty logins.)
   security.pam.services.greetd.fprintAuth = false;
   security.pam.services.login.fprintAuth = false;
+
+  # ── Narrow the blast radius to the stated intent (sudo + polkit) ───────
+  # Without these, the enable-everything default quietly hands a finger
+  # scan powers it shouldn't have:
+  #  * passwd/chpasswd — CHANGING the login password by finger-scan. That's
+  #    exactly the operation the kwallet warning (modules/kwallet.nix,
+  #    home/kwallet.nix) says silently breaks wallet auto-unlock; it must
+  #    stay deliberate, behind the current password.
+  #  * systemd-run0 — run0 root escalation.
+  #  * vlock — the console locker (not covered by the `login` opt-out).
+  #  * su — keep target-password-only, matching the tty-login policy.
+  #  * other — the PAM catch-all: any future service without its own stack
+  #    would silently inherit fingerprint.
+  #  * swaylock — an unused stack nixpkgs generates via programs.hyprland
+  #    (swaylock isn't installed; Noctalia's lock uses `login`) — dead auth
+  #    surface, neutralized for hygiene.
+  security.pam.services.passwd.fprintAuth = false;
+  security.pam.services.chpasswd.fprintAuth = false;
+  security.pam.services.systemd-run0.fprintAuth = false;
+  security.pam.services.vlock.fprintAuth = false;
+  security.pam.services.su.fprintAuth = false;
+  security.pam.services.other.fprintAuth = false;
+  security.pam.services.swaylock.fprintAuth = false;
 }
