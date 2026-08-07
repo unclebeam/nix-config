@@ -45,9 +45,7 @@ hl.config({
 		-- (the two mechanisms must never coexist).
 		kb_layout = "us,th",
 		numlock_by_default = true,
-		-- Focus follows the mouse: hovering a window focuses it (0 was
-		-- click-to-focus).
-		follow_mouse = 1,
+		-- (follow_mouse is left at Hyprland's default of 1 — hover focuses.)
 		-- Natural scrolling on mice too (the touchpad option below only
 		-- covers touchpads; without this the PC's mouse wheel scrolls the
 		-- traditional direction while the thinkpad's touchpad doesn't)
@@ -70,7 +68,6 @@ hl.config({
 		-- read as a frame, not a focus hint (colors come from noctalia's
 		-- template, required at the bottom of this file).
 		border_size = 2,
-		resize_on_border = false,
 		layout = "dwindle",
 	},
 	decoration = {
@@ -78,20 +75,16 @@ hl.config({
 		-- practice (and so did 12, the old GNOME-app window rule's value,
 		-- which that deviation had made redundant); 8 is deliberate.
 		rounding = 8,
-		rounding_power = 2,
-		shadow = {
-			enabled = true,
-			range = 4,
-			render_power = 3,
-			color = 0xee1a1a1a,
-		},
 		-- Window blur (Noctalia's shell surfaces get theirs from the
-		-- layer rule below, which works even without this block).
+		-- layer rule below, which works even without this block). Only the
+		-- values that DIFFER from Hyprland's defaults are set — the shadow
+		-- block, blur.enabled/vibrancy, rounding_power etc. that used to sit
+		-- here were the shipped defaults verbatim (Noctalia's recommended-
+		-- settings page spells defaults out; restating them here just hid
+		-- which knobs were actually turned).
 		blur = {
-			enabled = true,
-			size = 3,
-			passes = 2,
-			vibrancy = 0.1696,
+			size = 3, -- default 8
+			passes = 2, -- default 1
 		},
 	},
 	misc = {
@@ -99,10 +92,7 @@ hl.config({
 		disable_splash_rendering = true,
 	},
 	dwindle = {
-		preserve_split = true,
-	},
-	master = {
-		mfact = 0.5,
+		preserve_split = true, -- default false: keep a window's split direction stable
 	},
 })
 
@@ -145,26 +135,17 @@ hl.animation({ leaf = "workspaces", enabled = true, speed = 1.8, bezier = "quick
 hl.animation({ leaf = "fade", enabled = true, speed = 1.5, bezier = "quick" })
 hl.animation({ leaf = "border", enabled = true, speed = 2, bezier = "quick" })
 
-hl.window_rule({ match = { class = "^(org\\.wezfurlong\\.wezterm)$" }, tile = true })
-hl.window_rule({ match = { class = "^(gnome-control-center)$" }, tile = true })
+-- Window rules only for apps this config actually installs (the DMS-era
+-- template's rules for wezterm/GNOME apps/blueman/firefox/zoom — none of
+-- them present here — were pruned 2026-08; a rule's app must exist, same
+-- spirit as atomic removal).
 hl.window_rule({ match = { class = "^(pavucontrol)$" }, tile = true })
-hl.window_rule({ match = { class = "^(nm-connection-editor)$" }, tile = true })
-hl.window_rule({ match = { class = "^(org\\.gnome\\.Calculator)$" }, float = true })
-hl.window_rule({ match = { class = "^(gnome-calculator)$" }, float = true })
-hl.window_rule({ match = { class = "^(galculator)$" }, float = true })
-hl.window_rule({ match = { class = "^(blueman-manager)$" }, float = true })
-hl.window_rule({ match = { class = "^(org\\.gnome\\.Nautilus)$" }, float = true })
 hl.window_rule({ match = { class = "^(xdg-desktop-portal)$" }, float = true })
 hl.window_rule({
 	match = { class = "^(steam)$", title = "^(notificationtoasts)" },
 	no_initial_focus = true,
 	pin = true,
 })
-hl.window_rule({
-	match = { class = "^(firefox)$", title = "^(Picture-in-Picture)$" },
-	float = true,
-})
-hl.window_rule({ match = { class = "^(zoom)$" }, float = true })
 
 -- Noctalia's surfaces (upstream's recommended rules from its Hyprland
 -- docs): no animations on shell layers, blur behind the translucent ones,

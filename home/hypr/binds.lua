@@ -107,14 +107,16 @@ hl.bind("SUPER + I", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind("SUPER + U", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind("SUPER + CTRL + down", hl.dsp.window.move({ workspace = "e+1" }))
 hl.bind("SUPER + CTRL + up", hl.dsp.window.move({ workspace = "e-1" }))
-hl.bind("SUPER + CTRL + U", hl.dsp.window.move({ workspace = "e+1" }))
-hl.bind("SUPER + CTRL + I", hl.dsp.window.move({ workspace = "e-1" }))
+-- U/I directions match the focus binds above: I = next, U = prev.
+hl.bind("SUPER + CTRL + I", hl.dsp.window.move({ workspace = "e+1" }))
+hl.bind("SUPER + CTRL + U", hl.dsp.window.move({ workspace = "e-1" }))
 
 -- === Move Workspaces ===
 hl.bind("SUPER + SHIFT + Page_Down", hl.dsp.window.move({ workspace = "e+1" }))
 hl.bind("SUPER + SHIFT + Page_Up", hl.dsp.window.move({ workspace = "e-1" }))
-hl.bind("SUPER + SHIFT + U", hl.dsp.window.move({ workspace = "e+1" }))
-hl.bind("SUPER + SHIFT + I", hl.dsp.window.move({ workspace = "e-1" }))
+-- U/I directions match the focus binds above: I = next, U = prev.
+hl.bind("SUPER + SHIFT + I", hl.dsp.window.move({ workspace = "e+1" }))
+hl.bind("SUPER + SHIFT + U", hl.dsp.window.move({ workspace = "e-1" }))
 
 -- === Mouse Wheel Navigation ===
 hl.bind("SUPER + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
