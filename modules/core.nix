@@ -4,7 +4,6 @@
   config,
   lib,
   pkgs,
-  inputs, # from specialArgs in flake.nix — lets us reach other flakes' packages
   pkgs-unstable, # the unstable package set (flake.nix) — for a few fast movers
   ...
 }:
@@ -93,9 +92,16 @@
       "video" # backlight control on the laptop
     ];
     shell = pkgs.fish;
-    # First-login password — CHANGE IT immediately after install with `passwd`.
+    # First-login password ("changeme") — CHANGE IT immediately after
+    # install with `passwd`. Hashed (openssl passwd -6) rather than
+    # initialPassword because the plain option lands the literal string in
+    # the world-readable /nix/store; marginal here since the value is
+    # public in this repo anyway, but the hash costs nothing. NB: changing
+    # the password later does NOT re-key the kwallet — see the warning in
+    # modules/kwallet.nix (the wallet keeps the OLD password until you
+    # change it in kwalletmanager too).
     # (nixos-install also asks for the root password interactively.)
-    initialPassword = "changeme";
+    initialHashedPassword = "$6$CwzSz2CEk36YeqZ9$jwZf/3qbXcSzqvX2ymARckGqeoxpcT5sBc801REF0PnlHI9u2CDoluoH3d3zqwrhQNdlR6dQp4wWOOeGsqrjE1";
   };
 
   # ── Baseline packages ──────────────────────────────────────────────────
@@ -137,9 +143,8 @@
     # DBeaver Community Edition. nixpkgs only carries the upstream binary
     # release (-bin); there is no from-source `dbeaver` attribute.
     dbeaver-bin
-    # Zen Browser — not in nixpkgs, comes from the zen-browser flake input
-    # (see flake.nix). `default` is Zen's mainline release channel (their
-    # "beta"); the flake also offers the bleeding-edge `twilight`.
-    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+    # (Zen Browser was removed 2026-08: third browser with no mime handler,
+    # keybind, or stated role next to Chrome (default) + Brave (secondary).
+    # Its flake input went with it — re-add both together if it returns.)
   ];
 }

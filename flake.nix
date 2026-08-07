@@ -9,7 +9,9 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
     # A SECOND nixpkgs tracking unstable. Used ONLY to source a curated set of
-    # fast-moving packages (claude-code, lazygit, starship);
+    # fast-moving packages (claude-code, lazygit, starship, brave,
+    # google-chrome, slack — grep for `pkgs-unstable.` to enumerate; the
+    # share-picker input below also follows it);
     # everything else stays on nixos-26.05. Deliberately NOT `follows` nixpkgs —
     # it must be its own package set, or those packages would rebuild against
     # 26.05 deps and defeat the purpose. mkHost instantiates it once (with
@@ -33,18 +35,6 @@
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # Zen Browser is not in nixpkgs at all — this community flake repackages
-    # the official releases. It ships only packages (no NixOS module), so
-    # nothing gets wired into mkHost; core.nix pulls the package straight
-    # out of `inputs` (available there via specialArgs below).
-    zen-browser = {
-      url = "github:0xc000022070/zen-browser-flake";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        home-manager.follows = "home-manager";
-      };
     };
 
     # Noctalia v5 — the native desktop shell that IS the whole desktop: bar,
