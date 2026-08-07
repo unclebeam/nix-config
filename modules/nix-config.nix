@@ -11,11 +11,19 @@
 # network, then never runs again.
 #
 # Failure modes are deliberately soft:
-#  * ConditionPathExists means an existing checkout — however it got there
-#    — makes the unit a silent no-op forever. It can never touch a repo
-#    with local work in it. The condition is re-checked on every restart,
-#    so a manual `git clone` while the unit is retrying stops the retries
-#    cleanly instead of racing them.
+#  * ConditionPathExists watches ~/nix-config/.git — a real-checkout marker,
+#    NOT the bare directory. The bare-directory check burned on paper 2026-08:
+#    home-manager's activation (home/hyprland.nix) runs `mkdir -p
+#    ~/nix-config/home/hypr/local` seconds after boot with NO network
+#    dependency, so on a fresh install the directory exists before this unit's
+#    network-online wait finishes — the condition would fail, a condition-skip
+#    is not a unit *failure*, Restart=on-failure never fires, and the clone
+#    never happens (dangling symlinks forever, the exact bounced-login bug the
+#    retry loop exists to prevent). Keying on .git means only an actual
+#    checkout — however it got there — makes the unit a silent no-op forever;
+#    it can never touch a repo with local work in it. The condition is
+#    re-checked on every restart, so a manual clone while the unit is retrying
+#    stops the retries cleanly instead of racing them.
 #  * No network at boot → the unit RETRIES every 15s until the clone
 #    succeeds (Restart=on-failure below). The original fail-once oneshot
 #    burned a fresh install (unclebeam-pc 2026-07-21): network-online was
@@ -41,7 +49,7 @@
     wants = [ "network-online.target" ];
     after = [ "network-online.target" ];
     unitConfig = {
-      ConditionPathExists = "!/home/unclebeam/nix-config";
+      ConditionPathExists = "!/home/unclebeam/nix-config/.git";
       # No start-rate limit: a machine sitting without network (laptop
       # before wifi credentials exist) may retry for hours before the
       # clone can land, and that's fine.
@@ -62,8 +70,20 @@
       User = "unclebeam";
     };
     path = [ pkgs.git ];
+    # NOT a plain `git clone`: home-manager's activation may already have
+    # seeded ~/nix-config with the (gitignored) hypr/local placeholder before
+    # we run, and `git clone` fails PERMANENTLY into a non-empty directory —
+    # the 15s retry loop would spin forever. init+fetch+checkout is the
+    # clone-into-non-empty idiom: idempotent across retries (every step
+    # tolerates a partial previous attempt), and it leaves the seeded
+    # untracked files alone.
     script = ''
-      git clone https://github.com/unclebeam/nix-config.git /home/unclebeam/nix-config
+      mkdir -p /home/unclebeam/nix-config
+      cd /home/unclebeam/nix-config
+      git init -b main
+      git remote add origin https://github.com/unclebeam/nix-config.git 2>/dev/null || true
+      git fetch origin
+      git checkout -f -B main -t origin/main
     '';
   };
 }

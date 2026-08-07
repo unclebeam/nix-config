@@ -64,7 +64,11 @@ in
   # require() takes the whole compositor config down with it. An empty Lua
   # chunk loads fine: hyprland just uses auto monitor config until real
   # hl.monitor() lines are written here. ([ -e ] = a file that exists —
-  # even empty — is never touched again.)
+  # even empty — is never touched again.) NOTE: on a fresh install this
+  # mkdir runs BEFORE clone-nix-config (no network dependency here), so it
+  # creates ~/nix-config as an empty skeleton — which is why that unit keys
+  # its ConditionPathExists on ~/nix-config/.git and clones via
+  # init+fetch+checkout instead of `git clone` (modules/nix-config.nix).
   home.activation.hyprLocalPlaceholders = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     mkdir -p "$HOME/nix-config/home/hypr/local"
     [ -e "$HOME/nix-config/home/hypr/local/outputs.lua" ] || touch "$HOME/nix-config/home/hypr/local/outputs.lua"

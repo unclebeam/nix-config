@@ -156,8 +156,12 @@ in
   # oneshot clones it on the first login where it's missing;
   # ConditionPathExists makes it a permanent no-op afterwards, so it can
   # never touch a live install. If the clone fails (no network yet), git
-  # deletes the half-made dir, the condition stays true, and it simply
-  # retries next login. `doom install` stays MANUAL (header comment): it
+  # deletes the half-made dir, the condition stays true, and Restart
+  # retries every 15s until network is up — the same hardening as the
+  # nix-config clone (whose fail-once version burned a first boot,
+  # 2026-07-21; before 2026-08 this unit still had that gap and a
+  # networkless first login meant no Doom until the NEXT login).
+  # `doom install` stays MANUAL (header comment): it
   # builds Doom's ~300 packages for minutes and is upstream's supported
   # interactive path — an activation script is the wrong place for an
   # interactive, minutes-long bootstrap. No sha pin, latest Doom at
@@ -169,10 +173,19 @@ in
     Unit = {
       Description = "Clone Doom Emacs on first login (bootstrap target of doom install)";
       ConditionPathExists = "!%h/.config/emacs";
+      # No start-rate limit: may retry for as long as the machine sits
+      # without network (same reasoning as clone-nix-config).
+      StartLimitIntervalSec = 0;
     };
     Service = {
-      Type = "oneshot";
+      # `simple`, not `oneshot`, for the same reason as clone-nix-config:
+      # a oneshot's start job holds default.target (login startup) until
+      # the process exits — fine for one fast failure, minutes of blocked
+      # session once we retry. simple completes the job on spawn.
+      Type = "simple";
       ExecStart = "${pkgs.git}/bin/git clone --depth 1 https://github.com/doomemacs/doomemacs %h/.config/emacs";
+      Restart = "on-failure";
+      RestartSec = 15;
     };
     Install.WantedBy = [ "default.target" ];
   };
