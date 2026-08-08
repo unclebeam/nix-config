@@ -2,7 +2,7 @@
 #
 # The repo checkout at ~/nix-config is a load-bearing invariant (see
 # CLAUDE.md): every out-of-store symlink hardcodes it — hyprland.lua, the
-# hypr/binds.lua + hypr/local fragments, the noctalia config dir, and the
+# hypr/binds.lua + hypr/host.lua fragments, the noctalia config dir, and the
 # neovim config. On a fresh nixos-anywhere install the checkout doesn't
 # exist yet, so all of those links dangle and the FIRST login is broken
 # (no compositor config, no shell config, configless nvim) until someone
@@ -13,17 +13,18 @@
 # Failure modes are deliberately soft:
 #  * ConditionPathExists watches ~/nix-config/.git — a real-checkout marker,
 #    NOT the bare directory. The bare-directory check burned on paper 2026-08:
-#    home-manager's activation (home/hyprland.nix) runs `mkdir -p
-#    ~/nix-config/home/hypr/local` seconds after boot with NO network
-#    dependency, so on a fresh install the directory exists before this unit's
-#    network-online wait finishes — the condition would fail, a condition-skip
-#    is not a unit *failure*, Restart=on-failure never fires, and the clone
-#    never happens (dangling symlinks forever, the exact bounced-login bug the
-#    retry loop exists to prevent). Keying on .git means only an actual
-#    checkout — however it got there — makes the unit a silent no-op forever;
-#    it can never touch a repo with local work in it. The condition is
-#    re-checked on every restart, so a manual clone while the unit is retrying
-#    stops the retries cleanly instead of racing them.
+#    a home-manager activation script was creating ~/nix-config/… seconds
+#    after boot with NO network dependency, so on a fresh install the
+#    directory existed before this unit's network-online wait finished — the
+#    condition would fail, a condition-skip is not a unit *failure*,
+#    Restart=on-failure never fires, and the clone never happens (dangling
+#    symlinks forever, the exact bounced-login bug the retry loop exists to
+#    prevent). That particular script is gone, but the .git marker stays: it's
+#    correct no matter what else ever pre-seeds the directory. Keying on .git
+#    means only an actual checkout — however it got there — makes the unit a
+#    silent no-op forever; it can never touch a repo with local work in it.
+#    The condition is re-checked on every restart, so a manual clone while the
+#    unit is retrying stops the retries cleanly instead of racing them.
 #  * No network at boot → the unit RETRIES every 15s until the clone
 #    succeeds (Restart=on-failure below). The original fail-once oneshot
 #    burned a fresh install (unclebeam-pc 2026-07-21): network-online was
@@ -70,13 +71,13 @@
       User = "unclebeam";
     };
     path = [ pkgs.git ];
-    # NOT a plain `git clone`: home-manager's activation may already have
-    # seeded ~/nix-config with the (gitignored) hypr/local placeholder before
-    # we run, and `git clone` fails PERMANENTLY into a non-empty directory —
-    # the 15s retry loop would spin forever. init+fetch+checkout is the
-    # clone-into-non-empty idiom: idempotent across retries (every step
-    # tolerates a partial previous attempt), and it leaves the seeded
-    # untracked files alone.
+    # NOT a plain `git clone`: something may already have put files in
+    # ~/nix-config before we run (a home-manager activation script did
+    # exactly that until 2026-08), and `git clone` fails PERMANENTLY into a
+    # non-empty directory — the 15s retry loop would spin forever.
+    # init+fetch+checkout is the clone-into-non-empty idiom: idempotent
+    # across retries (every step tolerates a partial previous attempt), and
+    # it leaves any pre-existing untracked files alone.
     script = ''
       mkdir -p /home/unclebeam/nix-config
       cd /home/unclebeam/nix-config

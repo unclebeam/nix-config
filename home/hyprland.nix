@@ -12,6 +12,7 @@
   lib,
   pkgs,
   inputs,
+  osConfig,
   ...
 }:
 
@@ -21,7 +22,26 @@ let
   # store path. `inputs` reaches this file via home-manager.extraSpecialArgs.
   previewSharePicker =
     inputs.hyprland-preview-share-picker.packages.${pkgs.stdenv.hostPlatform.system}.default;
+
+  # WHICH machine this is, decided at EVAL time. `osConfig` is the NixOS
+  # config, handed to every home-manager module because home-manager is wired
+  # in as a NixOS module (flake.nix) — no extraSpecialArgs plumbing needed.
+  # This is what replaced hyprland.lua's old io.open("/etc/hostname") branch:
+  # the hostname was already known to Nix, so the split belongs here.
+  hostName = osConfig.networking.hostName;
+  hostLua = ./hypr/hosts + "/${hostName}.lua";
 in
+# Fail LOUDLY at eval if this host has no display file. The failure this
+# prevents is the repo's classic footgun: a new .lua that wasn't `git add`ed
+# is invisible to the flake, the symlink below dangles, and Lua's require()
+# hard-fails — taking the WHOLE compositor config down at the next login,
+# which reads as a bounced login rather than a missing file. `pathExists`
+# resolves against the flake's source (git-tracked files only), so this
+# catches the un-added case too. It does not copy anything to the store.
+assert lib.assertMsg (builtins.pathExists hostLua) ''
+  home/hypr/hosts/${hostName}.lua does not exist in the flake source.
+  Either create it, or `git add` it — flakes only see git-tracked files.
+'';
 {
   # Hyprland 0.55+ loads ~/.config/hypr/hyprland.lua INSTEAD of
   # hyprland.conf whenever the .lua file exists (hyprlang is deprecated
@@ -48,31 +68,26 @@ in
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nix-config/home/hypr/binds.lua";
 
-  # THIS machine's monitor config (require("local.outputs")): resolution,
-  # scale, position, VRR — per-machine hardware facts that must never sync
-  # between hosts, so home/hypr/local/* is gitignored and hand-maintained
-  # (it replaced the DMS Displays GUI, which wrote the old dms/outputs.lua
-  # imperatively). Still an out-of-store symlink so edits apply on
-  # `hyprctl reload`.
-  xdg.configFile."hypr/local".source =
+  # THIS machine's displays (require("host")): monitor resolution/scale/
+  # position/VRR, plus which workspaces are pinned to which panel. One
+  # TRACKED file per host in home/hypr/hosts/, and the line below is the
+  # whole per-machine split — hyprland.lua never learns the hostname, and
+  # the other host's rules are not merely skipped at runtime, they're never
+  # loaded. That matters: workspace rules naming an absent monitor are NOT
+  # no-ops (they once stole eDP-1's default workspace on the thinkpad).
+  #
+  # Tracking these is safe precisely BECAUSE Nix picks one — the thing the
+  # old gitignore protected against was a single shared file applying one
+  # machine's panels to the other, which per-host selection makes
+  # impossible. The upside is that a fresh nixos-anywhere install boots with
+  # the right layout instead of hyprland's 60 Hz auto-config, with no manual
+  # first-login step. (The contents are still HARDWARE FACTS: copied from
+  # `hyprctl monitors all` on the machine, never invented.)
+  #
+  # Out-of-store as always, so edits apply on a bare `hyprctl reload`.
+  xdg.configFile."hypr/host.lua".source =
     config.lib.file.mkOutOfStoreSymlink
-      "${config.home.homeDirectory}/nix-config/home/hypr/local";
-
-  # Seed the machine-local outputs file: the local/ dir holds ZERO tracked
-  # files, so a fresh clone doesn't even have the directory (git doesn't
-  # track empty dirs) and require("local.outputs") would hard-fail — Lua's
-  # require() takes the whole compositor config down with it. An empty Lua
-  # chunk loads fine: hyprland just uses auto monitor config until real
-  # hl.monitor() lines are written here. ([ -e ] = a file that exists —
-  # even empty — is never touched again.) NOTE: on a fresh install this
-  # mkdir runs BEFORE clone-nix-config (no network dependency here), so it
-  # creates ~/nix-config as an empty skeleton — which is why that unit keys
-  # its ConditionPathExists on ~/nix-config/.git and clones via
-  # init+fetch+checkout instead of `git clone` (modules/nix-config.nix).
-  home.activation.hyprLocalPlaceholders = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p "$HOME/nix-config/home/hypr/local"
-    [ -e "$HOME/nix-config/home/hypr/local/outputs.lua" ] || touch "$HOME/nix-config/home/hypr/local/outputs.lua"
-  '';
+      "${config.home.homeDirectory}/nix-config/home/hypr/hosts/${hostName}.lua";
 
   # (No Nix-generated Lua anymore: the old nix.lua that mirrored the cursor
   # theme/size into the compositor is gone — hyprland.lua stopped

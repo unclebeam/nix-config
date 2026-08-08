@@ -8,10 +8,9 @@ result-*
 # Direnv, if you ever adopt it
 .direnv/
 
-# Machine-local hyprland fragment: THIS machine's monitor config
-# (hl.monitor lines — resolution/scale/position/VRR), hand-maintained.
-# Syncing it between hosts would apply one machine's monitors to the
-# other, so it's local-only; home/hyprland.nix's activation script seeds
-# it empty on a fresh clone (require() hard-fails on a missing file, but
-# an empty Lua chunk is fine — auto monitor config until real lines land).
-home/hypr/local/outputs.lua
+# (Monitor config used to be ignored here — home/hypr/local/outputs.lua.
+# It's tracked now, one file per host in home/hypr/hosts/, because Nix
+# links only the current machine's: see home/hyprland.nix. The reason to
+# ignore it — one shared file applying one machine's panels to the other —
+# no longer exists, and tracking means a fresh install boots with the
+# right layout.)
