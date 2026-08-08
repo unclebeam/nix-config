@@ -98,13 +98,14 @@ hl.config({
 	},
 })
 
--- MACHINE FACT: the PC's outputs are 4K at scale 1.5 (see
--- hosts/unclebeam-pc.lua). Without this, XWayland apps (Steam, other X11) render
--- at the logical resolution and Hyprland bitmap-upscales them 1.5x =>
--- blurry. force_zero_scaling makes XWayland own native pixels (crisp);
--- per-app scaling then restores correct size (Steam: STEAM_FORCE_DESKTOPUI_
--- SCALING in modules/gaming.nix). Harmless on the thinkpad if it runs at
--- scale 1 (zero scaling == no scaling there).
+-- MACHINE FACT: EVERY output on BOTH hosts is fractionally scaled — the PC's
+-- two 4K panels at 1.5, and all three of the thinkpad's at 1.5 too (see
+-- hosts/*.lua). Without this, XWayland apps (Steam, other X11) render at the
+-- logical resolution and Hyprland bitmap-upscales them 1.5x => blurry.
+-- force_zero_scaling makes XWayland own native pixels (crisp); per-app scaling
+-- then restores correct size (Steam: STEAM_FORCE_DESKTOPUI_SCALING in
+-- modules/gaming.nix). So this belongs here in the shared file rather than
+-- per host — there is no unscaled output left to make it a no-op for.
 hl.config({
 	xwayland = {
 		force_zero_scaling = true,
