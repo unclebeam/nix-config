@@ -65,7 +65,29 @@
   # boot makes 6 GHz persistently legal, so the roam completes instead of
   # flapping. Host-level on purpose: this desktop never leaves Thailand;
   # the ThinkPad travels and should keep the country-IE default.
-  boot.kernelParams = [ "pcie_aspm=off" "cfg80211.ieee80211_regdom=TH" ];
+  #
+  # usbcore.autosuspend=-1 — the "keyboard and mouse are dead for 15 s at the
+  # login screen" bug (diagnosed 2026-08-09). The greeter draws at ~9.6 s, but
+  # the keyboard/mouse evdev nodes only reach logind and the greeter's
+  # compositor at ~23.5 s. The chain: USB devices enumerate at ~3.2 s, sit idle,
+  # and runtime autosuspend (default delay 2 s) puts them to sleep at ~5.3 s.
+  # Their drivers probe at ~6.6 s and must resume them first — and two devices
+  # on this desk answer that resume far too slowly, so their control transfers
+  # hit the 5 s USB timeout: the Kanto ORA speakers ("cannot get freq at ep
+  # 0x2", twice, every boot) and the Insta360 Link 2 Pro ("Failed to query
+  # (GET_INFO) UVC control N on unit 5: -110"). udev event processing for the
+  # WHOLE PCIe branch holding that USB controller serializes behind those
+  # probes, which is why the Intel NIC and the MT7925 also only appeared at
+  # 23.8 s — and why on one boot (journal 2026-08-09 14:21) the camera burned
+  # 8 × 5 s and input never arrived at all before the machine was rebooted.
+  # A negative default delay means devices are never runtime-suspended, so both
+  # are still awake when their drivers probe. It has to be a kernel param, not
+  # a udev rule setting power/control=on: the param applies at device
+  # registration (~3.2 s), while a udev rule would race the probe it's meant to
+  # protect. Same failure class — and same cure — as the btusb quirk below.
+  # Host-level on purpose: this box is on mains; the ThinkPad runs on battery
+  # and should keep autosuspend.
+  boot.kernelParams = [ "pcie_aspm=off" "cfg80211.ieee80211_regdom=TH" "usbcore.autosuspend=-1" ];
 
   # The regdom pin above is only as good as the signed regulatory.db the
   # kernel validates TH against. It's currently present via the general
@@ -79,8 +101,26 @@
   # binding fine (xpadneo "gamepad detected") and then disconnecting ~30s
   # later, in a loop, across two controller firmware versions and a clean
   # re-pair. Desktop box: autosuspend on the radio saves nothing worth having.
+  # The Kanto ORA speakers (USB 8888:17b6) don't support reading back their
+  # current sample rate: snd-usb-audio asks anyway during probe and eats a 5 s
+  # USB timeout per endpoint — "usb 1-5.1.1: 1:1: cannot get freq at ep 0x2",
+  # twice, on every single boot. That is the larger half of the login-screen
+  # input stall documented on boot.kernelParams above, so belt-and-braces with
+  # usbcore.autosuspend=-1: that keeps the speakers awake, this stops the
+  # pointless question being asked at all (in case they're slow to answer even
+  # when never suspended). GET_SAMPLE_RATE is the stock upstream quirk for this
+  # exact symptom — Plantronics DA45/BT600, Microdia JP001 and friends carry it
+  # hardcoded in sound/usb/quirks.c; ours just isn't in the kernel's list.
+  #
+  # quirk_flags is a string array parsed as VID:PID:flags, so this is scoped to
+  # the Kanto by ID and cannot touch the other two USB audio devices on this
+  # machine (the Insta360's mic and the ASUS front-panel DAC). Verify the kernel
+  # still takes strings — not the old per-card int array — before editing:
+  # `cat /sys/module/snd_usb_audio/parameters/quirk_flags` must print "(null)"
+  # slots, not numbers.
   boot.extraModprobeConfig = ''
     options btusb enable_autosuspend=n
+    options snd-usb-audio quirk_flags=8888:17b6:GET_SAMPLE_RATE
   '';
 
   # MT7925 power-management failure #3: with WiFi power-save on (the driver
