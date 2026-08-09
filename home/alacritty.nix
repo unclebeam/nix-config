@@ -18,8 +18,15 @@
       # (against the store symlink that write would die with EROFS).
       general.import = [ "~/.config/alacritty/themes/noctalia.toml" ];
 
+      # Lilex, on trial since 2026-08-09 (was "IosevkaTerm Nerd Font Mono" —
+      # revert to that one string to back it out; the package is still
+      # installed either way, since Doom pins it). The *Mono* variant, not
+      # plain "Lilex Nerd Font": the Mono patch constrains the added nerd
+      # glyphs to a single cell, which is what a terminal grid needs.
+      # NB: alacritty falls back silently on an unknown family — it only
+      # warns on stderr — so a typo here looks like "nothing changed".
       font = {
-        normal.family = "IosevkaTerm Nerd Font Mono";
+        normal.family = "Lilex Nerd Font Mono";
         size = 12.0;
       };
 

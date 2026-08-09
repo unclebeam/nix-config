@@ -21,6 +21,31 @@ let
       cp *.ttf "$out/share/fonts/truetype/"
     '';
   };
+
+  # IBM Plex Mono, and only that. nixpkgs has no split package: pkgs.ibm-plex
+  # is one ~287M bundle of Sans/Serif/Mono/Math, Condensed, and the Arabic,
+  # Devanagari, Hebrew, CJK and Thai scripts. We want the coding face alone, so
+  # copy the 16 Mono faces out (~1.4M) and leave the rest behind. Keeping the
+  # bundle out of the font set also keeps its two Thai families out of
+  # Chromium's fallback walk — see the rejectfont block below for why any new
+  # Thai-capable font is a hazard here.
+  # .otf and not .ttf: upstream ships the same 16 faces in both formats, and
+  # installing both would show fontconfig 32 faces for one family. OTF (CFF
+  # outlines) is IBM Plex's canonical format.
+  # NB: the glob must stay IBMPlexMono-* — a looser IBMPlex* would drag in
+  # IBMPlexMath-Regular.otf, which sits in the same directory.
+  # The full bundle is still fetched ONCE as a build input; it never enters the
+  # system closure (only this 1.4M subset does) and nix.gc in core.nix reclaims
+  # it like any other build-time dependency.
+  ibm-plex-mono = pkgs.stdenvNoCC.mkDerivation {
+    pname = "ibm-plex-mono";
+    inherit (pkgs.ibm-plex) version;
+    src = pkgs.ibm-plex;
+    installPhase = ''
+      mkdir -p $out/share/fonts/opentype
+      cp share/fonts/opentype/IBMPlexMono-*.otf "$out/share/fonts/opentype/"
+    '';
+  };
 in
 {
   # Chromium-based apps (Brave) run native Wayland instead of XWayland when
@@ -37,11 +62,18 @@ in
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
   # ── Fonts ──────────────────────────────────────────────────────────────
-  # Mono fonts (JetBrainsMono for the UI, IosevkaTerm for the terminal),
-  # Sarabun for Thai text, Noto for everything else.
+  # Mono fonts (JetBrainsMono for the UI, Lilex for the terminal, IosevkaTerm
+  # for Doom, Plex Mono installed but unused), Sarabun for Thai text, Noto for
+  # everything else.
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
-    nerd-fonts.iosevka-term # alacritty's terminal font (home/alacritty.nix)
+    # alacritty's terminal font (home/alacritty.nix) — on trial as of
+    # 2026-08-09, replacing IosevkaTerm there.
+    nerd-fonts.lilex
+    # Doom's font (home/doom/config.el, family "IosevkaTermNerdFont"). It used
+    # to be alacritty's too; it stays for Doom, which also means backing the
+    # Lilex trial out is a one-line edit with no package churn.
+    nerd-fonts.iosevka-term
     # "Symbols Nerd Font Mono" — the default family of emacs' nerd-icons
     # (doom-modeline/dired icons, home/emacs.nix). Without it Doom nags to run
     # M-x nerd-icons-install-fonts, which drops an untracked font in ~/.local.
@@ -49,6 +81,11 @@ in
     # Emacs' last-resort glyph fallback (`doom doctor` warns without it) —
     # missing obscure glyphs can slow emacs badly. Unfree (allowUnfree is on).
     symbola
+    # IBM Plex Mono — installed on purpose, used by NOTHING on purpose. It's
+    # here to be available for coding whenever it gets tried; until then
+    # alacritty is on Lilex and Doom on IosevkaTerm, and no default moves.
+    # (Definition + why it's a subset: the let block at the top of this file.)
+    ibm-plex-mono
     sarabun-font # Thai text font (the fontconfig rules below prefer it)
     th-sarabun-psk # family "TH SarabunPSK" — for Thai official documents
     noto-fonts
