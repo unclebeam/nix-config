@@ -6,7 +6,7 @@
 # Noctalia's on greetd (modules/noctalia-greeter.nix). The USER half
 # (hyprland.lua glue) lives in home/hyprland.nix; the desktop shell — bar,
 # lock screen, idle policy — is Noctalia (modules/noctalia.nix).
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgs-unstable, ... }:
 
 {
   # System-level enable does things home-manager can't:
@@ -21,6 +21,35 @@
   #    (hyprland's Lua API stubs live there).
   # Window-manager *configuration* comes from home-manager.
   programs.hyprland.enable = true;
+
+  # ── The compositor tracks UNSTABLE, not our 26.05 pin ───────────────────
+  # Everything else on these machines comes from nixos-26.05; hyprland is one
+  # of the curated exceptions that ride nixpkgs-unstable (flake.nix's
+  # `pkgs-unstable`, reaching this module via specialArgs — same route as
+  # brave/lazygit/starship). The reason is the same reason those packages get
+  # the exception, only sharper: 0.55 was the FIRST release of the Lua config
+  # this whole setup is built on, upstream ships a release roughly monthly,
+  # and a frozen stable branch means sitting on the .0 of a brand-new config
+  # format for six months. 26.05 has 0.55.4; unstable has 0.56.1.
+  #
+  # package and portalPackage MUST move together, and that pairing is the
+  # load-bearing part of this block. xdg-desktop-portal-hyprland is not a
+  # generic portal — it IS hyprland's screencopy backend, and it speaks the
+  # compositor's own wlr-screencopy/hyprland-toplevel protocol versions over
+  # hyprland's socket. Leaving xdph on 26.05 (1.3.12) against a 0.56
+  # compositor is exactly the skew that yields a BLACK or silently-empty
+  # screenshare rather than a loud error — the worst failure shape, because
+  # nothing logs. Bump both or neither. (The KDE portal below is unaffected:
+  # different process, public portal D-Bus API, no version coupling.)
+  #
+  # Cost check, so nobody fears a source build: both derivations are fully in
+  # cache.nixos.org at the current lock (`nix build --dry-run` says "will be
+  # fetched", never "will be built"). And the unstable rev we're locked to is
+  # the same one noctalia's flake pins, so this reuses a package set already
+  # in the closure instead of adding a third nixpkgs.
+  programs.hyprland.package = pkgs-unstable.hyprland;
+  programs.hyprland.portalPackage = pkgs-unstable.xdg-desktop-portal-hyprland;
+
   # withUWSM deliberately OFF: our own session plumbing replaces it —
   # hyprland.lua's startup hook pushes the session env into the systemd
   # user manager and starts hyprland-session.target itself (the same

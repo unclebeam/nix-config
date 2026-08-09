@@ -10,9 +10,13 @@
 
     # A SECOND nixpkgs tracking unstable. Used ONLY to source a curated set of
     # fast-moving packages (claude-code, lazygit, starship, brave,
-    # google-chrome, slack — grep for `pkgs-unstable.` to enumerate; the
-    # share-picker input below also follows it);
-    # everything else stays on nixos-26.05. Deliberately NOT `follows` nixpkgs —
+    # google-chrome, slack — and, since this branch, hyprland itself plus its
+    # xdg-desktop-portal-hyprland, pinned as a PAIR in modules/hyprland.nix;
+    # grep for `pkgs-unstable.` to enumerate; the share-picker input below
+    # also follows it). So this is no longer only leaf apps: the compositor
+    # rides unstable too, because 0.55 was the first release of the Lua config
+    # the whole desktop is built on and stable freezes it for six months.
+    # Everything else stays on nixos-26.05. Deliberately NOT `follows` nixpkgs —
     # it must be its own package set, or those packages would rebuild against
     # 26.05 deps and defeat the purpose. mkHost instantiates it once (with
     # allowUnfree) and hands it to every module as `pkgs-unstable`.
