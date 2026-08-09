@@ -208,6 +208,30 @@ in
   # `doom upgrade`, `doom doctor` work from any shell.
   home.sessionPath = [ "${config.home.homeDirectory}/.config/emacs/bin" ];
 
+  # `doomreload` — the two-step ritual after editing home/doom/*.el, as one
+  # command. `doom sync` rebuilds Doom's autoloads and packages; the daemon
+  # must THEN be restarted or every `emacsclient -c` frame keeps serving the
+  # old state (home/doom is an out-of-store symlink, so the .el edits
+  # themselves are already live — it's the long-lived daemon that goes stale,
+  # which is exactly the "I changed config.el and nothing happened" trap).
+  #
+  # `; or return $status` is load-bearing, not sugar: a failed sync leaves Doom
+  # half-built, and restarting onto that swaps a working daemon for a broken
+  # one. Fish's `&&` only joins commands on ONE line, so this is its two-line
+  # equivalent — and it propagates sync's exit status out of the function.
+  #
+  # Lives HERE, not in home/fish.nix, because it exists because of Doom and so
+  # must die with Doom (the one-file-per-intent rule). programs.fish.functions
+  # merges across modules; fish itself is enabled in home/fish.nix. `doom`
+  # resolves via the sessionPath entry directly above.
+  programs.fish.functions.doomreload = {
+    description = "doom sync, then restart the emacs daemon";
+    body = ''
+      doom sync; or return $status
+      systemctl --user restart emacs.service
+    '';
+  };
+
   # Same out-of-store contract as nvim (see home/neovim.nix for the full
   # story): the repo checkout lives at ~/nix-config on EVERY machine, and a
   # wrong path dangles SILENTLY (emacs just starts with Doom's defaults…
