@@ -58,6 +58,20 @@ in
     # `nixfmt-rfc-style` attr is a deprecated alias that eval-warns). Command
     # name `nixfmt` — exactly what :lang nix's nix-format-buffer invokes.
     pkgs.nixfmt # :lang nix — nixfmt formatter
+    # Same server + formatter nvim uses (home/neovim.nix); listed here TOO
+    # for the same reason as pkgs.nil above — each editor's file declares its
+    # own tools. Enabled here because the compositor config is Lua now
+    # (home/hypr/*.lua), so Emacs edits it as often as nvim does.
+    # lsp-mode's lua client resolves the binary with `executable-find`, so
+    # being on PATH is the whole wiring — nothing to pin by hand the way
+    # tailwind's server-path is pinned in doom/config.el.
+    pkgs.lua-language-server # :lang (lua +lsp) — LuaLS
+    # apheleia maps lua-mode → `stylua -` out of the box, so :editor
+    # (format +onsave) formats lua the moment this is on PATH. It reads the
+    # nearest stylua.toml: home/nvim's (2 spaces) for the nvim config,
+    # stylua's defaults (tabs) for home/hypr/*.lua — which is exactly how
+    # those files are already formatted, so this reformats nothing.
+    pkgs.stylua # :lang lua — formatter
 
     # ── Next.js/TypeScript stack (:lang (javascript +lsp +tree-sitter)) ──
     # lsp-mode's ts-ls client for js/ts/tsx modes — no elisp config needed,
