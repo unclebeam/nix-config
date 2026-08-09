@@ -18,17 +18,22 @@
       # (against the store symlink that write would die with EROFS).
       general.import = [ "~/.config/alacritty/themes/noctalia.toml" ];
 
-      # Lilex, on trial since 2026-08-09 (was "IosevkaTerm Nerd Font Mono" —
+      # IBM Plex Mono, on trial since 2026-08-09 (was "Lilex Nerd Font Mono" —
       # revert to that one string to back it out; the package is still
       # installed either way, kept for exactly that in modules/desktop.nix).
-      # Doom is on the same family now (home/doom/config.el). The *Mono*
-      # variant, not plain "Lilex Nerd Font": the Mono patch constrains the
-      # added nerd glyphs to a single cell, which is what a terminal grid
-      # needs.
+      # Doom is on the same family now (home/doom/config.el). "BlexMono" is
+      # Nerd Fonts' patch of Plex Mono — same outlines, renamed around IBM's
+      # trademark; the patched build rather than the plain one because the
+      # prompt and TUIs need nerd glyphs in the font itself (modules/desktop.nix
+      # has the long version). The *Mono* variant, not plain "BlexMono Nerd
+      # Font": the Mono patch constrains the added glyphs to a single cell,
+      # which is what a terminal grid needs.
+      # The size carries over from Lilex unchanged — Lilex IS Plex Mono with
+      # ligatures added, so the metrics are the same font's.
       # NB: alacritty falls back silently on an unknown family — it only
       # warns on stderr — so a typo here looks like "nothing changed".
       font = {
-        normal.family = "Lilex Nerd Font Mono";
+        normal.family = "BlexMono Nerd Font Mono";
         size = 12.0;
       };
 

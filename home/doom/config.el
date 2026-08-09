@@ -24,12 +24,15 @@
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 ;;
-;; Lilex, matching alacritty's trial (home/alacritty.nix, since 2026-08-09;
-;; was "IosevkaTermNerdFont" — revert to that one string to back it out, the
-;; package stays installed via modules/desktop.nix either way). The *Mono*
-;; variant deliberately, same as the terminal: its nerd glyphs are patched to
-;; one cell wide, so nerd-icons in the modeline/dired keep the grid aligned.
-(setq doom-font (font-spec :family "Lilex Nerd Font Mono" :size 16))
+;; IBM Plex Mono, matching alacritty's trial (home/alacritty.nix, since
+;; 2026-08-09; was "Lilex Nerd Font Mono" — revert to that one string to back
+;; it out, the package stays installed via modules/desktop.nix either way).
+;; "BlexMono" is Nerd Fonts' patch of Plex Mono: same outlines, renamed around
+;; IBM's trademark. The *Mono* variant deliberately, same as the terminal: its
+;; nerd glyphs are patched to one cell wide, so nerd-icons in the
+;; modeline/dired keep the grid aligned. Size unchanged from Lilex — Lilex is
+;; Plex Mono plus ligatures, so it's the same metrics either way.
+(setq doom-font (font-spec :family "BlexMono Nerd Font Mono" :size 16))
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
