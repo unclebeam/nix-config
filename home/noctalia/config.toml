@@ -79,6 +79,47 @@ timeout = 660 # one minute after the lock, screens power down
 action = "screen_off"
 enabled = true
 
+[system.monitor]
+# Which sysfs file the bar's CPU temperature widget reads. Left unset the
+# shell auto-detects k10temp's `Tctl` on the PC — the package CONTROL value
+# the boost algorithm and the fan curves consume. We want the RAW SILICON
+# reading instead: `Tccd1`, the first chiplet's own die sensor. (Not an
+# offset being removed — there is no offset on this part: k10temp publishes
+# temp1=Tctl, temp3=Tccd1, temp4=Tccd2 and no temp2/Tdie, and the kernel
+# only creates that Tdie channel when a nonzero offset exists. `tempN` is a
+# registration index, not a core number.) home/btop.nix pins btop to the
+# same sensor so the bar and btop agree.
+#
+# Know what you are reading here. Tctl behaves like a FILTERED value riding
+# near the hottest die and decaying slowly — sampled together, Tctl slid
+# smoothly 79 -> 72 C while Tccd1 thrashed 83 -> 54 -> 74 within the same
+# few seconds — and it is not an upper bound (measured Tctl=80 vs Tccd1=83).
+# Tccd1 is the honest silicon reading but it covers only HALF the CPU: this
+# 12-core part is two chiplets, CPUs 0-5,12-17 on CCD1 and 6-11,18-23 on CCD2
+# (verified from the per-CCD L3 domains). CCD2 is NOT represented in the bar,
+# and it is not always the cooler die — measured Tccd1=54 while Tccd2=67. So
+# expect a jumpy number that can under-report the hottest chiplet. That is a
+# deliberate trade for seeing raw die temperature rather than the control
+# value; the 95 C throttle limit is defined on Tctl, so don't compare this
+# number against it.
+#
+# The path is anchored under k10temp's PCI FUNCTION, not /sys/class/hwmon.
+# hwmonN numbering is assigned in driver probe order and shifts if a kernel
+# update reorders it or an NVMe drive is added — and /sys/class/hwmon/hwmon2
+# would then still resolve, silently handing us an SSD's temp3_input.
+# Anchored here it simply CEASES TO EXIST, and noctalia warns and falls back
+# to auto-detect: fail closed, not fail wrong. Only one hwmon lives under
+# this function, so hwmon2 is the sole occupant, not a guess.
+#
+# NB this is a PC hardware fact in a file the thinkpad also loads (noctalia
+# reads every *.toml in the config dir, and home/noctalia.nix symlinks the
+# whole dir — there is no per-host slot here like home/hypr/hosts/). On the
+# Intel machine the path is absent, so expect a "configured CPU temperature
+# sensor does not exist" warning followed by its normal coretemp detection.
+# If that fallback ever doesn't happen, resolve the sensor to a fixed
+# host-agnostic path at boot instead of naming it here.
+cpu_temp_sensor_path = "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon2/temp3_input"
+
 [hooks]
 # hyprland does not watch its config files: after the hyprland template
 # rewrites ~/.config/hypr/noctalia.lua (every palette change), reload so
