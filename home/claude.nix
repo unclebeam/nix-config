@@ -19,17 +19,25 @@
   # interpolation). ~/.claude is NOT under XDG, hence home.file rather
   # than xdg.configFile.
   #
-  # settings.json is a read-only store symlink: in-app `/config` edits
-  # will fail — edit the repo file and rebuild instead. If Claude Code
-  # ever replaces the symlink with a real file, the next switch backs it
-  # up (*.backup, see flake.nix) and re-links: self-healing.
-  home.file.".claude/settings.json".source = ./claude/settings.json;
-  home.file.".claude/statusline.sh" = {
-    source = ./claude/statusline.sh;
-    # Invoked as `bash <path>` so the bit isn't required — set anyway so
-    # the script can be run directly when debugging.
-    executable = true;
-  };
+  # Both are OUT-OF-STORE symlinks into the live checkout (same
+  # ~/nix-config path contract as neovim.nix): edits — including Claude
+  # Code's own writes from /model and /config, which used to fail against
+  # the read-only store — land directly in the tracked repo file and
+  # apply on the next launch, no rebuild. On a fresh install the links
+  # dangle harmlessly until modules/nix-config.nix clones the checkout.
+  # Caveat: if Claude Code ever saves via temp-file+rename instead of
+  # writing in place, that clobbers the symlink into a plain file; the
+  # next switch backs it up (*.backup, see flake.nix) and re-links:
+  # self-healing, but the clobbered edit stays only in the backup.
+  home.file.".claude/settings.json".source =
+    config.lib.file.mkOutOfStoreSymlink
+      "${config.home.homeDirectory}/nix-config/home/claude/settings.json";
+  # No `executable = true` here: through an out-of-store symlink the bit
+  # lives on the repo file itself (kept +x in git); home-manager can't
+  # set it. Invoked as `bash <path>` anyway, so it's only for debugging.
+  home.file.".claude/statusline.sh".source =
+    config.lib.file.mkOutOfStoreSymlink
+      "${config.home.homeDirectory}/nix-config/home/claude/statusline.sh";
   # Deliberately NOT managed: ~/.claude/.credentials.json (written by
   # `claude login`) and statusline-usage-cache.json (a 60s API cache the
   # script writes). The dir itself stays a normal writable directory —
