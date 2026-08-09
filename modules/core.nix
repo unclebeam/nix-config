@@ -109,7 +109,8 @@
   # (alacritty, dolphin…) live in home/ instead; these are config-less here.
   environment.systemPackages = with pkgs; [
     fastfetch
-    btop
+    # btop moved to home/btop.nix — it grew per-user config (the CPU sensor
+    # pin, which is per-machine), and apps with per-user config live in home/.
     fzf
     ripgrep
     fd # file finder; promoted from home/neovim.nix when Doom Emacs became a second consumer

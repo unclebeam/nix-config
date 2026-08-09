@@ -15,6 +15,7 @@
     ./fish.nix      # shell + prompt
     ./direnv.nix    # per-directory envs (project dev shells via .envrc)
     ./neovim.nix    # Neovim + LazyVim (live-symlinked lua config; LSPs from Nix, no Mason)
+    ./btop.nix      # resource monitor (CPU sensor pinned to k10temp/Tctl on the PC)
     ./emacs.nix     # Doom Emacs (classic clone; Nix ships emacs-pgtk, doom config live-symlinked)
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
     ./gtk.nix       # GTK icon theme (Adwaita) — GTK apps' counterpart to qt.nix's breeze-icons
