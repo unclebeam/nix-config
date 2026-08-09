@@ -62,17 +62,18 @@ in
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
   # ── Fonts ──────────────────────────────────────────────────────────────
-  # Mono fonts (JetBrainsMono for the UI, Lilex for the terminal, IosevkaTerm
-  # for Doom, Plex Mono installed but unused), Sarabun for Thai text, Noto for
-  # everything else.
+  # Mono fonts (JetBrainsMono for the Qt UI, Lilex for the terminal AND Doom,
+  # IosevkaTerm kept as the revert target, Plex Mono installed but unused),
+  # Sarabun for Thai text, Noto for everything else.
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
-    # alacritty's terminal font (home/alacritty.nix) — on trial as of
-    # 2026-08-09, replacing IosevkaTerm there.
+    # The coding font for BOTH alacritty (home/alacritty.nix) and Doom
+    # (home/doom/config.el) — family "Lilex Nerd Font Mono" in each. On trial
+    # as of 2026-08-09, replacing IosevkaTerm in both.
     nerd-fonts.lilex
-    # Doom's font (home/doom/config.el, family "IosevkaTermNerdFont"). It used
-    # to be alacritty's too; it stays for Doom, which also means backing the
-    # Lilex trial out is a one-line edit with no package churn.
+    # No longer referenced by anything — kept ON PURPOSE as the Lilex trial's
+    # revert target, so backing it out stays a one-line edit per config with
+    # no package churn. Drop this line only once Lilex is settled.
     nerd-fonts.iosevka-term
     # "Symbols Nerd Font Mono" — the default family of emacs' nerd-icons
     # (doom-modeline/dired icons, home/emacs.nix). Without it Doom nags to run
@@ -83,7 +84,7 @@ in
     symbola
     # IBM Plex Mono — installed on purpose, used by NOTHING on purpose. It's
     # here to be available for coding whenever it gets tried; until then
-    # alacritty is on Lilex and Doom on IosevkaTerm, and no default moves.
+    # alacritty and Doom are both on Lilex, and no default moves.
     # (Definition + why it's a subset: the let block at the top of this file.)
     ibm-plex-mono
     sarabun-font # Thai text font (the fontconfig rules below prefer it)

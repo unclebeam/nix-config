@@ -20,9 +20,11 @@
 
       # Lilex, on trial since 2026-08-09 (was "IosevkaTerm Nerd Font Mono" —
       # revert to that one string to back it out; the package is still
-      # installed either way, since Doom pins it). The *Mono* variant, not
-      # plain "Lilex Nerd Font": the Mono patch constrains the added nerd
-      # glyphs to a single cell, which is what a terminal grid needs.
+      # installed either way, kept for exactly that in modules/desktop.nix).
+      # Doom is on the same family now (home/doom/config.el). The *Mono*
+      # variant, not plain "Lilex Nerd Font": the Mono patch constrains the
+      # added nerd glyphs to a single cell, which is what a terminal grid
+      # needs.
       # NB: alacritty falls back silently on an unknown family — it only
       # warns on stderr — so a typo here looks like "nothing changed".
       font = {
