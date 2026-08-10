@@ -73,13 +73,20 @@ hl.monitor({
 
 -- ── Workspace pins ──────────────────────────────────────────────────────
 --
--- 1-5 live on the Alienware (main, below), 6-9 on the Dell (above). Same
+-- 1-8 live on the Alienware (main, below), 9-10 on the Dell (above). Same
 -- `desc:` selectors as the monitor rules, deliberately — one place to fix
--- if a panel is ever replaced. `default` on 1 and 6 makes each monitor start
+-- if a panel is ever replaced. `default` on 1 and 9 makes each monitor start
 -- on its first bound workspace at login and on monitor-connect.
-for ws = 1, 5 do
+--
+-- The split ends at 10, not 9, because the binds in home/hypr/binds.lua run
+-- SUPER+1..0 => workspaces 1..10: workspace 10 used to have no rule at all,
+-- so SUPER+0 landed wherever hyprland felt like putting it. Every numbered
+-- bind now names a pinned monitor. (Leftovers are not harmless — see the
+-- thinkpad file, where unmatched pins put real monitors on workspaces 11/12,
+-- off the end of the binds entirely.)
+for ws = 1, 8 do
 	hl.workspace_rule({ workspace = tostring(ws), monitor = main, default = (ws == 1) })
 end
-for ws = 6, 9 do
-	hl.workspace_rule({ workspace = tostring(ws), monitor = secondary, default = (ws == 6) })
+for ws = 9, 10 do
+	hl.workspace_rule({ workspace = tostring(ws), monitor = secondary, default = (ws == 9) })
 end
