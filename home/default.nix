@@ -29,6 +29,7 @@
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
     ./ticktick.nix     # TickTick task manager (unfree; allowUnfree in core.nix)
     ./onlyoffice.nix   # OnlyOffice desktop editors (alongside LibreOffice in core.nix)
+    ./orca-slicer.nix  # 3D slicer file associations (the app is a flatpak — see modules/orca-slicer.nix)
     ./mangohud.nix     # in-game FPS overlay (per-game: `mangohud %command%` in Steam)
     ./google-drive.nix # ~/GoogleDrive rclone mount (one-time: `rclone config`)
     ./chrome.nix       # default browser: web-link handler + $BROWSER (policies via modules/chromium-policies.nix + onepassword.nix)

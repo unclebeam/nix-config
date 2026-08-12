@@ -93,6 +93,25 @@
       url = "git+https://github.com/WhySoBad/hyprland-preview-share-picker?submodules=1";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+
+    # nix-flatpak — declarative flatpak remotes + apps. This input exists for
+    # exactly ONE app: OrcaSlicer, which cannot be a Nix package here because
+    # the nixpkgs build aborts the moment Bambu's proprietary network plugin
+    # loads (two libstdc++ copies in one process — the whole story, with the
+    # backtrace, is in modules/orca-slicer.nix). The Flathub build is fine.
+    #
+    # It is needed because nixpkgs' own `services.flatpak` has ONLY `enable` —
+    # no way to declare a remote or an app — which would have made installing
+    # the slicer a manual step on each machine. This input extends that same
+    # `services.flatpak` namespace with `remotes`/`packages`/`update`.
+    #
+    # Pinned to a release tag rather than a moving branch: it runs privileged
+    # activation-time commands, so it should only move when we say so.
+    # If OrcaSlicer ever goes back to being a Nix package, this input and the
+    # flatpak service in modules/orca-slicer.nix are deleted together.
+    nix-flatpak = {
+      url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
+    };
   };
 
   outputs =
@@ -104,6 +123,7 @@
       disko,
       noctalia,
       noctalia-greeter,
+      nix-flatpak,
       ...
     }@inputs:
     let
@@ -143,6 +163,12 @@
             # greeter UI) is enabled by modules/noctalia-greeter.nix.
             noctalia.nixosModules.default
             noctalia-greeter.nixosModules.default
+
+            # nix-flatpak's NixOS module. Same deal again: loading it only
+            # extends `services.flatpak` with declarative remotes/packages.
+            # modules/orca-slicer.nix is the one place that enables it — and
+            # the only reason flatpak exists in this config at all.
+            nix-flatpak.nixosModules.nix-flatpak
 
             # Wire home-manager in as a NixOS module: `nixos-rebuild switch`
             # builds system AND user config in one transaction.

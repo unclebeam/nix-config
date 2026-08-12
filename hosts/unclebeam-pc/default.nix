@@ -27,6 +27,7 @@
     ../../modules/printing.nix   # CUPS + SANE, driverless network printing/scanning
     ../../modules/localsend.nix  # LAN file sharing (AirDrop-style) + firewall port
     ../../modules/syncthing.nix  # continuous file sync between machines (P2P; GUI-owned config)
+    ../../modules/orca-slicer.nix # OrcaSlicer (flatpak — the Nix build can't run) + Bambu X1C LAN discovery firewall holes
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)
     ../../modules/zsa.nix        # ZSA keyboard udev rules (flash via Oryx in browser)
   ];
