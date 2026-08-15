@@ -1,6 +1,8 @@
 # home/orca-slicer.nix — OrcaSlicer, the slicer for the Bambu Lab X1 Carbon
 # (3D model in → G-code/3MF out → sent to the printer). One file per intent:
-# everything that exists because of OrcaSlicer lives here.
+# everything that exists because of OrcaSlicer lives here. It is the OUTPUT
+# half of the pipeline; the models are authored in FreeCAD (home/freecad.nix),
+# which is why the two files split the CAD/mesh mime types between them below.
 #
 # NOTE THE APP ITSELF IS NOT HERE. OrcaSlicer is installed as a FLATPAK from
 # modules/orca-slicer.nix, because the nixpkgs build aborts on startup as soon
@@ -26,8 +28,8 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Model files get handed to the slicer — nothing else on this system claims
-  # any of these types. This list mirrors the MimeType= line of OrcaSlicer's
+  # Model files get handed to the slicer. This list mirrors the MimeType= line
+  # of OrcaSlicer's
   # own desktop entry rather than being invented: the id is
   # com.orcaslicer.OrcaSlicer.desktop, NOT `OrcaSlicer.desktop` (a wrong id
   # here fails silently — the entry just points at nothing). It survived the
@@ -35,11 +37,17 @@
   # /var/lib/flatpak/exports/share/applications, which services.flatpak puts on
   # XDG_DATA_DIRS, so the same id resolves. Merges with the directory/archive/
   # media defaults; xdg.mimeApps.enable lives in home/default.nix.
+  #
+  # What's here is MESHES only, and the missing type is deliberate: `model/step`
+  # moved to home/freecad.nix when FreeCAD arrived. STEP carries real solid
+  # geometry, so it belongs to the modeller that can edit it — the slicer would
+  # only tessellate it. Don't add it back without deleting it there; two
+  # defaultApplications entries for one type is a home-manager option conflict
+  # and fails the eval.
   xdg.mimeApps.defaultApplications = {
     "model/3mf" = "com.orcaslicer.OrcaSlicer.desktop"; # the Bambu/Orca native project format
     "application/vnd.ms-3mfdocument" = "com.orcaslicer.OrcaSlicer.desktop"; # the same thing under its older mime name
     "model/stl" = "com.orcaslicer.OrcaSlicer.desktop";
-    "model/step" = "com.orcaslicer.OrcaSlicer.desktop";
     "application/prs.wavefront-obj" = "com.orcaslicer.OrcaSlicer.desktop";
     "application/x-amf" = "com.orcaslicer.OrcaSlicer.desktop";
     # Not a file type: the URL scheme behind the "Open in OrcaSlicer" button
