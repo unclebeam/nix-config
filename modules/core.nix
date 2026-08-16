@@ -129,6 +129,15 @@
     # they get theirs from a dev shell activated by direnv (home/direnv.nix),
     # which shadows this one inside the project dir.
     nodejs_latest
+    # The Python half of that same story — and the reason there is no `python3`
+    # on this list. uv manages interpreters itself (`uv venv --python 3.12`
+    # downloads one on first use) into a per-project .venv, which is what lets
+    # Jupyter notebooks pip-install their own dependencies mid-lesson with no
+    # rebuild — see home/vscode.nix. Those downloaded interpreters are ordinary
+    # FHS binaries; they run only because modules/nix-ld.nix is enabled on both
+    # hosts. A global python3 here would just be a second interpreter for a
+    # notebook kernel to pick by mistake.
+    uv
     # Electron (native Wayland via NIXOS_OZONE_WL) and unfree.
     obsidian # markdown notes — vaults live in $HOME, nothing for Nix to configure
     # Also Electron + unfree, same Wayland story as obsidian; fast-moving,
