@@ -20,7 +20,7 @@
 
   # Register Chrome as the default browser: clicking a link anywhere
   # (Slack, Obsidian, terminal xdg-open) opens Chrome. Merges with the
-  # dolphin/vlc/ark defaults (xdg.mimeApps is enabled in home/default.nix;
+  # nautilus/vlc/file-roller defaults (xdg.mimeApps is enabled in home/default.nix;
   # don't re-set enable here). Chrome's desktop id is `google-chrome.desktop`
   # — NOT `com.google.Chrome.desktop`, the reverse-DNS alias shipped
   # alongside it (same trap as Brave's com.brave.Browser.desktop).

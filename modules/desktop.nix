@@ -57,12 +57,13 @@ in
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   # xdg-desktop-portal is how sandbox-ish desktop APIs work on Wayland:
-  # screen sharing, screenshots, file pickers. Since the 2026-07 KDE
-  # migration nothing routes to the GTK portal directly — dialogs go to the
-  # KDE portal, capture to the GNOME one (both via modules/niri.nix's
-  # routing) — it's only the trailing fallback in `default=kde;gtk` for
-  # interfaces neither implements. Kept here so this file stays a working
-  # baseline for any compositor.
+  # screen sharing, screenshots, file pickers. Since the 2026-08 Nautilus
+  # revert the GTK portal is a working member again, not just a fallback:
+  # upstream programs.niri routes Access and Notification straight to it,
+  # and it's the trailing entry in `default=gnome;gtk` for anything the
+  # GNOME portal doesn't implement (capture and file dialogs land on
+  # gnome — see modules/niri.nix). Kept here, not in niri.nix, so this
+  # file stays a working baseline for any compositor.
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
   # ── Fonts ──────────────────────────────────────────────────────────────

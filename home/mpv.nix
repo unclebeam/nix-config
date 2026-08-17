@@ -36,7 +36,7 @@
     };
   };
 
-  # Make double-clicking a video in Dolphin open mpv. Merges with the other
+  # Make double-clicking a video in Nautilus open mpv. Merges with the other
   # defaultApplications sets (xdg.mimeApps is enabled in home/default.nix;
   # don't re-set enable here). Video only — audio stays with VLC.
   xdg.mimeApps.defaultApplications = {

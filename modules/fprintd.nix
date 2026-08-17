@@ -20,7 +20,7 @@
   # pam_kwallet (wired on the `greetd` service in modules/kwallet.nix) can
   # only derive the wallet key from the password typed at login. A
   # fingerprint login would leave the wallet locked and every secrets
-  # consumer (Dolphin's saved SMB shares, browser Safe Storage) prompting
+  # consumer (Nautilus/gvfs's saved SMB credentials, browser Safe Storage) prompting
   # separately — so the greeter stays password-only forever, and
   # fingerprint is for the surfaces where the wallet is already open:
   # sudo and polkit. `login` also stays password-only because the DMS

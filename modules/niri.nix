@@ -28,14 +28,16 @@
   #    lists must actually boot.
   #  * portals per upstream recommendation: adds xdg-desktop-portal-gnome
   #    and writes a niri-portals.conf routing default→gnome,gtk /
-  #    Secret→gnome-keyring. We REROUTE most of that below: every dialog-ish
-  #    interface goes to the KDE portal, and only the capture family stays
-  #    GNOME — it has to, because xdg-desktop-portal-gnome is the ONLY
-  #    screencast backend niri supports (niri implements
-  #    org.gnome.Mutter.ScreenCast; xdp-kde's capture code speaks KWin's
-  #    private zkde_screencast protocol instead). Portal routing is
-  #    per-desktop (picked by XDG_CURRENT_DESKTOP at login), so it composes
-  #    with the fallback GTK portal in desktop.nix. Unlike the hyprland/xdph
+  #    Access→gtk / Notification→gtk / Secret→gnome-keyring. Since the
+  #    2026-08 Dolphin→Nautilus revert we KEEP that routing (the KDE portal
+  #    and its mkForce'd reroutes left with Dolphin) — the only overrides
+  #    are Secret→kwallet in modules/kwallet.nix and the capture pins
+  #    below. xdg-desktop-portal-gnome is also the ONLY screencast backend
+  #    niri supports (niri implements org.gnome.Mutter.ScreenCast;
+  #    xdp-kde's capture code speaks KWin's private zkde_screencast
+  #    protocol instead). Portal routing is per-desktop (picked by
+  #    XDG_CURRENT_DESKTOP at login), so it composes with the fallback GTK
+  #    portal in desktop.nix. Unlike the hyprland/xdph
   #    pair there is NO version-coupling hazard here: the gnome portal talks
   #    to niri over a public D-Bus API, not the compositor's own protocol
   #    versions — which is also why niri needs no unstable pin (26.05's
@@ -53,42 +55,43 @@
   # Window-manager *configuration* comes from home-manager.
   programs.niri.enable = true;
 
-  # The nixpkgs niri module defaults useNautilus=true: it puts the full
-  # Nautilus package on the session bus so xdg-desktop-portal-gnome can use
-  # Nautilus's dialog as the FileChooser. Two problems since the file manager
-  # went to Dolphin (2026-07): every app's open/save dialog would secretly
-  # be Nautilus, and Nautilus's D-Bus dir also claims
-  # org.freedesktop.FileManager1 — so "reveal in folder" (1Password etc.)
-  # would open Nautilus, not Dolphin. false = keeps Nautilus out of the
-  # closure and Dolphin the only FileManager1 provider. (The FileChooser→gtk
-  # route it writes is overridden to kde just below.)
-  programs.niri.useNautilus = false;
+  # Upstream defaults useNautilus=true; pinned explicitly because it IS the
+  # file-dialog story now (belt-and-braces like defaultSession below —
+  # guards against an upstream default flip). It puts Nautilus on the
+  # session bus (D-Bus activation, not systemPackages — the app itself is
+  # installed by home/nautilus.nix) so xdg-desktop-portal-gnome serves
+  # every app's open/save dialog with Nautilus's picker, and Nautilus's
+  # D-Bus dir claims org.freedesktop.FileManager1 — "reveal in folder"
+  # (1Password, Chrome downloads) opens Nautilus. The Dolphin era set this
+  # false to keep Nautilus off the bus; that inversion left with Dolphin
+  # (2026-08).
+  programs.niri.useNautilus = true;
 
-  # ── Portal routing: KDE for dialogs, GNOME only for capture ─────────────
-  # The KDE portal serves everything interactive: file dialogs (KIO,
-  # matching Dolphin), notifications (forwarded to org.freedesktop.
-  # Notifications, i.e. the DMS shell), Access prompts, and Settings —
-  # apps read the color-scheme preference from kdeglobals, not gsettings.
-  # The niri module hard-sets its keys as plain coerced strings, so
-  # overriding the SAME keys needs mkForce (a second plain definition is an
-  # eval conflict) — unlike programs.hyprland, which wrote no portal-config
-  # keys at all. The gnome pins are NEW keys — today they fall through
-  # default=gnome — and merge without force. They exist because the whole
-  # capture family in xdg-desktop-portal-kde is hard-wired to KWin's
-  # zkde_screencast: routed to kde they wouldn't just be untested, they'd
-  # be certainly broken. GNOME capture is the permanent exception to the
-  # KDE plumbing — do not "finish" the migration by flipping these.
+  # ── Portal routing: upstream's gnome/gtk, capture pinned gnome ──────────
+  # Since the 2026-08 Nautilus revert we no longer fight the niri module's
+  # routing. What's in effect: default=gnome;gtk, Access/Notification→gtk
+  # (the gtk portal forwards notifications to org.freedesktop.
+  # Notifications, i.e. the DMS shell), FileChooser deliberately UNWRITTEN
+  # by upstream when useNautilus is on — it falls through default to
+  # gnome, whose dialog is Nautilus's picker — and Settings falls through
+  # to gnome too, so apps read the color-scheme preference from gsettings,
+  # which DMS's "Apply GTK Themes" toggle writes. The KDE portal package
+  # and its mkForce'd routes are GONE (they existed for Dolphin/KIO
+  # dialogs); the one KDE route that stays is Secret→kwallet in
+  # modules/kwallet.nix (one file per intent — the keyring did not
+  # migrate, and that key still needs mkForce because the niri module
+  # hard-sets Secret as a plain coerced string).
+  # The three pins below are REDUNDANT today (upstream never writes these
+  # keys, and they'd fall through default=gnome anyway) and kept on
+  # purpose as the executable form of a hard rule: xdg-desktop-portal-kde's
+  # capture code is hard-wired to KWin's private zkde_screencast and can
+  # NEVER work here — xdg-desktop-portal-gnome is niri's only screencast
+  # backend (org.gnome.Mutter.ScreenCast). If routing is ever touched
+  # again, the capture family stays gnome.
   # GlobalShortcuts is deliberately UNROUTED: xdph's implementation left
-  # with hyprland and neither the gnome nor kde impl works here; the
-  # interface simply isn't served, which no current consumer misses.
-  # (Secret→kwallet lives in modules/kwallet.nix: one file per intent, so
-  # deleting the keyring module deletes its route.)
-  xdg.portal.extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ];
+  # with hyprland and no working impl exists here; the interface simply
+  # isn't served, which no current consumer misses.
   xdg.portal.config.niri = {
-    default = lib.mkForce [ "kde" "gtk" ];
-    "org.freedesktop.impl.portal.Access" = lib.mkForce "kde";
-    "org.freedesktop.impl.portal.FileChooser" = lib.mkForce "kde";
-    "org.freedesktop.impl.portal.Notification" = lib.mkForce "kde";
     "org.freedesktop.impl.portal.ScreenCast" = "gnome";
     "org.freedesktop.impl.portal.Screenshot" = "gnome";
     "org.freedesktop.impl.portal.RemoteDesktop" = "gnome";

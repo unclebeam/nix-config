@@ -69,7 +69,7 @@
 {
   home.packages = [ pkgs-unstable.vscode-fhs ];
 
-  # Double-clicking a notebook in Dolphin should land in VS Code. xdg.mimeApps
+  # Double-clicking a notebook in Nautilus should land in VS Code. xdg.mimeApps
   # is enabled in home/default.nix — don't re-set enable here (same note as
   # vlc.nix / orca-slicer.nix). Two files claiming one mime type is a
   # home-manager option conflict and fails the eval, so this type lives here
@@ -82,7 +82,7 @@
   # Needed ON TOP of the default, unlike every other app in this repo:
   # code.desktop ships no MimeType= line of its own (only the separate
   # code-url-handler.desktop declares anything), so without an explicit
-  # [Added Associations] entry Dolphin's "Open With" menu never offers VS
+  # [Added Associations] entry Nautilus's "Open With" list never offers VS
   # Code for a notebook — the double-click default would work while the
   # right-click menu looked broken.
   xdg.mimeApps.associations.added."application/x-ipynb+json" = "code.desktop";

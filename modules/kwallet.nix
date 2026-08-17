@@ -5,8 +5,8 @@
 # see modules/niri.nix).
 # ksecretd
 # (the Secret Service daemon split out of kwalletd in Plasma 6) becomes the
-# owner of org.freedesktop.secrets — the store behind Dolphin's saved share
-# passwords, browser Safe Storage keys, and the Secret portal.
+# owner of org.freedesktop.secrets — the store behind Nautilus/gvfs's saved
+# share credentials, browser Safe Storage keys, and the Secret portal.
 #
 # The whole login chain, since no single upstream doc spells it out:
 #   1. pam_kwallet (below) derives a key from the password typed at login

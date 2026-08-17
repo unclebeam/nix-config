@@ -106,7 +106,7 @@
 
   # ── Baseline packages ──────────────────────────────────────────────────
   # System-wide CLI + the browser. Desktop apps with per-user *config*
-  # (alacritty, dolphin…) live in home/ instead; these are config-less here.
+  # (alacritty, nautilus…) live in home/ instead; these are config-less here.
   environment.systemPackages = with pkgs; [
     fastfetch
     # btop moved to home/btop.nix — it grew per-user config (the CPU sensor

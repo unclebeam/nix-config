@@ -3,7 +3,7 @@
 #
 #  * xdg.userDirs for the standard folders: besides `mkdir`ing them on every
 #    activation (createDirectories), it writes ~/.config/user-dirs.dirs, which
-#    is what file dialogs (the KDE portal's FileChooser), browsers' download
+#    is what file dialogs (the portal FileChooser — Nautilus's picker), browsers' download
 #    prompts, and `xdg-user-dir` actually consult — so declaring the dir HERE
 #    also points every app at it.
 #  * a plain activation script for the two non-XDG dirs (~/org, ~/.ssh),

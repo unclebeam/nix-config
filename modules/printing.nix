@@ -3,7 +3,7 @@
 # printers announce themselves over mDNS and speak IPP Everywhere, so CUPS
 # needs no vendor driver — it creates a temporary queue the moment a print
 # dialog enumerates destinations. The discovery layer this rides on (avahi +
-# nssmdns4, UDP 5353 open) is already enabled in modules/dolphin.nix.
+# nssmdns4, UDP 5353 open) is already enabled in modules/nautilus.nix.
 # Removing printing = delete this file + its import line in both hosts.
 { config, lib, pkgs, ... }:
 
@@ -12,7 +12,7 @@
   services.printing.enable = true;
 
   # cups-browsed would default to ON here — its default is
-  # config.services.avahi.enable, and dolphin.nix enables avahi. All it would
+  # config.services.avahi.enable, and nautilus.nix enables avahi. All it would
   # add is a permanent local queue for every printer it ever sees (unnecessary
   # with driverless temporary queues), and it was the vector for
   # CVE-2024-47176: an unauthenticated UDP 631 listener that accepted printer
@@ -36,9 +36,10 @@
   # lists merge across modules (same pattern as hosts/unclebeam-pc's "i2c").
   users.users.unclebeam.extraGroups = [ "scanner" "lp" ];
 
-  # Scanning GUI — the KDE app, matching the Dolphin/Ark app layer. It is
-  # config-less, so it lives here with the rest of the printing/scanning
-  # intent instead of a home/ file (one file per intent; nothing user-level
-  # to split out).
-  environment.systemPackages = [ pkgs.kdePackages.skanlite ];
+  # Scanning GUI — the GNOME app, matching the Nautilus/File Roller app
+  # layer (it replaced Skanlite with the 2026-08 Dolphin→Nautilus
+  # migration). It is config-less, so it lives here with the rest of the
+  # printing/scanning intent instead of a home/ file (one file per intent;
+  # nothing user-level to split out).
+  environment.systemPackages = [ pkgs.simple-scan ];
 }

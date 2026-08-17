@@ -23,7 +23,7 @@
     ../../modules/onepassword.nix # 1Password app + op CLI + browser extension (Chrome + Brave)
     ../../modules/chromium-policies.nix # managed policy for ALL Chromium-family browsers (Chrome + Brave): Google as default search
     ../../modules/ddc.nix        # DDC/CI brightness for the two external monitors (i2c + ddcutil)
-    ../../modules/dolphin.nix    # avahi discovery + udisks2 + ntfs/exfat (system half of Dolphin)
+    ../../modules/nautilus.nix   # gvfs + avahi discovery + udisks2 + ntfs/exfat (system half of Nautilus)
     ../../modules/printing.nix   # CUPS + SANE, driverless network printing/scanning
     ../../modules/localsend.nix  # LAN file sharing (AirDrop-style) + firewall port
     ../../modules/syncthing.nix  # continuous file sync between machines (P2P; GUI-owned config)

@@ -1,7 +1,8 @@
 # home/kwallet.nix — kwalletrc: the USER half of the session keyring (the
 # daemon, PAM unlock, and portal wiring are system-side in
-# modules/kwallet.nix). History: this file's predecessor lived in
-# home/dolphin.nix as a BRIDGE config ([KSecretD] Enabled=false +
+# modules/kwallet.nix). History: this file's predecessor lived in the
+# Dolphin-era home/dolphin.nix (since replaced by home/nautilus.nix — the
+# keyring stayed put) as a BRIDGE config ([KSecretD] Enabled=false +
 # MigrateTo3rdParty=true) that forwarded KWallet API calls into
 # gnome-keyring. The 2026-07 KDE-plumbing migration inverted it: ksecretd
 # now IS the org.freedesktop.secrets store, so the bridge settings are gone

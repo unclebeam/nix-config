@@ -20,10 +20,10 @@
     ./vscode.nix    # VS Code (FHS build) for .ipynb notebooks; per-project venvs via uv (core.nix)
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
     ./gtk.nix       # GTK icon theme (Adwaita) — GTK apps' counterpart to qt.nix's breeze-icons
-    ./dolphin.nix      # file manager (KIO workers) + xdg default for dirs
+    ./nautilus.nix     # file manager (gvfs-backed, system half in modules/nautilus.nix) + xdg default for dirs
     ./kwallet.nix      # session keyring user half: kwalletrc (ksecretd on, no first-run wizard)
-    ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
-    ./qt.nix           # Qt theming via qt6ct + DMS's KColorScheme (Dolphin/Ark/VLC)
+    ./file-roller.nix  # archive manager (.zip/.7z/.rar) + CLI backends
+    ./qt.nix           # Qt theming via qt6ct + DMS's KColorScheme (VLC/FreeCAD)
     ./vlc.nix          # VLC media player + default audio handler
     ./mpv.nix          # mpv: video player + default video handler (HDR parked — niri has no CM yet)
     ./obs.nix          # OBS Studio (screencast via the GNOME portal — niri's backend; audio via PipeWire)
@@ -51,11 +51,11 @@
   programs.home-manager.enable = true;
 
   # The xdg default-application registry (~/.config/mimeapps.list). Enabled
-  # HERE, not in any app's file: dolphin (inode/directory), ark (archives),
-  # vlc (audio), mpv (video), and chrome (web links — the default browser!)
-  # all merge their defaultApplications into it. It used to live in
-  # dolphin.nix, which meant deleting the file manager would have silently
-  # killed every other app's mime defaults too.
+  # HERE, not in any app's file: nautilus (inode/directory), file-roller
+  # (archives), vlc (audio), mpv (video), and chrome (web links — the
+  # default browser!) all merge their defaultApplications into it. It used
+  # to live in the file manager's own file, which meant deleting the file
+  # manager would have silently killed every other app's mime defaults too.
   xdg.mimeApps.enable = true;
 
   programs.git = {

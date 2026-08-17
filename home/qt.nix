@@ -1,16 +1,18 @@
 # home/qt.nix — Qt theming, so Qt apps don't draw the bare Fusion default
 # and instead follow DMS's wallpaper-derived colors. Promoted to its own
-# file because it has three consumers (the promotion rule in CLAUDE.md):
-# Dolphin and Ark (Qt6/KF6) and VLC (Qt5). Not tied to any one app —
-# remove it and the apps still run, just visibly unthemed.
+# file because it has two consumers (the promotion rule in CLAUDE.md):
+# FreeCAD (Qt6) and VLC (Qt5). Not tied to any one app — remove it and the
+# apps still run, just visibly unthemed. (The KF6 consumers — Dolphin,
+# Ark — left with the 2026-08 Nautilus migration; what stayed KDE here is
+# plumbing, not apps: qt6ct-kde and breeze-icons, see below.)
 #
 # How the colors flow: DMS's "Apply Qt Themes" toggle (Settings GUI — a
 # first-login step, default OFF) renders a KColorScheme to
 # ~/.local/share/color-schemes/DankMatugen.colors on every palette change
-# and merges it into ~/.config/kdeglobals — KF6 apps (Dolphin, Ark)
-# recolor live from kdeglobals. The qt6ct/qt5ct seed below points
-# color_scheme_path at the same .colors file for everything that renders
-# through qt6ct instead (plain Qt6 apps, and VLC via qt5ct);
+# (it also merges it into ~/.config/kdeglobals — a no-op now with no KF6
+# app left to read it; harmless residue). The qt6ct/qt5ct seed below
+# points color_scheme_path at that .colors file for everything that
+# renders through qt6ct (plain Qt6 apps like FreeCAD, and VLC via qt5ct);
 # QT_QPA_PLATFORMTHEME=qt6ct is what routes them there. The .colors file
 # may not exist yet on a fresh install (first render needs the toggle plus
 # a wallpaper) — qt6ct just uses defaults until it appears.
@@ -39,18 +41,21 @@ let
 in
 {
   home.packages = [
-    # qt6ct, the KDE-flavored build: KF6 apps (Dolphin, Ark) resolve their
-    # palette through KColorScheme, which plain qt6ct can't feed — this
-    # variant carries the KDE integration so the generated scheme actually
-    # reaches them. (In nixpkgs the qt6ct-kde fork IS kdePackages.qt6ct;
-    # there is no separate top-level attr.)
+    # qt6ct, the KDE-flavored build — kept AFTER the KF6 apps left, and not
+    # by inertia: DMS's generated scheme is a KColorScheme (.colors) file,
+    # a format plain qt6ct's color_scheme_path cannot parse — only this
+    # fork's KDE integration reads it. Swapping in plain qt6ct would
+    # silently untheme VLC and FreeCAD. (In nixpkgs the qt6ct-kde fork IS
+    # kdePackages.qt6ct; there is no separate top-level attr.)
     pkgs.kdePackages.qt6ct
     # VLC is Qt5; qt5ct reads the same generated colors for it.
     pkgs.libsForQt5.qt5ct
-    # KF6 apps hardcode "breeze" as their default icon-theme name; without
-    # the theme actually installed, Dolphin/Ark render missing-icon
-    # placeholders on every toolbar button. (Only the ICONS survive the
-    # Breeze exit — the widget style is qt6ct's now.)
+    # The seed below pins icon_theme=breeze, and FreeCAD's Qt toolbars need
+    # a complete icon theme behind that name — without the package they
+    # render missing-icon placeholders. (Only the ICONS remain of Breeze —
+    # the widget style is qt6ct's Fusion. Switching Qt apps to Adwaita
+    # icons would mean rewriting the seed + its repair branch for untested
+    # FreeCAD coverage; not worth it.)
     pkgs.kdePackages.breeze-icons
   ];
 
