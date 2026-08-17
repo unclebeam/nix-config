@@ -122,12 +122,12 @@ hl.monitor({
 -- matched nothing and landed on workspaces 11 and 12, off the end of the
 -- SUPER+1..0 binds entirely.
 --
--- Undocked (laptop alone) is deliberately NOT special-cased: workspace 1
--- belongs to the absent MSI, so hyprland reassigns the orphans and eDP-1 comes
--- up on 9. Every number still works, they just all land on the one live
--- output. Not worth extra machinery — a second `default = true` for workspace
--- 1 wouldn't help anyway, since the FIRST matching rule wins and the second is
--- silently dropped.
+-- Undocked (laptop alone) can NOT be fixed by these rules: workspace 1 belongs
+-- to the absent MSI, so hyprland reassigns the orphans and eDP-1 comes up on 9
+-- — and a second `default = true` for workspace 1 wouldn't help, since the
+-- FIRST matching rule wins and the second is silently dropped. Every number
+-- still works undocked, they just all land on the one live output; landing on
+-- 1 instead of 9 is handled by the focus hook below, not here.
 for ws = 1, 5 do
 	hl.workspace_rule({ workspace = tostring(ws), monitor = main, default = (ws == 1) })
 end
@@ -137,3 +137,26 @@ end
 for ws = 9, 10 do
 	hl.workspace_rule({ workspace = tostring(ws), monitor = internal, default = (ws == 9) })
 end
+
+-- ── Undocked: land on workspace 1 ───────────────────────────────────────
+--
+-- The pins above are right docked and wrong laptop-alone: eDP-1's default is
+-- workspace 9, so a solo login opens on 9. The rules themselves can't express
+-- "1 here, but only when nothing else is connected" (first-rule-wins, see the
+-- note above), so FOCUS is steered instead — workspace 1's rule names the
+-- absent MSI, and dispatching it with nothing else live creates it on the only
+-- output there is. The empty 9 hyprland already opened self-destructs.
+--
+-- The guard is the monitor COUNT, not a `desc:` match: that's what makes this
+-- a no-op the instant anything is docked, whichever panel it happens to be —
+-- and why docking needs no hook of its own (with >1 monitor the test is false).
+local function solo_lands_on_ws1()
+	if #hl.get_monitors() == 1 then
+		hl.dispatch(hl.dsp.focus({ workspace = "1" }))
+	end
+end
+
+-- Two entry points into the same state: booting already undocked, and the dock
+-- going away underneath a running session.
+hl.on("hyprland.start", solo_lands_on_ws1)
+hl.on("monitor.removed", solo_lands_on_ws1)
