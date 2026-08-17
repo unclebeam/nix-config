@@ -38,8 +38,26 @@
   home.file.".claude/statusline.sh".source =
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nix-config/home/claude/statusline.sh";
+  # Skills — the /gridfinity calculator, and the pattern for any future one.
+  # This links the skill DIRECTORY, not the files inside it, and that is the
+  # whole point: `gridfinity/SKILL.md` is a thin router that reads one file
+  # out of `references/` per calculation, so adding a calculation is a new
+  # file in the checkout and nothing here — no rebuild, live on the next
+  # `claude` launch (skills are read at startup, so an already-running
+  # session won't see an edit). Linking each file instead would cost a
+  # rebuild per file. Same out-of-store rule and same hardcoded ~/nix-config
+  # base path as the two files above; the tree is plain markdown so it
+  # hand-copies to the Mac's ~/.claude/skills unchanged.
+  #
+  # ~/.claude/skills itself stays a normal writable directory — home-manager
+  # only drops this one symlink into it, so an untracked skill can sit
+  # beside it.
+  home.file.".claude/skills/gridfinity".source =
+    config.lib.file.mkOutOfStoreSymlink
+      "${config.home.homeDirectory}/nix-config/home/claude/skills/gridfinity";
+
   # Deliberately NOT managed: ~/.claude/.credentials.json (written by
   # `claude login`) and statusline-usage-cache.json (a 60s API cache the
   # script writes). The dir itself stays a normal writable directory —
-  # home-manager only symlinks the two files above into it.
+  # home-manager only symlinks the files above into it.
 }
