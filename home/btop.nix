@@ -56,7 +56,7 @@
 
 let
   # WHICH machine this is, decided at EVAL time — same trick as
-  # home/hyprland.nix uses to pick the per-host monitor file. `osConfig` is
+  # home/niri.nix uses to pick the per-host monitor file. `osConfig` is
   # the NixOS config, reachable from every home module because home-manager
   # is wired in as a NixOS module.
   hostName = osConfig.networking.hostName;

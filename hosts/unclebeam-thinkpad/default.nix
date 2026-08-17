@@ -9,7 +9,7 @@
     ../../modules/core.nix
     ../../modules/nix-config.nix # clone ~/nix-config on first boot (out-of-store symlink target)
     ../../modules/desktop.nix    # fonts, Wayland env, GTK portal fallback
-    ../../modules/hyprland.nix   # hyprland session (re-trial vs niri, 2026-07; full replacement on this branch)
+    ../../modules/niri.nix       # niri session (back for good 2026-08; hyprland re-trial ended — full replacement)
     ../../modules/noctalia.nix   # Noctalia shell, system half (service + cachix + fonts; config in home/noctalia.nix)
     ../../modules/noctalia-greeter.nix # Noctalia login greeter on greetd (took over from DMS greeter 2026-07)
     ../../modules/kwallet.nix    # session keyring: ksecretd + pam_kwallet unlock (replaced gnome-keyring 2026-07)

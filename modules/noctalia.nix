@@ -17,20 +17,23 @@
   # Noctalia's NixOS module (wired into mkHost from the noctalia flake
   # input). Enabling it installs the `noctalia` binary into
   # environment.systemPackages; interaction from keybinds/scripts is
-  # `noctalia msg <command>` (see home/hypr/binds.lua).
+  # `noctalia msg <command>` (see home/niri/config.kdl's binds). v5 has a
+  # first-class niri backend — workspaces/windows/keyboard-layout over the
+  # NIRI_SOCKET IPC, plus niri-only extras (overview backdrop,
+  # type-to-launch) the hyprland era never had.
   programs.noctalia = {
     enable = true;
 
     # The ONE noctalia.service — a system-defined user unit,
     # Restart=on-failure (the safety net while v5 is Beta), restarted on
-    # every switch. NEVER also spawn `noctalia` from hyprland.lua — same
+    # every switch. NEVER also spawn `noctalia` from config.kdl — same
     # never-run-twice rule as dms.service before it.
     systemd.enable = true;
-    # Scope to the hyprland session (home/hyprland.nix's
-    # hyprland-session.target), not the module's graphical-session.target
-    # default — same reasoning as swayidle → dms before it: the shell is
-    # this session's policy, a future second session brings its own.
-    systemd.target = "hyprland-session.target";
+    # Scope to the niri session (home/niri.nix's niri-session.target), not
+    # the module's graphical-session.target default — same reasoning as
+    # swayidle → dms before it: the shell is this session's policy, a
+    # future second session brings its own.
+    systemd.target = "niri-session.target";
   };
 
   # The binary cache for the flake input. Without it every bump of the
@@ -84,7 +87,7 @@
   # modules/fprintd.nix keeps `login` password-only. Never declare a
   # security.pam.services entry for the shell.
   #
-  # Polkit note: security.polkit (the engine) comes from programs.hyprland;
+  # Polkit note: security.polkit (the engine) comes from programs.niri;
   # the AGENT (the prompt UI) is built into the shell but OFF by default
   # upstream — home/noctalia/config.toml switches it on (polkit_agent).
   # No other polkit agent may ever join the session bus.

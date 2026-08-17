@@ -3,11 +3,12 @@
 # Removing OBS = delete this file + its import line in default.nix.
 #
 # No system-side (modules/) half needed: screen capture goes through
-# xdg-desktop-portal-hyprland (pulled in by programs.hyprland.enable in
-# modules/hyprland.nix — hyprland's native wlr-screencopy backend; the
-# ScreenCast/Screenshot routing lives there too), and audio
-# capture rides the PipeWire stack from modules/audio.nix. Both are already
-# there for other reasons, so OBS is a plain user package.
+# xdg-desktop-portal-gnome (pulled in by programs.niri.enable in
+# modules/niri.nix — niri implements org.gnome.Mutter.ScreenCast and the
+# GNOME portal is its only capture backend; the ScreenCast/Screenshot
+# routing lives there too), and audio capture rides the PipeWire stack
+# from modules/audio.nix. Both are already there for other reasons, so OBS
+# is a plain user package.
 #
 # Deliberately NOT included until actually needed:
 #   - virtual camera: needs the v4l2loopback kernel module (a system-level

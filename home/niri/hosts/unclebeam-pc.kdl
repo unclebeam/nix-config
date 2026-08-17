@@ -1,0 +1,71 @@
+// home/niri/hosts/unclebeam-pc.kdl — THIS machine's displays.
+//
+// One file per host, and Nix picks which one gets symlinked to
+// ~/.config/niri/host.kdl (home/niri.nix, keyed on
+// osConfig.networking.hostName). So config.kdl carries NO hostname branch:
+// the other machine's outputs are never even loaded here.
+//
+// Everything below is a HARDWARE FACT — with one caveat this first round:
+// resolutions/scales/positions are measured (carried over from the hyprland
+// host file, which read them off this machine), but the output NAME strings
+// are DERIVED from hyprland's EDID descriptions, because these panels have
+// never run under niri. niri matches the FULL "Make Model Serial" string —
+// no prefix matching (unlike hyprland's desc:) — and a string that's even
+// one character off silently never matches, leaving the panel on
+// auto-config with no error. So on the FIRST niri login run
+// `niri msg outputs` and correct the two names below verbatim if they
+// differ; the file is an out-of-store symlink and niri live-reloads on
+// save, so the fix is one edit, no rebuild.
+//
+// Physical layout: the Dell sits stacked directly ON TOP of the Alienware,
+// both landscape.
+//
+//   ┌────────────────┐  Dell S2725QS   2560x1440 logical @ 0,-1440
+//   └────────────────┘
+//   ┌────────────────┐  Alienware AW2725Q  2560x1440 logical @ 0,0  (main)
+//   └────────────────┘
+//
+// `position` is in LOGICAL pixels, i.e. AFTER scale — same rule as
+// hyprland. Both panels are 4K (3840x2160) at scale 1.5 => 2560x1440
+// logical each, so the top monitor goes at y = -1440, not -2160; using the
+// physical height is the classic mistake that leaves a dead 720 px gap the
+// cursor has to cross.
+//
+// Refresh rates are deliberately OMITTED from the modes: given a bare
+// resolution niri picks the HIGHEST rate it offers (240 and 120 here) —
+// the opposite of hyprland's auto-config, which fell back to the EDID's
+// first (60 Hz) mode. Omitting also dodges niri's exact-modeline matching,
+// where "@239.99" vs "@239.988" is a silent mismatch.
+
+// Main: Alienware AW2725Q, 27" 4K QD-OLED. 4K240 needs DP 2.1 + DSC — fine
+// on this box's RX 9070 XT. on-demand VRR is the hyprland vrr=2
+// equivalent: adaptive sync only engages while a window matching the
+// variable-refresh-rate window-rule below is visible — games get it, the
+// desktop doesn't, so the OLED can't flicker on static content.
+output "Dell Inc. AW2725Q 4KTF174" {
+    mode "3840x2160"
+    scale 1.5
+    position x=0 y=0
+    variable-refresh-rate on-demand=true
+    // Where a fresh login lands (replaces the hyprland workspace-1 pin —
+    // niri's workspaces are dynamic and per-monitor, nothing else to pin).
+    focus-at-startup
+}
+
+// Above: Dell S2725QS, 27" 4K IPS, 120 Hz max. No VRR: it's the
+// secondary/reference screen, nothing runs fullscreen on it.
+output "Dell Inc. DELL S2725QS 3V7S364" {
+    mode "3840x2160"
+    scale 1.5
+    position x=0 y=-1440
+}
+
+// The on-demand VRR trigger for the Alienware: Steam games (every Proton/
+// native title gets an app-id of steam_app_<appid> under
+// xwayland-satellite) and mpv. Windows matching this rule request the
+// variable refresh rate while visible on an on-demand output.
+window-rule {
+    match app-id=r#"^steam_app_"#
+    match app-id=r#"^mpv$"#
+    variable-refresh-rate true
+}

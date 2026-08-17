@@ -145,9 +145,10 @@
     pkgs-unstable.slack
     # Discord via Vesktop: the stock discord client's screenshare can't capture
     # on Wayland, while Vesktop captures through the xdg-desktop-portal
-    # ScreenCast path (routed to xdg-desktop-portal-hyprland here — see
-    # modules/hyprland.nix; the restore-token tuning in hypr/xdph.conf keeps
-    # re-shares picker-free).
+    # ScreenCast path (routed to xdg-desktop-portal-gnome here — see
+    # modules/niri.nix. One regression vs the hyprland era, accepted: the
+    # xdph restore-token tuning is gone, so every re-share opens the picker
+    # again).
     vesktop
     libreoffice
     # DBeaver Community Edition. nixpkgs only carries the upstream binary

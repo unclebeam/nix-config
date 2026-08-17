@@ -6,7 +6,7 @@
 {
   imports = [
     ./directories.nix # home skeleton: XDG dirs (Documents/Downloads/Pictures) + ~/org + ~/.ssh
-    ./hyprland.nix  # hyprland glue: symlinks hypr/hyprland.lua + session target
+    ./niri.nix      # niri glue: symlinks niri/config.kdl + host.kdl + session target
     ./noctalia.nix  # Noctalia user glue: adw-gtk3 + symlinked config dir (the shell itself: modules/noctalia.nix)
     ./wallpapers.nix # tracked wallpaper images -> ~/Pictures/Wallpapers (picked via SUPER+Y)
     ./satty.nix     # screenshot annotator (fed by noctalia's screenshot pipe)
@@ -25,8 +25,8 @@
     ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
     ./qt.nix           # Qt theming via qt6ct + noctalia's KColorScheme (Dolphin/Ark/VLC)
     ./vlc.nix          # VLC media player + default audio handler
-    ./mpv.nix          # mpv: HDR-capable video player + default video handler
-    ./obs.nix          # OBS Studio (screencast via the hyprland portal, audio via PipeWire)
+    ./mpv.nix          # mpv: video player + default video handler (HDR parked — niri has no CM yet)
+    ./obs.nix          # OBS Studio (screencast via the GNOME portal — niri's backend; audio via PipeWire)
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
     ./ticktick.nix     # TickTick task manager (unfree; allowUnfree in core.nix)
     ./onlyoffice.nix   # OnlyOffice desktop editors (alongside LibreOffice in core.nix)

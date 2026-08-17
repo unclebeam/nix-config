@@ -8,9 +8,9 @@ result-*
 # Direnv, if you ever adopt it
 .direnv/
 
-# (Monitor config used to be ignored here — home/hypr/local/outputs.lua.
-# It's tracked now, one file per host in home/hypr/hosts/, because Nix
-# links only the current machine's: see home/hyprland.nix. The reason to
-# ignore it — one shared file applying one machine's panels to the other —
-# no longer exists, and tracking means a fresh install boots with the
-# right layout.)
+# (Monitor config used to be ignored here — the hyprland era's
+# home/hypr/local/outputs.lua. It's tracked now, one file per host in
+# home/niri/hosts/, because Nix links only the current machine's: see
+# home/niri.nix. The reason to ignore it — one shared file applying one
+# machine's panels to the other — no longer exists, and tracking means a
+# fresh install boots with the right layout.)

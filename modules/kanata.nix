@@ -1,6 +1,6 @@
 # kanata.nix — key remapping at the evdev level, below the compositor.
 # Because kanata rewrites events before anything else sees them, the
-# remap works everywhere: hyprland, TTYs, even the greeter at login —
+# remap works everywhere: niri, TTYs, even the greeter at login —
 # unlike an xkb option, which only applies inside the graphical session.
 #
 # Thinkpad-only since 2026-07-20: the PC types on a ZSA board, and its

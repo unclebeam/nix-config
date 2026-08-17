@@ -1,9 +1,9 @@
 # desktop.nix — compositor-agnostic desktop infrastructure: Wayland-wide
 # env, the GTK portal fallback, and fonts. Compositor-specific bits stay in
-# modules/hyprland.nix; the login greeter (Noctalia on greetd) lives in
+# modules/niri.nix; the login greeter (Noctalia on greetd) lives in
 # modules/noctalia-greeter.nix. (This file was split out when hyprland first
-# ran alongside sway; it kept its role through the niri era and keeps it
-# now — nothing in here assumes a particular compositor.)
+# ran alongside sway; it kept its role through every compositor era since —
+# nothing in here assumes a particular compositor.)
 { config, lib, pkgs, ... }:
 
 let
@@ -59,10 +59,10 @@ in
   # xdg-desktop-portal is how sandbox-ish desktop APIs work on Wayland:
   # screen sharing, screenshots, file pickers. Since the 2026-07 KDE
   # migration nothing routes to the GTK portal directly — dialogs go to the
-  # KDE portal, capture to the hyprland one (both via modules/hyprland.nix's
+  # KDE portal, capture to the GNOME one (both via modules/niri.nix's
   # routing) — it's only the trailing fallback in `default=kde;gtk` for
-  # interfaces neither implements. Kept here (the hyprland module installs
-  # it anyway) so this file stays a working baseline for any compositor.
+  # interfaces neither implements. Kept here so this file stays a working
+  # baseline for any compositor.
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
   # ── Fonts ──────────────────────────────────────────────────────────────

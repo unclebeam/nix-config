@@ -49,9 +49,10 @@
   #  * su — keep target-password-only, matching the tty-login policy.
   #  * other — the PAM catch-all: any future service without its own stack
   #    would silently inherit fingerprint.
-  #  * swaylock — an unused stack nixpkgs generates via programs.hyprland
-  #    (swaylock isn't installed; Noctalia's lock uses `login`) — dead auth
-  #    surface, neutralized for hygiene.
+  #  * swaylock — an unused stack nixpkgs generates via programs.niri
+  #    (wayland-session.nix ships it unconditionally; swaylock isn't
+  #    installed, Noctalia's lock uses `login`) — dead auth surface,
+  #    neutralized for hygiene.
   security.pam.services.passwd.fprintAuth = false;
   security.pam.services.chpasswd.fprintAuth = false;
   security.pam.services.systemd-run0.fprintAuth = false;

@@ -9,20 +9,18 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
     # A SECOND nixpkgs tracking unstable. Used ONLY to source a curated set of
-    # fast-moving packages (claude-code, lazygit, starship, brave,
-    # google-chrome, slack — and, since this branch, hyprland itself plus its
-    # xdg-desktop-portal-hyprland, pinned as a PAIR in modules/hyprland.nix;
-    # grep for `pkgs-unstable.` to enumerate; the share-picker input below
-    # also follows it). So this is no longer only leaf apps: the compositor
-    # rides unstable too, because 0.55 was the first release of the Lua config
-    # the whole desktop is built on and stable freezes it for six months.
-    # Everything else stays on nixos-26.05. Deliberately NOT `follows` nixpkgs —
+    # fast-moving LEAF packages (claude-code, lazygit, starship, brave,
+    # google-chrome, vscode, slack — grep for `pkgs-unstable.` to enumerate).
+    # The compositor no longer rides unstable: that was a hyprland-era
+    # exception (0.55's brand-new Lua config), and niri 26.04 in nixos-26.05
+    # is current. Everything else stays on nixos-26.05.
+    # Deliberately NOT `follows` nixpkgs —
     # it must be its own package set, or those packages would rebuild against
     # 26.05 deps and defeat the purpose. mkHost instantiates it once (with
     # allowUnfree) and hands it to every module as `pkgs-unstable`.
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # home-manager manages per-user config (dotfiles, hyprland config, alacritty…).
+    # home-manager manages per-user config (dotfiles, niri config, alacritty…).
     # Its release branch must match the nixpkgs release.
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
@@ -67,31 +65,6 @@
     # Enabled in modules/noctalia-greeter.nix.
     noctalia-greeter = {
       url = "github:noctalia-dev/noctalia-greeter";
-    };
-
-    # hyprland-preview-share-picker — an alternative xdph screen-share picker
-    # that shows live window/monitor THUMBNAILS before you pick (the default
-    # hyprland-share-picker is a flat Qt title list with no visuals). Rust +
-    # GTK4. Not in nixpkgs; it ships ONLY a package (no NixOS module), so —
-    # exactly like zen-browser above — nothing wires into mkHost;
-    # home/hyprland.nix pulls the package straight out of `inputs` and points
-    # xdph's screencopy:custom_picker_binary at it.
-    #
-    # It follows nixpkgs-unstable, NOT our 26.05 nixpkgs: 26.05's rustc SIGABRTs
-    # (`double free or corruption`) compiling this picker's `unsafe-libyaml`
-    # dependency, while unstable's newer rustc builds it cleanly. This is
-    # exactly what the curated nixpkgs-unstable input exists for (a fast-moving
-    # package that stable can't build) — and following it reuses an input we
-    # already evaluate rather than pulling a third nixpkgs.
-    #
-    # Fetched via the git+https scheme (NOT `github:`) with `?submodules=1`:
-    # the repo vendors git submodules, and this Nix rejects the `submodules`
-    # attribute under the github scheme (`not supported by scheme 'github'` on
-    # any re-lock) — the git scheme accepts it as a query param and pulls the
-    # submodules the build needs.
-    hyprland-preview-share-picker = {
-      url = "git+https://github.com/WhySoBad/hyprland-preview-share-picker?submodules=1";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
     # nix-flatpak — declarative flatpak remotes + apps. This input exists for

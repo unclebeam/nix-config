@@ -20,8 +20,10 @@
     name = "breeze_cursors";
     size = 24; # logical px; the compositor multiplies by the output scale (1.5) on screen
 
-    # hyprland picks this up too, via the XCURSOR_* env vars above — no
-    # compositor-side config needed.
+    # niri does NOT read XCURSOR_* — it takes the cursor from its own
+    # config, so home/niri.nix mirrors name/size from here into the
+    # Nix-generated ~/.config/niri/nix.kdl. Change it HERE; the mirror
+    # follows. (The env vars above still cover apps.)
 
     # Generates the gtk cursor settings so GTK apps pick the same theme/size.
     # Only *generates* them — the gtk module that actually writes settings.ini

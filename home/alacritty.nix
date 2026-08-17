@@ -42,8 +42,10 @@
         y = 6;
       };
 
-      # The one translucent surface in the setup. (Under hyprland the stock
-      # blur — enabled by default — shows through it.)
+      # The one translucent surface in the setup. (The hyprland era blurred
+      # what showed through; niri has no blur, so this is now plain
+      # see-through onto the wallpaper — kept at 0.92 deliberately, bump to
+      # 1.0 if legibility over busy wallpapers suffers.)
       window.opacity = 0.92;
 
       # Shift+Enter normally sends the exact same bytes as plain Enter, so

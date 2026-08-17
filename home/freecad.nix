@@ -18,7 +18,8 @@
 # (nixpkgs pkgs/top-level/aliases.nix, "Added 2025-06-14"), kept only so old
 # configs don't break. Upstream folded Wayland support into the one build:
 # qt6.qtwayland is in freecad's own buildInputs, so this runs Wayland-native
-# under hyprland with no XWayland detour and no separate package.
+# under niri with no XWayland detour and no separate package (which matters
+# more now: X11 clients go through xwayland-satellite).
 #
 # No Qt block and no theme colors here: FreeCAD is Qt6, so the shared
 # home/qt.nix already reaches it — QT_QPA_PLATFORMTHEME=qt6ct points it at

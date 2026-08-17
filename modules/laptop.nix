@@ -25,7 +25,7 @@
 
   # ── Backlight ──────────────────────────────────────────────────────────
   # The XF86 brightness keys go through `noctalia msg brightness-up/-down`
-  # (home/hypr/binds.lua); brightness handling is built into the shell,
+  # (home/niri/config.kdl); brightness handling is built into the shell,
   # which talks to logind — no extra permissions or udev rules needed for
   # users with an active session. (External DDC monitors — including the
   # docked Dell here — are modules/ddc.nix's concern.)

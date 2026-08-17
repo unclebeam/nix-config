@@ -1,5 +1,5 @@
 # home/satty.nix — screenshot annotator. Every screenshot flows through it:
-# the Print binds (home/hypr/binds.lua) run `noctalia msg screenshot-*`,
+# the Print binds (home/niri/config.kdl) run `noctalia msg screenshot-*`,
 # and Noctalia's screenshot config (home/noctalia/config.toml,
 # [shell.screenshot]) pipes the capture straight into satty on stdin
 # (`satty -f -`) with file/clipboard output off — nothing touches disk or

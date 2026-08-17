@@ -1,9 +1,9 @@
 # home/ticktick.nix — TickTick task-management client.
 # One file per intent: everything that exists because of TickTick lives here.
 # Removing TickTick = delete this file + its import line in default.nix.
-# (Its old SUPER+O scratchpad keybind lived in the pre-niri hyprland config
+# (Its old SUPER+O scratchpad keybind lived in the first hyprland config
 # and left with it — the current config carries no app scratchpads, and
-# SUPER+O now belongs to the window switcher in home/hypr/binds.lua.)
+# SUPER+O now belongs to niri's overview toggle in home/niri/config.kdl.)
 #
 # Unfree package — covered by the allowUnfree set in modules/core.nix
 # (home-manager runs with useGlobalPkgs, so the system nixpkgs config

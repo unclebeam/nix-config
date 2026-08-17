@@ -6,10 +6,11 @@
 # (home-manager runs with useGlobalPkgs, so the system nixpkgs config
 # applies here too; no per-file allowUnfree needed).
 #
-# No mime handlers and no Qt block: Spotify is Electron-based (runs fine
-# under XWayland) and doesn't own any file types worth claiming. Login
-# and playback settings live in ~/.config/spotify, managed by the app
-# itself, not Nix.
+# No mime handlers and no Qt block: Spotify is Electron-based (native
+# Wayland via NIXOS_OZONE_WL from modules/desktop.nix; the fallback would
+# be xwayland-satellite under niri) and doesn't own any file types worth
+# claiming. Login and playback settings live in ~/.config/spotify, managed
+# by the app itself, not Nix.
 { config, lib, pkgs, ... }:
 
 {

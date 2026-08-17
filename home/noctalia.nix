@@ -25,7 +25,7 @@
 # when it should apply to both machines.
 #
 # Interaction happens through `noctalia msg <command>` — that's what the
-# keybinds in home/hypr/binds.lua run (`noctalia msg --help` lists all).
+# keybinds in home/niri/config.kdl run (`noctalia msg --help` lists all).
 #
 # FRESH INSTALL: no setup command, nothing to run. The tracked config +
 # binds boot straight to a working desktop; the only shell-side first-login
@@ -41,7 +41,7 @@
   home.packages = [ pkgs.adw-gtk3 ];
 
   # The whole config dir, OUT-OF-STORE symlinked into the repo (same rule
-  # and same hardcoded ~/nix-config base path as hypr/hyprland.lua and
+  # and same hardcoded ~/nix-config base path as niri/config.kdl and
   # home/neovim.nix): config.toml edits hot-reload with no rebuild, and the
   # dir stays writable in case noctalia ever needs to write here (its own
   # writes go to ~/.local/state and ~/.cache, so in practice this is ours).
@@ -49,20 +49,19 @@
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nix-config/home/noctalia";
 
-  # Empty placeholders for files noctalia's TEMPLATES write imperatively on
-  # theme/wallpaper change, seeded so their consumers never see a dangling
-  # reference before the first render ([ -e ] = a file that exists — even
-  # empty — is never touched again):
-  #  * alacritty/themes/noctalia.toml — imported by home/alacritty.nix; an
-  #    empty TOML import is valid, so alacritty starts unthemed instead of
-  #    erroring out before the shell's first wallpaper.
-  #  * hypr/noctalia.lua — require()d (guarded) by home/hypr/hyprland.lua
-  #    for wallpaper-derived border colors. An empty chunk makes require()
-  #    return `true`; the type-check guard in hyprland.lua skips it until
-  #    the template writes the real module.
+  # Empty placeholder for the one template output whose consumer can't
+  # tolerate a missing file: alacritty/themes/noctalia.toml is imported by
+  # home/alacritty.nix, and alacritty errors out on a dangling import — an
+  # empty TOML is valid, so it starts unthemed instead of failing before
+  # the shell's first wallpaper. ([ -e ] = a file that exists — even
+  # empty — is never touched again; the template writes the real thing.)
+  # The niri template needs NO placeholder: home/niri/config.kdl pulls
+  # ~/.config/niri/noctalia.kdl in with `include optional=true`, which
+  # tolerates absence natively — that's the placeholder pattern's job done
+  # in the consumer instead (the hyprland-era hypr/noctalia.lua seed died
+  # with the compositor).
   home.activation.noctaliaPlaceholders = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p ~/.config/alacritty/themes ~/.config/hypr
+    mkdir -p ~/.config/alacritty/themes
     [ -e ~/.config/alacritty/themes/noctalia.toml ] || touch ~/.config/alacritty/themes/noctalia.toml
-    [ -e ~/.config/hypr/noctalia.lua ] || touch ~/.config/hypr/noctalia.lua
   '';
 }

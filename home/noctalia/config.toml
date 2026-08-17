@@ -11,7 +11,7 @@
 # The ONE polkit agent on this session's bus (upstream default is false —
 # without this, fprintd-enroll / systctl edits / any privileged GUI action
 # has no prompt UI and just fails). The engine half (security.polkit) comes
-# from programs.hyprland; see modules/noctalia.nix.
+# from programs.niri; see modules/noctalia.nix.
 polkit_agent = true
 
 [shell.screenshot]
@@ -40,19 +40,21 @@ source = "wallpaper"
 #  * gtk3/gtk4     → ~/.config/gtk-{3,4}.0/noctalia.css + apply.sh, which
 #                    @imports it into gtk.css, sets the adw-gtk3(-dark)
 #                    theme and the org.gnome color-scheme (the old DMS
-#                    "Apply GTK Themes" toggle, automated); gtk4's css is
-#                    also @imported by home/hypr/share-picker.css
+#                    "Apply GTK Themes" toggle, automated)
 #  * kcolorscheme  → ~/.local/share/color-schemes/noctalia.colors, the
 #                    KColorScheme home/qt.nix points qt6ct/qt5ct at
 #                    (Dolphin/Ark/VLC colors)
-#  * hyprland      → ~/.config/hypr/noctalia.lua (border colors), loaded by
-#                    the guarded require in home/hypr/hyprland.lua; the
-#                    colors_changed hook below makes hyprland actually
-#                    re-read it
+#  * niri          → ~/.config/niri/noctalia.kdl (focus-ring/border/shadow
+#                    colors), pulled in by the LAST include in
+#                    home/niri/config.kdl (optional=true, so pre-first-
+#                    wallpaper it's simply absent). No reload hook needed:
+#                    niri watches its includes and re-applies on rewrite —
+#                    the [hooks] colors_changed = "hyprctl reload" the
+#                    hyprland template needed is gone with it.
 # Community templates stay off: nothing here consumes them, and off means
 # no fetches from api.noctalia.dev.
 enable_builtin_templates = true
-builtin_ids = ["alacritty", "gtk3", "gtk4", "kcolorscheme", "hyprland"]
+builtin_ids = ["alacritty", "gtk3", "gtk4", "kcolorscheme", "niri"]
 enable_community_templates = false
 
 [brightness]
@@ -113,16 +115,14 @@ enabled = true
 #
 # NB this is a PC hardware fact in a file the thinkpad also loads (noctalia
 # reads every *.toml in the config dir, and home/noctalia.nix symlinks the
-# whole dir — there is no per-host slot here like home/hypr/hosts/). On the
+# whole dir — there is no per-host slot here like home/niri/hosts/). On the
 # Intel machine the path is absent, so expect a "configured CPU temperature
 # sensor does not exist" warning followed by its normal coretemp detection.
 # If that fallback ever doesn't happen, resolve the sensor to a fixed
 # host-agnostic path at boot instead of naming it here.
 cpu_temp_sensor_path = "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon2/temp3_input"
 
-[hooks]
-# hyprland does not watch its config files: after the hyprland template
-# rewrites ~/.config/hypr/noctalia.lua (every palette change), reload so
-# the new border colors actually apply. All other template consumers pick
-# up their rewrite on their own (alacritty live-reloads, GTK/Qt re-read).
-colors_changed = "hyprctl reload"
+# (No [hooks] section: every template consumer picks up its rewrite on its
+# own — alacritty live-reloads, GTK/Qt re-read, and niri watches its
+# includes. The hyprland era needed colors_changed = "hyprctl reload" here
+# because hyprland didn't watch files; that whole ritual is gone.)

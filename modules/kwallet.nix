@@ -1,7 +1,8 @@
 # kwallet.nix — the session keyring, KDE edition (SYSTEM half; the USER half
 # — kwalletrc — is home/kwallet.nix). Replaced gnome-keyring 2026-07 by
 # explicit request: session plumbing followed the file manager to KDE
-# (screencasting goes to hyprland's own portal — see modules/hyprland.nix).
+# (screencasting goes to the GNOME portal, niri's only capture backend —
+# see modules/niri.nix).
 # ksecretd
 # (the Secret Service daemon split out of kwalletd in Plasma 6) becomes the
 # owner of org.freedesktop.secrets — the store behind Dolphin's saved share
@@ -25,13 +26,14 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Nothing enables gnome-keyring anymore (the old niri module did with
-  # mkDefault; programs.hyprland doesn't), so this is a pure guard: if some
-  # future module flips it back on, everything it wires — pam_gnome_keyring
-  # on the `greetd` PAM service (the greetd module's enableGnomeKeyring
-  # follows this option via mkDefault), its Secret portal backend, the
-  # D-Bus activation, the CAP_IPC_LOCK wrapper — would fight ksecretd for
-  # org.freedesktop.secrets. Two keyrings on one bus is breakage, not choice.
+  # LIVE override, not a hygiene guard (it was only hygiene in the hyprland
+  # era): programs.niri enables gnome-keyring via mkDefault, and everything
+  # it would wire — pam_gnome_keyring on the `greetd` PAM service (the
+  # greetd module's enableGnomeKeyring follows this option via mkDefault),
+  # its Secret portal backend, the D-Bus activation, the CAP_IPC_LOCK
+  # wrapper — would fight ksecretd for org.freedesktop.secrets. Two
+  # keyrings on one bus is breakage, not choice. A plain `false` beats
+  # mkDefault, so no mkForce needed here.
   services.gnome.gnome-keyring.enable = false;
 
   # kdePackages.kwallet ships kwallet.portal (an org.freedesktop.impl.portal.
@@ -42,12 +44,13 @@
   # go — exactly how plasma6.nix installs it.
   xdg.portal.extraPortals = [ pkgs.kdePackages.kwallet ];
 
-  # Unlike the old niri module (which hard-set Secret="gnome-keyring",
-  # forcing a mkForce here), programs.hyprland writes no portal-config keys
-  # at all — this is a fresh key, no force needed. The rest of the routing
-  # lives in modules/hyprland.nix — the Secret route is here so removing
-  # this file removes every trace of the KDE keyring.
-  xdg.portal.config.hyprland."org.freedesktop.impl.portal.Secret" = "kwallet";
+  # mkForce is MANDATORY here: programs.niri hard-sets
+  # Secret="gnome-keyring" as a plain coerced string, and a second plain
+  # definition is an eval conflict (the hyprland era's fresh-key comfort is
+  # over — this is the same fight the first niri era had). The rest of the
+  # routing lives in modules/niri.nix — the Secret route is here so
+  # removing this file removes every trace of the KDE keyring.
+  xdg.portal.config.niri."org.freedesktop.impl.portal.Secret" = lib.mkForce "kwallet";
 
   # PAM half of step 1. On `greetd` (the Noctalia greeter's display manager,
   # modules/noctalia-greeter.nix). Unlike the old sddm service — which was
@@ -76,18 +79,18 @@
   # exist here and were dropped — but their ROLE (run only once the
   # compositor is up) must be kept. The env-pipe timing is load-bearing:
   # ksecretd constructs its QApplication the moment the env arrives, so
-  # WAYLAND_DISPLAY in that env must point at a LIVE socket — in the niri
-  # era this unit once raced the compositor, piped a STALE WAYLAND_DISPLAY
-  # from the previous session, and ksecretd SIGABRTed, taking the
-  # PAM-derived wallet key with it (every secrets consumer then prompted).
-  # There is no compositor user unit to order after now (greetd execs
-  # Hyprland directly; no uwsm) — instead the guarantee comes from
-  # hyprland.lua's startup hook: it pushes the fresh env into the user
-  # manager and THEN starts hyprland-session.target, whose BindsTo pulls up
-  # graphical-session.target. So After=graphical-session.target implies the
-  # env push already happened. (No deadlock with WantedBy on the same
-  # target: the target doesn't wait for its wants, this unit just starts
-  # once the target is active.)
+  # WAYLAND_DISPLAY in that env must point at a LIVE socket — in the FIRST
+  # niri era this unit once raced the compositor, piped a STALE
+  # WAYLAND_DISPLAY from the previous session, and ksecretd SIGABRTed,
+  # taking the PAM-derived wallet key with it (every secrets consumer then
+  # prompted). The guarantee now comes from niri.service itself: niri
+  # imports the fresh WAYLAND_DISPLAY into the user manager BEFORE reaching
+  # Type=notify readiness, and niri.service is Before=graphical-session.
+  # target — so After=graphical-session.target implies the env import
+  # already happened. (That race the first era hit predated niri's
+  # systemd-native session; today's ordering closes it. No deadlock with
+  # WantedBy on the same target: the target doesn't wait for its wants,
+  # this unit just starts once the target is active.)
   systemd.user.services.plasma-kwallet-pam = {
     description = "Unlock kwallet from PAM credentials";
     wantedBy = [ "graphical-session.target" ];

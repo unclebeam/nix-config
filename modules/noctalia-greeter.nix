@@ -6,13 +6,14 @@
 # session at the noctalia-greeter binary.
 #
 # Sessions: greetd's session, once authenticated, execs the chosen session
-# from the wayland-sessions dir. The menu shows exactly ONE entry — plain
-# "Hyprland" — because modules/hyprland.nix force-filters
-# services.displayManager.sessionPackages: the hyprland package's second
-# entry, "Hyprland (uwsm-managed)", has no uwsm units behind it (withUWSM
-# is off) and provably bounced first-attempt logins back to the greeter
-# (journal 2026-07-20). That filter is greeter-agnostic — it protected the
-# DMS greeter and protects this one identically. Don't remove it.
+# from the wayland-sessions dir. The menu shows exactly ONE entry — "Niri"
+# — naturally: the niri package ships exactly one session file, so the
+# force-filter the hyprland era needed (its package unconditionally
+# shipped a second, uwsm-managed entry with no units behind it, which
+# provably bounced logins — journal 2026-07-20) has nothing to filter and
+# is gone. The lesson survives in modules/niri.nix and CLAUDE.md: audit
+# the session files any future compositor package ships — every entry
+# this menu lists must actually boot.
 #
 # PAM: greetd authenticates via security.pam.services.greetd — a service
 # generated WITH default rules, so per-service toggles on it actually work
