@@ -259,8 +259,22 @@ binds {
     XF86AudioPrev        allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "previous"; }
     XF86AudioNext        allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "next"; }
 
-    XF86MonBrightnessUp   allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5"; }
+    // The trailing "" is NOT a typo and NOT optional. Since DMS 1.5.3 the
+    // brightness verbs are `increment(step, device)` — two parameters — and
+    // quickshell's IPC layer enforces arity on every typed parameter, so a
+    // one-argument call is rejected client-side by `dms` and the key does
+    // nothing at all, silently (nothing reaches dms.service, nothing lands
+    // in its journal). That's exactly how these binds sat broken. `audio`
+    // is still one-argument, which is why the volume keys never noticed.
+    // Empty device = "you pick": DMS falls through to getPreferredDevice(),
+    // i.e. the device PINNED to the focused screen (Control Center →
+    // brightness, a per-machine GUI step like the idle timeouts), else its
+    // default. That's what keeps this file host-agnostic — a literal id
+    // like "ddc:i2c-11" is an i2c BUS NUMBER, not a stable identifier, and
+    // would be PC-only besides. On the thinkpad the same two lines find the
+    // eDP backlight first, no host branch needed.
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5" ""; }
 
     // DEVIATION: keyboard layout us↔th on the key it's been on since the
     // sway era. With exactly two layouts, "next" IS the toggle — no
