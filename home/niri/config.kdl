@@ -499,3 +499,5 @@ binds {
 // missing non-optional include fails the whole config. (Unlike noctalia's
 // template, DMS never edits this tracked file — no marker line needed.)
 include optional=true "~/.config/niri/dms/colors.kdl"
+include "dms/layout.kdl"
+include "dms/windowrules.kdl"
