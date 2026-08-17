@@ -9,20 +9,20 @@ NixOS flake for my two machines. One repo, one shell, reinstall = one command.
 
 Both run NixOS 26.05 + [niri](https://github.com/niri-wm/niri) (scrollable
 tiling, KDL config) +
-[Noctalia](https://github.com/noctalia-dev/noctalia) v5: one native
-Wayland-shell process is the bar, launcher, notifications, lock screen,
-greeter, idle policy, OSD, clipboard history, polkit agent, power menu,
-wallpaper, and screenshot tool. Theming is dynamic — Noctalia derives
-Material You colors from the wallpaper and its templates apply them to the
-shell, niri, GTK/Qt apps, and the terminal.
+[DMS / DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell):
+one shell is the bar, launcher, notifications, lock screen, greeter, idle
+policy, OSD, clipboard history, polkit agent, power menu, wallpaper, and
+screenshot tool. Theming is dynamic — DMS derives Material You colors from
+the wallpaper (matugen) and applies them to the shell, niri, GTK/Qt apps,
+and the terminal.
 
 ## Layout
 
 ```
-flake.nix       inputs (nixpkgs 26.05, home-manager, noctalia) + one nixosConfiguration per host
+flake.nix       inputs (nixpkgs 26.05, home-manager, dank-material-shell) + one nixosConfiguration per host
 hosts/<name>/   thin per-host config + hardware-configuration.nix (machine-generated)
-modules/        shared NixOS modules: core, desktop, niri, noctalia, noctalia-greeter, audio, gaming, laptop
-home/           shared home-manager config: niri, noctalia, alacritty, fish, ...
+modules/        shared NixOS modules: core, desktop, niri, dms, dms-greeter, audio, gaming, laptop
+home/           shared home-manager config: niri, dms, alacritty, fish, ...
 ```
 
 ## Installing a machine

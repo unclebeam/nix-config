@@ -1,4 +1,4 @@
-# home/alacritty.nix — terminal, themed by Noctalia.
+# home/alacritty.nix — terminal, themed by DMS.
 { config, lib, pkgs, ... }:
 
 {
@@ -6,17 +6,14 @@
     enable = true;
     # `settings` is written out as alacritty.toml.
     settings = {
-      # Colors come from Noctalia: its alacritty template (builtin_ids in
-      # home/noctalia/config.toml) rewrites themes/noctalia.toml from the
-      # wallpaper palette on every palette change, and alacritty
-      # live-reloads imports — so the terminal recolors the moment the
-      # wallpaper does. home/noctalia.nix seeds an (initially empty)
+      # Colors come from DMS: its matugen alacritty template rewrites
+      # dank-theme.toml from the wallpaper palette on every palette change,
+      # and alacritty live-reloads imports — so the terminal recolors the
+      # moment the wallpaper does. home/dms.nix seeds an (initially empty)
       # placeholder so the import never dangles before the first render.
-      # NB: importing this exact path is also what keeps the template's
-      # apply.sh away from our read-only alacritty.toml — the script only
-      # tries to ADD an import when none referencing noctalia.toml exists
-      # (against the store symlink that write would die with EROFS).
-      general.import = [ "~/.config/alacritty/themes/noctalia.toml" ];
+      # (dank-theme.toml is DMS's fixed output path — machine-local and
+      # imperatively written, so never an xdg.configFile.)
+      general.import = [ "~/.config/alacritty/dank-theme.toml" ];
 
       # IBM Plex Mono, on trial since 2026-08-09 (was "Lilex Nerd Font Mono" —
       # revert to that one string to back it out; the package is still

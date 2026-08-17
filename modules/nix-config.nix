@@ -2,8 +2,8 @@
 #
 # The repo checkout at ~/nix-config is a load-bearing invariant (see
 # CLAUDE.md): every out-of-store symlink hardcodes it — niri/config.kdl +
-# niri/host.kdl, the noctalia config dir, and the
-# neovim config. On a fresh nixos-anywhere install the checkout doesn't
+# niri/host.kdl and the neovim config. On a fresh nixos-anywhere install
+# the checkout doesn't
 # exist yet, so all of those links dangle and the FIRST login is broken
 # (no compositor config, no shell config, configless nvim) until someone
 # remembers to clone. This

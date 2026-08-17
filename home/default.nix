@@ -7,9 +7,9 @@
   imports = [
     ./directories.nix # home skeleton: XDG dirs (Documents/Downloads/Pictures) + ~/org + ~/.ssh
     ./niri.nix      # niri glue: symlinks niri/config.kdl + host.kdl + session target
-    ./noctalia.nix  # Noctalia user glue: adw-gtk3 + symlinked config dir (the shell itself: modules/noctalia.nix)
+    ./dms.nix       # DMS user glue: adw-gtk3 + template placeholders (the shell itself: modules/dms.nix)
     ./wallpapers.nix # tracked wallpaper images -> ~/Pictures/Wallpapers (picked via SUPER+Y)
-    ./satty.nix     # screenshot annotator (fed by noctalia's screenshot pipe)
+    ./satty.nix     # screenshot annotator (fed by the screenshot-annotate wrapper around `dms screenshot`)
     ./alacritty.nix # terminal
     ./tmux.nix      # terminal multiplexer (plain tmux.conf; nvim navigation pairing)
     ./fish.nix      # shell + prompt
@@ -23,7 +23,7 @@
     ./dolphin.nix      # file manager (KIO workers) + xdg default for dirs
     ./kwallet.nix      # session keyring user half: kwalletrc (ksecretd on, no first-run wizard)
     ./ark.nix          # archive manager (.zip/.7z/.rar) + CLI backends
-    ./qt.nix           # Qt theming via qt6ct + noctalia's KColorScheme (Dolphin/Ark/VLC)
+    ./qt.nix           # Qt theming via qt6ct + DMS's KColorScheme (Dolphin/Ark/VLC)
     ./vlc.nix          # VLC media player + default audio handler
     ./mpv.nix          # mpv: video player + default video handler (HDR parked — niri has no CM yet)
     ./obs.nix          # OBS Studio (screencast via the GNOME portal — niri's backend; audio via PipeWire)

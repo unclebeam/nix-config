@@ -1,7 +1,7 @@
 # desktop.nix — compositor-agnostic desktop infrastructure: Wayland-wide
 # env, the GTK portal fallback, and fonts. Compositor-specific bits stay in
-# modules/niri.nix; the login greeter (Noctalia on greetd) lives in
-# modules/noctalia-greeter.nix. (This file was split out when hyprland first
+# modules/niri.nix; the login greeter (DMS on greetd) lives in
+# modules/dms-greeter.nix. (This file was split out when hyprland first
 # ran alongside sway; it kept its role through every compositor era since —
 # nothing in here assumes a particular compositor.)
 { config, lib, pkgs, ... }:

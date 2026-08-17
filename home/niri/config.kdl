@@ -63,7 +63,7 @@ include "~/.config/niri/host.kdl"
 
 // Settings that influence how windows are positioned and sized — STOCK.
 // (The focus-ring/border colors here are the pre-first-wallpaper fallback:
-// the noctalia.kdl include at the BOTTOM of this file re-themes them from
+// the dms/colors.kdl include at the BOTTOM of this file re-themes them from
 // the wallpaper palette, winning by position — includes merge last-wins.)
 // Find more information on the wiki:
 // https://niri-wm.github.io/niri/Configuration:-Layout
@@ -119,8 +119,8 @@ layout {
 
     // You can enable drop shadows for windows.
     shadow {
-        // (Stock keeps shadows off; the noctalia.kdl include may turn them
-        // on with palette colors — leave this block stock.)
+        // (Stock keeps shadows off; the dms/colors.kdl include may turn
+        // them on with palette colors — leave this block stock.)
 
         // Softness controls the shadow blur radius.
         softness 30
@@ -145,10 +145,11 @@ layout {
 }
 
 // DEVIATION (replaces stock's `spawn-at-startup "waybar"` — the bar is
-// Noctalia, a user SERVICE, never spawned from here: two shell processes on
-// one bus is breakage). This one line is our half of the session lifecycle:
-// it starts the anchor target that noctalia.service and friends are scoped
-// to (home/niri.nix). niri runs startup spawns only after WAYLAND_DISPLAY
+// DMS, a user SERVICE, never spawned from here: two shell processes on
+// one bus is breakage, so never `spawn-at-startup "dms" "run"` either).
+// This one line is our half of the session lifecycle: it starts the anchor
+// target that dms.service and friends are scoped to (home/niri.nix). niri
+// runs startup spawns only after WAYLAND_DISPLAY
 // is imported into the user manager, so everything the target pulls up sees
 // the display — the ordering hyprland needed a two-command sh -c dance for.
 // Teardown is native: niri.service BindsTo graphical-session.target.
@@ -164,11 +165,12 @@ hotkey-overlay {
 // decorations. Without it, windows that draw their own shadows/titlebars
 // make niri treat them as arbitrarily-shaped — borders and the focus ring
 // render as a solid rectangle BEHIND the window instead of around it,
-// which breaks the noctalia border theming. Restart apps after toggling.
+// which breaks the palette border theming. Restart apps after toggling.
 prefer-no-csd
 
 // You can change the path where screenshots are saved (used by niri's own
-// screenshot actions; our Print binds go through Noctalia → satty instead).
+// screenshot actions; our Print binds go through screenshot-annotate —
+// `dms screenshot` → satty, home/satty.nix — instead).
 // A ~ at the front will be expanded to the home directory.
 // The path is formatted with strftime(3) to give you the screenshot date and time.
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
@@ -184,19 +186,21 @@ animations {
 // (Stock's wezterm/firefox example rules are dropped — neither app is
 // installed here; dead config is the enemy.)
 
-// DEVIATION: Noctalia's own settings window floats instead of tiling into
-// a column (ported from the hyprland era's rule for the same window).
+// DEVIATION: DMS's own windows (Settings, process list) float instead of
+// tiling into a column. The app-id is set by shell.qml's
+// `pragma AppId com.danklinux.dms` — verified in the pinned 1.5.3 source
+// (older docs still say org.quickshell; sanity-check with
+// `niri msg windows` while Settings is open if this ever stops matching).
 window-rule {
-    match app-id=r#"^dev\.noctalia\.Noctalia$"#
+    match app-id=r#"^com\.danklinux\.dms$"#
     open-floating true
 }
 
-// DEVIATION: let Noctalia's backdrop wallpaper layer render inside niri's
-// overview backdrop (the zoomed-out Mod+O view). Inert until the backdrop
-// feature is switched on in the shell's Settings GUI — with it off,
-// nothing publishes this namespace.
+// DEVIATION: let DMS's wallpaper layer render inside niri's overview
+// backdrop (the zoomed-out Mod+O view) — upstream's documented rule for
+// running DMS on niri.
 layer-rule {
-    match namespace="^noctalia-backdrop$"
+    match namespace="^quickshell$"
     place-within-backdrop true
 }
 
@@ -217,45 +221,46 @@ binds {
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+T hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
-    // DEVIATION (command only, stock key): the launcher is Noctalia's, not
-    // fuzzel — one shell, no second launcher.
-    Mod+D hotkey-overlay-title="Run an Application" { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
-    // DEVIATION (command only, stock key): the locker is Noctalia's, not
+    // DEVIATION (command only, stock key): the launcher is DMS's spotlight,
+    // not fuzzel — one shell, no second launcher.
+    Mod+D hotkey-overlay-title="Run an Application" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
+    // DEVIATION (command only, stock key): the locker is DMS's, not
     // swaylock (which isn't installed).
-    Super+Alt+L hotkey-overlay-title="Lock the Screen" { spawn "noctalia" "msg" "session" "lock"; }
+    Super+Alt+L hotkey-overlay-title="Lock the Screen" { spawn "dms" "ipc" "call" "lock" "lock"; }
 
-    // DEVIATION: the Noctalia shell panels, on keys stock niri leaves
-    // free — kept from the hyprland-era binds where possible. Interaction
-    // is `noctalia msg …` (`noctalia msg --help` lists every command).
-    // Not ported: the window-switcher binds (Mod+Tab/Mod+O in the hyprland
-    // era) — niri's own overview on Mod+O covers that natively, with
-    // type-to-launch.
-    Mod+X hotkey-overlay-title="Power Menu" { spawn "noctalia" "msg" "panel-toggle" "session"; }
-    Mod+N hotkey-overlay-title="Control Center" { spawn "noctalia" "msg" "panel-toggle" "control-center"; }
-    Mod+Y hotkey-overlay-title="Wallpaper Picker" { spawn "noctalia" "msg" "panel-toggle" "wallpaper"; }
+    // DEVIATION: the DMS shell panels, on keys stock niri leaves free —
+    // the same keys every shell era has used (do NOT adopt DMS's default
+    // keymap; these binds are ours). Interaction is `dms ipc call <target>
+    // <fn>` (`dms ipc list` enumerates everything). Not ported: the
+    // window-switcher binds (Mod+Tab/Mod+O in the hyprland era) — niri's
+    // own overview on Mod+O covers that natively, with type-to-launch.
+    Mod+X hotkey-overlay-title="Power Menu" { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
+    Mod+N hotkey-overlay-title="Control Center" { spawn "dms" "ipc" "call" "control-center" "toggle"; }
+    Mod+Y hotkey-overlay-title="Wallpaper Picker" { spawn "dms" "ipc" "call" "dash" "toggle" "wallpaper"; }
     // Mod+Comma is stock consume-window-into-column, so Settings moves to
     // Shift (the first niri era made the same call); clipboard likewise
     // yields Mod+V to stock toggle-window-floating and lands on Mod+P.
-    Mod+Shift+Comma hotkey-overlay-title="Noctalia Settings" { spawn "noctalia" "msg" "settings-toggle"; }
-    Mod+P hotkey-overlay-title="Clipboard History" { spawn "noctalia" "msg" "panel-toggle" "clipboard"; }
+    Mod+Shift+Comma hotkey-overlay-title="DMS Settings" { spawn "dms" "ipc" "call" "settings" "toggle"; }
+    Mod+P hotkey-overlay-title="Clipboard History" { spawn "dms" "ipc" "call" "clipboard" "toggle"; }
 
     // DEVIATION (commands only, stock keys + allow-when-locked): audio,
     // media, and brightness route through the shell so its OSD shows and
-    // (PC) external monitors get DDC brightness. Step sizes are a shell
-    // setting (Settings GUI), not a bind argument. Stock's XF86AudioStop
-    // is dropped: noctalia has no stop verb and playerctl isn't installed.
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "noctalia" "msg" "volume-up"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "noctalia" "msg" "volume-down"; }
-    XF86AudioMute        allow-when-locked=true { spawn "noctalia" "msg" "volume-mute"; }
-    XF86AudioMicMute     allow-when-locked=true { spawn "noctalia" "msg" "mic-mute"; }
+    // (PC) external monitors get DDC brightness (native in DMS — no
+    // ddcutil shell-out). Steps are explicit arguments here, matching the
+    // 5% every era used. Stock's XF86AudioStop is dropped: nothing binds
+    // a stop verb and playerctl isn't installed.
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "increment" "5"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "decrement" "5"; }
+    XF86AudioMute        allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "mute"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "micmute"; }
 
-    XF86AudioPlay        allow-when-locked=true { spawn "noctalia" "msg" "media" "toggle"; }
-    XF86AudioPause       allow-when-locked=true { spawn "noctalia" "msg" "media" "toggle"; }
-    XF86AudioPrev        allow-when-locked=true { spawn "noctalia" "msg" "media" "previous"; }
-    XF86AudioNext        allow-when-locked=true { spawn "noctalia" "msg" "media" "next"; }
+    XF86AudioPlay        allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "playPause"; }
+    XF86AudioPause       allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "playPause"; }
+    XF86AudioPrev        allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "previous"; }
+    XF86AudioNext        allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "next"; }
 
-    XF86MonBrightnessUp   allow-when-locked=true { spawn "noctalia" "msg" "brightness-up"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "noctalia" "msg" "brightness-down"; }
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5"; }
 
     // DEVIATION: keyboard layout us↔th on the key it's been on since the
     // sway era. With exactly two layouts, "next" IS the toggle — no
@@ -439,15 +444,16 @@ binds {
     // rather than stacked on top of each other.
     Mod+W { toggle-column-tabbed-display; }
 
-    // DEVIATION (commands only, stock keys): screenshots are Noctalia's,
-    // piped straight into satty ([shell.screenshot] in
-    // home/noctalia/config.toml) — Enter commits (clipboard + file),
-    // Escape discards. niri's own screenshot UI is bypassed so the satty
-    // flow survives the compositor swap. Stock's Alt+Print
-    // screenshot-window is dropped, not remapped: no focused-window mode,
-    // draw the region instead (the same call the hyprland-era binds made).
-    Print { spawn "noctalia" "msg" "screenshot-region"; }
-    Ctrl+Print { spawn "noctalia" "msg" "screenshot-fullscreen"; }
+    // DEVIATION (commands only, stock keys): screenshots go through the
+    // screenshot-annotate wrapper (home/satty.nix) — DMS's screenshot UI
+    // captures, satty annotates; Enter commits (clipboard + file), Escape
+    // discards, nothing touches disk or clipboard before satty. niri's own
+    // screenshot UI is bypassed so the satty flow survives shell swaps.
+    // Stock's Alt+Print screenshot-window stays dropped on purpose (the
+    // wrapper's `window` mode exists, but drawing the region has been the
+    // call since the hyprland era).
+    Print { spawn "screenshot-annotate"; }
+    Ctrl+Print { spawn "screenshot-annotate" "full"; }
 
     // Applications such as remote-desktop clients and software KVM switches may
     // request that niri stops processing the keyboard shortcuts defined here
@@ -468,14 +474,14 @@ binds {
     Mod+Shift+P { power-off-monitors; }
 }
 
-// Wallpaper-derived theme colors, rendered by Noctalia's built-in "niri"
-// template on every wallpaper change (builtin_ids in
-// home/noctalia/config.toml) — focus-ring/border/shadow/tab-indicator.
-// LAST include on purpose: includes merge last-wins, so these override the
-// stock fallback colors in `layout` above. optional=true is load-bearing —
-// before the first wallpaper the file doesn't exist, and a missing
-// non-optional include fails the whole config. This line also doubles as
-// the marker the template's apply.sh greps for (any `include …
-// ….../noctalia.kdl`); without it the shell would append its own include
-// at the bottom of this tracked file.
-include optional=true "~/.config/niri/noctalia.kdl"
+// Wallpaper-derived theme colors, rendered by DMS's matugen niri template
+// on every wallpaper change — focus-ring/border/shadow/tab-indicator/
+// insert-hint/recent-windows. The ONE fragment we consume from DMS's
+// ~/.config/niri/dms/ dir (machine-local, DO-NOT-EDIT generated files;
+// its binds/layout/etc. fragments stay unused — our keybinds live in THIS
+// file). LAST include on purpose: includes merge last-wins, so these
+// override the stock fallback colors in `layout` above. optional=true is
+// load-bearing — before the first wallpaper the file doesn't exist, and a
+// missing non-optional include fails the whole config. (Unlike noctalia's
+// template, DMS never edits this tracked file — no marker line needed.)
+include optional=true "~/.config/niri/dms/colors.kdl"

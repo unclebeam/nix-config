@@ -2,8 +2,8 @@
 # (lsusb 06cb:0123, libfprint "synaptics" driver). Enroll once after the
 # first switch with:
 #   fprintd-enroll
-# (enrollment needs polkit auth; the Noctalia shell carries its own polkit
-# agent — enabled in home/noctalia/config.toml — which shows the prompt.)
+# (enrollment needs polkit auth; the DMS shell carries its own built-in
+# polkit agent — always on, no config — which shows the prompt.)
 # Then sanity-check the sensor with: fprintd-verify
 { config, lib, pkgs, ... }:
 
@@ -23,17 +23,19 @@
   # consumer (Dolphin's saved SMB shares, browser Safe Storage) prompting
   # separately — so the greeter stays password-only forever, and
   # fingerprint is for the surfaces where the wallet is already open:
-  # sudo and polkit. `login` also stays password-only because the Noctalia
+  # sudo and polkit. `login` also stays password-only because the DMS
   # lock screen authenticates against /etc/pam.d/login on NixOS —
   # pam_fprintd there would gate the LOCK SCREEN's password path behind a
-  # finger-scan prompt (and tty logins with it).
+  # finger-scan prompt (and tty logins with it). (This stance is
+  # era-independent: it held under DMS the first time, under Noctalia,
+  # and holds now — every shell's lock has used `login` for its password
+  # path.)
   #
-  # (Noctalia's own [lockscreen] fingerprint option is ORTHOGONAL to these
-  # opt-outs: the shell talks to fprintd directly over D-Bus
-  # (net.reactivated.Fprint.*), not through PAM, so `login.fprintAuth`
-  # neither enables nor blocks it. The lock screen is password-only today
-  # because Noctalia's default is off; the opt-out here still matters for
-  # the lock screen's PASSWORD path and for tty logins.)
+  # (DMS's own lock-screen fingerprint support is ORTHOGONAL to these
+  # opt-outs: the shell talks to fprintd directly, not through the
+  # `login` PAM stack, so `login.fprintAuth` neither enables nor blocks
+  # it. The opt-out here still matters for the lock screen's PASSWORD
+  # path and for tty logins.)
   security.pam.services.greetd.fprintAuth = false;
   security.pam.services.login.fprintAuth = false;
 
@@ -51,7 +53,7 @@
   #    would silently inherit fingerprint.
   #  * swaylock — an unused stack nixpkgs generates via programs.niri
   #    (wayland-session.nix ships it unconditionally; swaylock isn't
-  #    installed, Noctalia's lock uses `login`) — dead auth surface,
+  #    installed, the DMS lock uses `login`) — dead auth surface,
   #    neutralized for hygiene.
   security.pam.services.passwd.fprintAuth = false;
   security.pam.services.chpasswd.fprintAuth = false;

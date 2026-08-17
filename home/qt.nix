@@ -1,19 +1,19 @@
 # home/qt.nix — Qt theming, so Qt apps don't draw the bare Fusion default
-# and instead follow Noctalia's wallpaper-derived colors. Promoted to its
-# own file because it has three consumers (the promotion rule in
-# CLAUDE.md): Dolphin and Ark (Qt6/KF6) and VLC (Qt5). Not tied to any one
-# app — remove it and the apps still run, just visibly unthemed.
+# and instead follow DMS's wallpaper-derived colors. Promoted to its own
+# file because it has three consumers (the promotion rule in CLAUDE.md):
+# Dolphin and Ark (Qt6/KF6) and VLC (Qt5). Not tied to any one app —
+# remove it and the apps still run, just visibly unthemed.
 #
-# How the colors flow: Noctalia's kcolorscheme template (builtin_ids in
-# home/noctalia/config.toml) renders a KColorScheme to
-# ~/.local/share/color-schemes/noctalia.colors on every palette change,
-# then merges it into ~/.config/kdeglobals and pings running apps — KF6
-# apps (Dolphin, Ark) recolor live from kdeglobals. The qt6ct/qt5ct seed
-# below points color_scheme_path at the same .colors file for everything
-# that renders through qt6ct instead (plain Qt6 apps, and VLC via qt5ct);
+# How the colors flow: DMS's "Apply Qt Themes" toggle (Settings GUI — a
+# first-login step, default OFF) renders a KColorScheme to
+# ~/.local/share/color-schemes/DankMatugen.colors on every palette change
+# and merges it into ~/.config/kdeglobals — KF6 apps (Dolphin, Ark)
+# recolor live from kdeglobals. The qt6ct/qt5ct seed below points
+# color_scheme_path at the same .colors file for everything that renders
+# through qt6ct instead (plain Qt6 apps, and VLC via qt5ct);
 # QT_QPA_PLATFORMTHEME=qt6ct is what routes them there. The .colors file
-# may not exist yet on a fresh install (first render needs a wallpaper) —
-# qt6ct just uses defaults until it appears.
+# may not exist yet on a fresh install (first render needs the toggle plus
+# a wallpaper) — qt6ct just uses defaults until it appears.
 { config, lib, pkgs, ... }:
 
 let
@@ -22,13 +22,13 @@ let
   # (deliberate choice over Breeze/Darkly: no extra style package, the
   # generated palette does the work), breeze icons pinned by name instead
   # of trusting KF6's internal fallback, and Inter (installed by
-  # modules/noctalia.nix) so Qt apps stop falling back to fontconfig's
+  # modules/dms.nix) so Qt apps stop falling back to fontconfig's
   # pick. The font strings are the 10-field legacy QFont::fromString form,
   # which both Qt5 and Qt6 parse.
   qtctSeed = pkgs.writeText "qtct-seed.conf" ''
     [Appearance]
     custom_palette=true
-    color_scheme_path=${config.home.homeDirectory}/.local/share/color-schemes/noctalia.colors
+    color_scheme_path=${config.home.homeDirectory}/.local/share/color-schemes/DankMatugen.colors
     style=Fusion
     icon_theme=breeze
 
@@ -61,18 +61,28 @@ in
   home.sessionVariables.QT_QPA_PLATFORMTHEME = "qt6ct";
   systemd.user.sessionVariables.QT_QPA_PLATFORMTHEME = "qt6ct";
 
-  # Seed qt6ct.conf and qt5ct.conf so a fresh install needs no qt6ct-GUI
-  # visit. Same pattern as the repo's other placeholders: create only
-  # what's missing, then stay out of the way — an existing file is NEVER
-  # rewritten, so manual qt6ct-GUI changes survive every switch. Stays a
-  # plain writable file, never a store symlink, so the GUI can keep
-  # editing it. (The DMS-era literal-\n corruption repair left with DMS —
-  # noctalia never writes these files.) `install` (not cp) because the
-  # store copy is read-only 444 and the file must stay writable.
+  # Seed/repair qt6ct.conf and qt5ct.conf so a fresh install needs no
+  # qt6ct-GUI visit. Same pattern as the repo's other placeholders: create
+  # only what's missing, then stay out of the way — a well-formed existing
+  # file is NEVER rewritten, so DMS's own sed updates and manual qt6ct-GUI
+  # changes survive every switch. Stays a plain writable file, never a
+  # store symlink — DMS sed-edits it in place, and a store symlink would
+  # die with EROFS.
+  #
+  # The repair branch is back with DMS (retired during the noctalia era —
+  # noctalia never wrote these files): upstream's qt.sh CREATE branch once
+  # wrote `printf '[Appearance]\\n…'` with a doubled backslash, producing a
+  # one-line garbage file with literal "\n" text that qt6ct silently
+  # ignores forever (both machines carried that corpse until 2026-07-22;
+  # its update-an-EXISTING-file sed branch is fine). Unverified whether
+  # 1.5.3 still has the bug — the grep is harmless either way: only that
+  # broken create-branch ever puts a literal backslash-n in an ini file.
+  # `install` (not cp) because the store copy is read-only 444 and the
+  # file must stay writable.
   home.activation.qtctSeed = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     for d in qt5ct qt6ct; do
       conf="$HOME/.config/$d/$d.conf"
-      if [ ! -e "$conf" ]; then
+      if [ ! -e "$conf" ] || grep -qF '\n' "$conf"; then
         mkdir -p "$HOME/.config/$d"
         install -m 644 ${qtctSeed} "$conf"
       fi

@@ -39,32 +39,33 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Noctalia v5 — the native desktop shell that IS the whole desktop: bar,
-    # launcher, notifications, lock screen, idle policy, OSD, clipboard
-    # history, polkit agent, power menu, wallpaper + its own wallpaper-derived
-    # theming engine (replaced DMS 2026-07). v5 is a ground-up C++ rewrite —
-    # nixpkgs' `noctalia-shell` package is the OLD v4 Quickshell app and must
-    # never be substituted for this input. The flake ships a NixOS module and
-    # a home-manager module; we use the NixOS module only (enabled in
-    # modules/noctalia.nix; home/noctalia.nix holds only user-side glue, no
+    # DMS (DankMaterialShell) — the quickshell-based desktop shell that IS
+    # the whole desktop: bar, launcher, notifications, lock screen, idle
+    # policy, OSD, clipboard history, polkit agent, power menu, wallpaper +
+    # matugen wallpaper-derived theming (replaced Noctalia 2026-08, which
+    # had replaced DMS 2026-07 — this is the second DMS era, now paired
+    # with niri instead of hyprland). The `/stable` branch ref = the latest
+    # release tag; nixpkgs 26.05's `dms-shell` package is frozen at 1.4.6,
+    # too old, so the flake input is mandatory. The flake ships a NixOS
+    # module AND home-manager modules (including a niri one that takes over
+    # config.kdl — never use it: config.kdl is our out-of-store symlink);
+    # we use the NixOS module only (enabled in modules/dms.nix; the greeter
+    # module in modules/dms-greeter.nix; home/dms.nix is user glue, no
     # module import).
     #
-    # Deliberately NO `inputs.nixpkgs.follows` here (and on the greeter
-    # below), unlike every other input: noctalia.cachix.org only caches the
-    # build against upstream's own nixpkgs pin — following ours would change
-    # the derivation hash and silently recompile the whole C++ shell from
-    # source on every machine. The cache substituter/key live in
-    # modules/noctalia.nix. The cost is a second nixpkgs closure in the
-    # lock, which is exactly the trade the binary cache pays for.
-    noctalia = {
-      url = "github:noctalia-dev/noctalia";
-    };
-
-    # The matching login greeter (greetd UI) — a separate upstream project
-    # with its own flake. Same no-follows reasoning as the shell above.
-    # Enabled in modules/noctalia-greeter.nix.
-    noctalia-greeter = {
-      url = "github:noctalia-dev/noctalia-greeter";
+    # `follows` IS right here (unlike the noctalia era's deliberate
+    # no-follows): DMS has no binary cache to protect — quickshell comes
+    # prebuilt from cache.nixos.org via OUR nixpkgs, and the upstream
+    # module is built to pass our pkgs through. Only the small Go `dms`
+    # daemon builds from source, once per bump.
+    #
+    # `nix flake update` caveat: on upstream's master the greeter moved to
+    # a separate `dank-greeter` repo and `nixosModules.greeter` became a
+    # warning stub — when a future bump lands 1.6, the greeter needs its
+    # own input and modules/dms-greeter.nix a new option namespace.
+    dank-material-shell = {
+      url = "github:AvengeMedia/DankMaterialShell/stable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # nix-flatpak — declarative flatpak remotes + apps. This input exists for
@@ -94,8 +95,7 @@
       nixpkgs-unstable,
       home-manager,
       disko,
-      noctalia,
-      noctalia-greeter,
+      dank-material-shell,
       nix-flatpak,
       ...
     }@inputs:
@@ -130,12 +130,12 @@
             # Both hosts do, in hosts/<name>/disko.nix.
             disko.nixosModules.disko
 
-            # Noctalia's NixOS modules. Same deal as disko: loading them only
-            # adds options. The shell module (programs.noctalia) is enabled
-            # by modules/noctalia.nix; the greeter module (greetd + Noctalia
-            # greeter UI) is enabled by modules/noctalia-greeter.nix.
-            noctalia.nixosModules.default
-            noctalia-greeter.nixosModules.default
+            # DMS's NixOS modules. Same deal as disko: loading them only
+            # adds options. The shell module (programs.dank-material-shell)
+            # is enabled by modules/dms.nix; the greeter module (greetd +
+            # DMS greeter UI) is enabled by modules/dms-greeter.nix.
+            dank-material-shell.nixosModules.dank-material-shell
+            dank-material-shell.nixosModules.greeter
 
             # nix-flatpak's NixOS module. Same deal again: loading it only
             # extends `services.flatpak` with declarative remotes/packages.

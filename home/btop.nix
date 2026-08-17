@@ -8,8 +8,8 @@
 # k10temp exposes neither — only `Tctl`, `Tccd1`, `Tccd2` — so auto-detect
 # falls through to whatever hwmon entry comes first and lands on the ASUS
 # EC's board sensor, `asusec/CPU`. That one is socket-side: it lags and reads
-# a consistent 9-10 C LOW. Left alone, btop showed 69 C while the Noctalia
-# bar showed 79 C for the same instant.
+# a consistent 9-10 C LOW. Left alone, btop showed 69 C while the shell
+# bar (then Noctalia) showed 79 C for the same instant.
 #
 # WHAT THE CHANNELS ARE. `tempN` is a hwmon registration INDEX, not a core —
 # k10temp on this part publishes temp1=Tctl, temp3=Tccd1, temp4=Tccd2, and no
@@ -43,7 +43,10 @@
 # headline can under-report the hottest chiplet by better than 10 C, and it
 # will visibly jitter. btop's per-core rows still show both dies; that is
 # where the split is readable. Deliberate trade for seeing raw silicon.
-# The Noctalia bar is pinned to the same sensor, in home/noctalia/config.toml.
+# (The DMS bar has no equivalent sensor pin — noctalia's config.toml
+# carried one; DMS auto-detects, so its CPU widget may read Tctl or the
+# laggy asusec sensor. Accepted: btop is where temperature gets READ, and
+# this file keeps the pin — the knowledge lives here now.)
 #
 # Trade-off of managing btop at all: `settings` renders ~/.config/btop/btop.conf
 # as a read-only store symlink, so tweaks made inside btop's own Options menu

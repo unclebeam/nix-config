@@ -16,7 +16,7 @@
   # here rather than restating it. Set `hardware.bluetooth.powerOnBoot =
   # false` if a machine should ever boot radio-off.
 
-  # There is deliberately no pairing GUI here: the Noctalia shell's
+  # There is deliberately no pairing GUI here: the DMS shell's
   # bluetooth panel (control center) is the pairing/connection UI, including
   # answering BlueZ agent prompts. Blueman filled that role until 2026-07 —
   # removed as a redundant second GUI (and second tray applet) once the

@@ -1,7 +1,7 @@
 # home/niri.nix — the USER half of niri: glue for the plain KDL config.
 # (Session/portal plumbing is system-side in modules/niri.nix; the desktop
-# shell — bar, lock screen, idle policy, notifications — is Noctalia, in
-# modules/noctalia.nix.)
+# shell — bar, lock screen, idle policy, notifications — is DMS, in
+# modules/dms.nix.)
 #
 # The window-manager config itself is NOT here: it's the plain, tracked KDL
 # file home/niri/config.kdl — symlinked, not Nix-generated, same rule as the
@@ -50,9 +50,9 @@ assert lib.assertMsg (builtins.pathExists hostKdl) ''
   # No rebuild, no reload command (hyprland needed `hyprctl reload`).
   #
   # Individual files are linked (not the whole niri/ dir) so ~/.config/niri
-  # stays a real, writable directory — Noctalia's template engine writes
-  # noctalia.kdl there imperatively on every wallpaper change, which a
-  # read-only dir symlink would block.
+  # stays a real, writable directory — DMS's matugen writes dms/colors.kdl
+  # under it imperatively on every wallpaper change (dir seeded by
+  # home/dms.nix), which a read-only dir symlink would block.
   xdg.configFile."niri/config.kdl".source =
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nix-config/home/niri/config.kdl";
@@ -99,15 +99,15 @@ assert lib.assertMsg (builtins.pathExists hostKdl) ''
   # BindsTo when graphical-session.target goes down at logout. Deliberately
   # NO Install section — the target must only ever be reached by that
   # explicit start, never pulled in whenever a graphical session appears.
-  # That scoping is what lets units like the shell (noctalia.service,
-  # defined by modules/noctalia.nix as a system-level user unit) belong to
+  # That scoping is what lets units like the shell (dms.service,
+  # defined by modules/dms.nix as a system-level user unit) belong to
   # THIS session specifically rather than to any graphical session that
   # ever starts.
   #
   # Why spawn-at-startup and not Wants= on niri.service: niri only runs
   # startup spawns AFTER it has imported WAYLAND_DISPLAY into the user
   # manager (part of reaching Type=notify readiness), so everything the
-  # target drags up — noctalia.service first of all — is guaranteed to see
+  # target drags up — dms.service first of all — is guaranteed to see
   # the display. A Wants= would queue the target when the service STARTS,
   # racing that import; this exact spawn-at-startup design already ran for
   # months in the first niri era. Teardown needs no hook at all (unlike
@@ -125,15 +125,16 @@ assert lib.assertMsg (builtins.pathExists hostKdl) ''
   };
 
   # (No idle daemon here: idle/lock/screen-off policy — and the locker
-  # itself — is Noctalia. The timeouts are DECLARED in the tracked
-  # home/noctalia/config.toml ([idle.behavior.*]) — a fresh install has a
-  # working idle lock from the first login.)
+  # itself — is DMS. The timeouts live in its GUI-owned settings.json and
+  # DEFAULT TO 0 = disabled — setting them in DMS Settings is a
+  # first-login step on each machine, the accepted regression vs
+  # noctalia's tracked [idle.behavior.*]; see CLAUDE.md.)
 
   # Utilities the session shells out to. No grim/slurp: screenshots are
-  # Noctalia's, piped straight into satty ([shell.screenshot] in
-  # home/noctalia/config.toml; Print binds in niri/config.kdl). No
-  # brightnessctl: brightness keys go through `noctalia msg brightness-*`.
-  # No playerctl either — media keys go through `noctalia msg media …`.
+  # DMS's, via the screenshot-annotate wrapper into satty (home/satty.nix;
+  # Print binds in niri/config.kdl). No brightnessctl: brightness keys go
+  # through `dms ipc call brightness …`. No playerctl either — media keys
+  # go through `dms ipc call mpris …`.
   home.packages = with pkgs; [
     # Session-wide clipboard CLI: satty's copy-command, neovim's system
     # clipboard, and shell pipelines all exec wl-copy / wl-paste. Lives here

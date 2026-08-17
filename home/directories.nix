@@ -7,7 +7,7 @@
 #    prompts, and `xdg-user-dir` actually consult — so declaring the dir HERE
 #    also points every app at it.
 #  * a plain activation script for the two non-XDG dirs (~/org, ~/.ssh),
-#    following the placeholder pattern in home/noctalia.nix.
+#    following the placeholder pattern in home/dms.nix.
 { config, lib, pkgs, ... }:
 
 {

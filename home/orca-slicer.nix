@@ -17,7 +17,7 @@
 #
 # No Qt block and no theme colors: OrcaSlicer is GTK3/wxWidgets. Under flatpak
 # it renders with the runtime's own GTK theme rather than picking up
-# home/gtk.nix and Noctalia's GTK template — a sandbox has no view of those.
+# home/gtk.nix and DMS's GTK theming — a sandbox has no view of those.
 # That's accepted, not overlooked: per the repo's theming rule, an app either
 # reaches the templates or stays at its defaults, and no palette gets
 # hardcoded to fake it. Settings, printer profiles and the Bambu account login

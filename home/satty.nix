@@ -1,22 +1,43 @@
 # home/satty.nix — screenshot annotator. Every screenshot flows through it:
-# the Print binds (home/niri/config.kdl) run `noctalia msg screenshot-*`,
-# and Noctalia's screenshot config (home/noctalia/config.toml,
-# [shell.screenshot]) pipes the capture straight into satty on stdin
-# (`satty -f -`) with file/clipboard output off — nothing touches disk or
-# clipboard until you commit inside satty (Enter); Escape discards. A
-# cancelled region select never spawns satty at all.
-# Owns everything satty: the package and config.toml.
-#
-# (History: under DMS this file also carried a `screenshot-annotate`
-# wrapper — capture-to-stdout glue plus a clipboard re-own that stopped
-# Chromium windows yanking focus when DMS's region UI touched the
-# selection during init. Noctalia's pipe design needs no wrapper, and its
-# overlay isn't known to touch the clipboard pre-capture — if the
-# workspace ever jumps to a browser mid-capture again, that bug is back;
-# see git history for the wl-copy re-own trick.)
+# the Print binds (home/niri/config.kdl) run the `screenshot-annotate`
+# wrapper below, which captures via DMS's built-in screenshot UI and hands
+# the image straight to satty. Nothing touches disk or clipboard until you
+# commit inside satty (Enter); Escape discards. A cancelled region select
+# never spawns satty at all. (Noctalia had a native pipe_to_command for
+# this — DMS doesn't, hence the wrapper, restored from the first DMS era.)
+# Owns everything satty: the package, config.toml, and the wrapper script.
 { config, lib, pkgs, ... }:
 
 {
+  home.packages = [
+    # Capture with DMS's screenshot UI, hand the result to satty. Mode
+    # passes through: `screenshot-annotate` = region (the default),
+    # `… full` = focused output, `… window` = focused window.
+    (pkgs.writeShellScriptBin "screenshot-annotate" ''
+      # --no-file/--no-clipboard/--no-notify: satty is the ONLY output —
+      # the raw capture is kept nowhere, and DMS's "saved!" toast would lie.
+      # Buffer through a temp file instead of a raw pipe so a cancelled
+      # region-select (empty stdout) never launches satty on a blank image.
+      #
+      # Chromium quirk (verified 2026-07-21, DMS 1.5.2, under hyprland):
+      # when a Chromium-family window (brave) OWNS the clipboard, dms's
+      # region UI touching the selection during init makes the browser fire
+      # an xdg-activation request — a compositor that honors it yanks focus
+      # to the browser mid-capture. Re-owning the clipboard first (same
+      # content, owner becomes wl-copy) keeps dms away from the browser.
+      # Not re-verified on niri, but harmless: only the top mime type
+      # survives the re-own, which is fine — a committed satty run replaces
+      # the clipboard with the screenshot anyway. Drop when upstream fixes
+      # the clipboard init.
+      t=$(wl-paste --list-types 2>/dev/null | head -n1)
+      [ -n "$t" ] && wl-paste -t "$t" 2>/dev/null | wl-copy -t "$t" 2>/dev/null
+      img=$(mktemp --suffix=.png)
+      trap 'rm -f "$img"' EXIT
+      dms screenshot "$@" --stdout --no-file --no-clipboard --no-notify > "$img"
+      [ -s "$img" ] && satty --filename "$img"
+    '')
+  ];
+
   programs.satty = {
     enable = true;
     # Rendered to ~/.config/satty/config.toml.

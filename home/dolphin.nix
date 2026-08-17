@@ -68,7 +68,7 @@
   # default "auto", udiskie waits for a StatusNotifier tray host at startup
   # and silently never automounts if one is slow to appear — "never" keeps
   # automount independent of the shell bar's tray. notify routes toasts
-  # through the notification daemon (the Noctalia shell) on mount/unmount.
+  # through the notification daemon (the DMS shell) on mount/unmount.
   services.udiskie = {
     enable = true;
     automount = true;

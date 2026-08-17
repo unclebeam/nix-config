@@ -4,11 +4,11 @@
 # with niri back as a FULL replacement — the hyprland modules are gone, not
 # parked, same as last time in the other direction.) Fonts and Wayland-wide
 # env stay in modules/desktop.nix (compositor-agnostic); the greeter is
-# Noctalia's on greetd (modules/noctalia-greeter.nix). The USER half
-# (config.kdl glue) lives in home/niri.nix; the desktop shell — bar, lock
-# screen, idle policy — is Noctalia (modules/noctalia.nix, whose v5 has a
-# first-class niri backend: NIRI_SOCKET IPC for workspaces/windows/layout,
-# plus niri-only extras like the overview backdrop).
+# DMS's on greetd (modules/dms-greeter.nix). The USER half (config.kdl
+# glue) lives in home/niri.nix; the desktop shell — bar, lock screen, idle
+# policy — is DMS (modules/dms.nix; niri is DMS's original home-turf
+# compositor — NIRI_SOCKET IPC for workspaces/windows, plus the overview
+# backdrop layer-rule in config.kdl).
 { config, lib, pkgs, ... }:
 
 {
@@ -46,11 +46,10 @@
   #    this module does).
   #  * swaylock PAM (security.pam.services.swaylock) — generated
   #    unconditionally via wayland-session.nix. Unused (the locker is
-  #    Noctalia's, authenticating against /etc/pam.d/login) but harmless;
+  #    DMS's, authenticating against /etc/pam.d/login) but harmless;
   #    modules/fprintd.nix still opts its fprintAuth off.
   #  * polkit (security.polkit, the ENGINE) — also from wayland-session.nix.
-  #    The AGENT half is the Noctalia shell's, switched on in
-  #    home/noctalia/config.toml (polkit_agent).
+  #    The AGENT half is built into the DMS shell — always on, no config.
   # Window-manager *configuration* comes from home-manager.
   programs.niri.enable = true;
 
@@ -68,7 +67,7 @@
   # ── Portal routing: KDE for dialogs, GNOME only for capture ─────────────
   # The KDE portal serves everything interactive: file dialogs (KIO,
   # matching Dolphin), notifications (forwarded to org.freedesktop.
-  # Notifications, i.e. the Noctalia shell), Access prompts, and Settings —
+  # Notifications, i.e. the DMS shell), Access prompts, and Settings —
   # apps read the color-scheme preference from kdeglobals, not gsettings.
   # The niri module hard-sets its keys as plain coerced strings, so
   # overriding the SAME keys needs mkForce (a second plain definition is an
@@ -94,9 +93,10 @@
     "org.freedesktop.impl.portal.Screenshot" = "gnome";
     "org.freedesktop.impl.portal.RemoteDesktop" = "gnome";
   };
-  # (Screenshots via Print don't touch these portals at all: Noctalia
-  # captures natively over wlr-screencopy — which niri implements — and
-  # pipes into satty. The gnome routes above serve app screencast: OBS,
+  # (Screenshots via Print don't touch these portals at all: DMS's
+  # screenshot UI captures natively — niri implements the wlr protocols it
+  # needs — and the screenshot-annotate wrapper hands the image to satty.
+  # The gnome routes above serve app screencast: OBS,
   # browser screenshare, vesktop. One behavior change vs xdph: the
   # restore-token auto-grant tuning lived in hypr/xdph.conf, so re-sharing
   # to the same site re-opens the picker each time now — accepted.)

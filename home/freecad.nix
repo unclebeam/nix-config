@@ -23,7 +23,7 @@
 #
 # No Qt block and no theme colors here: FreeCAD is Qt6, so the shared
 # home/qt.nix already reaches it — QT_QPA_PLATFORMTHEME=qt6ct points it at
-# Noctalia's wallpaper-derived KColorScheme and at breeze-icons. That is the
+# DMS's wallpaper-derived KColorScheme and at breeze-icons. That is the
 # whole difference from OrcaSlicer, which renders in a flatpak sandbox with the
 # runtime's own GTK theme because a sandbox can't see our templates. Per the
 # repo's theming rule an app either reaches the templates or stays at its

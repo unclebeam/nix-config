@@ -10,8 +10,8 @@
     ../../modules/nix-config.nix # clone ~/nix-config on first boot (out-of-store symlink target)
     ../../modules/desktop.nix    # fonts, Wayland env, GTK portal fallback
     ../../modules/niri.nix       # niri session (back for good 2026-08; hyprland re-trial ended — full replacement)
-    ../../modules/noctalia.nix   # Noctalia shell, system half (service + cachix + fonts; config in home/noctalia.nix)
-    ../../modules/noctalia-greeter.nix # Noctalia login greeter on greetd (took over from DMS greeter 2026-07)
+    ../../modules/dms.nix        # DMS shell, system half (service + fonts + input group; user glue in home/dms.nix)
+    ../../modules/dms-greeter.nix # DMS login greeter on greetd (took over from the Noctalia greeter 2026-08)
     ../../modules/kwallet.nix    # session keyring: ksecretd + pam_kwallet unlock (replaced gnome-keyring 2026-07)
     ../../modules/audio.nix
     ../../modules/bluetooth.nix  # bluez userspace for the built-in Intel adapter (pairing UI is the shell's — no Blueman)

@@ -15,8 +15,8 @@
 # machine-local wallpapers can still be dropped in by hand next to these.
 #
 # NOTE: only the images are declared here. The wallpaper *choice* is
-# machine-local GUI state (~/.local/state/noctalia/settings.toml) — picking
-# one via SUPER+Y remains the documented first-login step.
+# machine-local GUI state (DMS's settings.json) — picking one via SUPER+Y
+# remains the documented first-login step.
 { config, lib, pkgs, ... }:
 
 {
