@@ -97,9 +97,9 @@
     # initialPassword because the plain option lands the literal string in
     # the world-readable /nix/store; marginal here since the value is
     # public in this repo anyway, but the hash costs nothing. NB: changing
-    # the password later does NOT re-key the kwallet — see the warning in
-    # modules/kwallet.nix (the wallet keeps the OLD password until you
-    # change it in kwalletmanager too).
+    # the password later does NOT re-key the login keyring — see the
+    # warning in modules/gnome-keyring.nix (the keyring keeps the OLD
+    # password until you change it in Seahorse too).
     # (nixos-install also asks for the root password interactively.)
     initialHashedPassword = "$6$CwzSz2CEk36YeqZ9$jwZf/3qbXcSzqvX2ymARckGqeoxpcT5sBc801REF0PnlHI9u2CDoluoH3d3zqwrhQNdlR6dQp4wWOOeGsqrjE1";
   };

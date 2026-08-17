@@ -17,19 +17,20 @@
   services.fprintd.enable = true;
 
   # ── Keep the greeter (and tty login) password-only — BY DESIGN ─────────
-  # pam_kwallet (wired on the `greetd` service in modules/kwallet.nix) can
-  # only derive the wallet key from the password typed at login. A
-  # fingerprint login would leave the wallet locked and every secrets
-  # consumer (Nautilus/gvfs's saved SMB credentials, browser Safe Storage) prompting
-  # separately — so the greeter stays password-only forever, and
-  # fingerprint is for the surfaces where the wallet is already open:
+  # pam_gnome_keyring (wired on the `greetd` service in
+  # modules/gnome-keyring.nix) can only derive the keyring key from the
+  # password typed at login. A fingerprint login would leave the keyring
+  # locked and every secrets consumer (Nautilus/gvfs's saved SMB
+  # credentials, browser Safe Storage) prompting separately — so the
+  # greeter stays password-only forever, and fingerprint is for the
+  # surfaces where the keyring is already open:
   # sudo and polkit. `login` also stays password-only because the DMS
   # lock screen authenticates against /etc/pam.d/login on NixOS —
   # pam_fprintd there would gate the LOCK SCREEN's password path behind a
   # finger-scan prompt (and tty logins with it). (This stance is
   # era-independent: it held under DMS the first time, under Noctalia,
-  # and holds now — every shell's lock has used `login` for its password
-  # path.)
+  # under both keyrings — kwallet then, gnome-keyring now — and every
+  # shell's lock has used `login` for its password path.)
   #
   # (DMS's own lock-screen fingerprint support is ORTHOGONAL to these
   # opt-outs: the shell talks to fprintd directly, not through the
@@ -43,9 +44,9 @@
   # Without these, the enable-everything default quietly hands a finger
   # scan powers it shouldn't have:
   #  * passwd/chpasswd — CHANGING the login password by finger-scan. That's
-  #    exactly the operation the kwallet warning (modules/kwallet.nix,
-  #    home/kwallet.nix) says silently breaks wallet auto-unlock; it must
-  #    stay deliberate, behind the current password.
+  #    exactly the operation the keyring warning (modules/gnome-keyring.nix)
+  #    says silently breaks keyring auto-unlock; it must stay deliberate,
+  #    behind the current password.
   #  * systemd-run0 — run0 root escalation.
   #  * vlock — the console locker (not covered by the `login` opt-out).
   #  * su — keep target-password-only, matching the tty-login policy.

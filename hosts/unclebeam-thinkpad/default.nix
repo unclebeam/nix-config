@@ -12,13 +12,13 @@
     ../../modules/niri.nix       # niri session (back for good 2026-08; hyprland re-trial ended — full replacement)
     ../../modules/dms.nix        # DMS shell, system half (service + fonts + input group; user glue in home/dms.nix)
     ../../modules/dms-greeter.nix # DMS login greeter on greetd (took over from the Noctalia greeter 2026-08)
-    ../../modules/kwallet.nix    # session keyring: ksecretd + pam_kwallet unlock (replaced gnome-keyring 2026-07)
+    ../../modules/gnome-keyring.nix # session keyring: gnome-keyring + PAM unlock on greetd + seahorse (took back over from ksecretd 2026-08)
     ../../modules/audio.nix
     ../../modules/bluetooth.nix  # bluez userspace for the built-in Intel adapter (pairing UI is the shell's — no Blueman)
     ../../modules/kanata.nix     # capslock: tap = esc, hold = ctrl; f/j: hold = shift
     ../../modules/laptop.nix     # power mgmt, backlight, lid behavior, fwupd
     ../../modules/ddc.nix        # DDC/CI brightness for the docked Dell (i2c + ddcutil; panel stays on kernel backlight)
-    ../../modules/fprintd.nix    # fingerprint auth (sudo/polkit; greeter + lock stay password — kwallet)
+    ../../modules/fprintd.nix    # fingerprint auth (sudo/polkit; greeter + lock stay password — keyring unlock)
     ../../modules/docker.nix     # docker daemon + compose (importing it = enabling it)
     ../../modules/nix-ld.nix     # run prebuilt binaries (Prisma engines etc.)
     ../../modules/onepassword.nix # 1Password app + op CLI + browser extension (Chrome + Brave)

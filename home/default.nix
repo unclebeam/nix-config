@@ -21,7 +21,6 @@
     ./cursor.nix    # mouse cursor theme + size (HiDPI)
     ./gtk.nix       # GTK icon theme (Adwaita) — GTK apps' counterpart to qt.nix's breeze-icons
     ./nautilus.nix     # file manager (gvfs-backed, system half in modules/nautilus.nix) + xdg default for dirs
-    ./kwallet.nix      # session keyring user half: kwalletrc (ksecretd on, no first-run wizard)
     ./file-roller.nix  # archive manager (.zip/.7z/.rar) + CLI backends
     ./qt.nix           # Qt theming via qt6ct + DMS's KColorScheme (VLC/FreeCAD)
     ./vlc.nix          # VLC media player + default audio handler

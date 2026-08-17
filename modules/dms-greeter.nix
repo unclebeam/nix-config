@@ -20,14 +20,14 @@
 # generated WITH default rules, so per-service toggles on it actually work
 # (unlike sddm, whose stack was a bare `substack login` where every toggle
 # was a silent no-op — see the hard-won rule in CLAUDE.md). Two files hook
-# into it and have carried across every greeter era unchanged:
-# modules/kwallet.nix (pam_kwallet auto-unlock — the reason the greeter
-# must stay password-only) and modules/fprintd.nix (the fprintAuth opt-out
-# enforcing exactly that). The module also declares its own empty
-# `dms-greeter` PAM service — that one is the greeter UI's, not the login
-# path; leave it alone. If the wallet ever fails to unlock after login,
-# the escape hatch to try first is
-# security.pam.services.greetd.kwallet.forceRun = true.
+# into it and have carried across every greeter AND keyring era:
+# modules/gnome-keyring.nix (pam_gnome_keyring auto-unlock — the reason
+# the greeter must stay password-only) and modules/fprintd.nix (the
+# fprintAuth opt-out enforcing exactly that). The module also declares its
+# own empty `dms-greeter` PAM service — that one is the greeter UI's, not
+# the login path; leave it alone. If the keyring ever fails to unlock
+# after login, check /etc/pam.d/greetd actually carries pam_gnome_keyring
+# in both its auth and session phases before debugging anywhere else.
 #
 # Upstream note: on DMS master the greeter has moved out to a separate
 # `dank-greeter` repo and this flake output became a warning stub — fine

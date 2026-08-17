@@ -6,10 +6,10 @@
 # programs.niri.useNautilus = true, which puts Nautilus on the session bus
 # so xdg-desktop-portal-gnome serves every app's open/save dialog with
 # Nautilus's picker, and Nautilus claims org.freedesktop.FileManager1
-# ("reveal in folder"). The keyring did NOT move with it: secrets stay in
-# ksecretd (modules/kwallet.nix), which gvfs reaches via
+# ("reveal in folder"). The keyring is GNOME too (since 2026-08): secrets
+# live in gnome-keyring (modules/gnome-keyring.nix), which gvfs reaches via
 # org.freedesktop.secrets — saved SMB passwords survive relogin through the
-# same pam_kwallet unlock as before.
+# pam_gnome_keyring unlock at login.
 #
 # The system half (gvfs, avahi discovery, udisks2, ntfs/exfat) lives in
 # modules/nautilus.nix — only NixOS can set those. Removing Nautilus =

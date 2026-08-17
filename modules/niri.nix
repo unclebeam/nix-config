@@ -30,8 +30,9 @@
   #    and writes a niri-portals.conf routing default→gnome,gtk /
   #    Access→gtk / Notification→gtk / Secret→gnome-keyring. Since the
   #    2026-08 Dolphin→Nautilus revert we KEEP that routing (the KDE portal
-  #    and its mkForce'd reroutes left with Dolphin) — the only overrides
-  #    are Secret→kwallet in modules/kwallet.nix and the capture pins
+  #    and its mkForce'd reroutes left with Dolphin, and the Secret key
+  #    became correct as-is when the keyring followed to gnome-keyring —
+  #    modules/gnome-keyring.nix) — the only overrides are the capture pins
   #    below. xdg-desktop-portal-gnome is also the ONLY screencast backend
   #    niri supports (niri implements org.gnome.Mutter.ScreenCast;
   #    xdp-kde's capture code speaks KWin's private zkde_screencast
@@ -42,10 +43,10 @@
   #    to niri over a public D-Bus API, not the compositor's own protocol
   #    versions — which is also why niri needs no unstable pin (26.05's
   #    26.04 is current) and this module takes no pkgs-unstable arg.
-  #  * enables gnome-keyring (mkDefault) — overridden back OFF in
-  #    modules/kwallet.nix, where ksecretd (KDE) is the session keyring.
-  #    That guard is LIVE again (programs.hyprland never touched keyrings;
-  #    this module does).
+  #  * enables gnome-keyring (mkDefault) — and since 2026-08 we AGREE:
+  #    modules/gnome-keyring.nix pins it true and adds the PAM unlock on
+  #    greetd. (The kwallet era overrode this to false to run ksecretd
+  #    instead; that fight is over — auth is GNOME now.)
   #  * swaylock PAM (security.pam.services.swaylock) — generated
   #    unconditionally via wayland-session.nix. Unused (the locker is
   #    DMS's, authenticating against /etc/pam.d/login) but harmless;
@@ -77,10 +78,11 @@
   # to gnome too, so apps read the color-scheme preference from gsettings,
   # which DMS's "Apply GTK Themes" toggle writes. The KDE portal package
   # and its mkForce'd routes are GONE (they existed for Dolphin/KIO
-  # dialogs); the one KDE route that stays is Secret→kwallet in
-  # modules/kwallet.nix (one file per intent — the keyring did not
-  # migrate, and that key still needs mkForce because the niri module
-  # hard-sets Secret as a plain coerced string).
+  # dialogs), and Secret stays on upstream's gnome-keyring — the keyring
+  # followed to GNOME 2026-08 (modules/gnome-keyring.nix), retiring the
+  # repo's last mkForce'd portal key (kwallet's Secret reroute; the
+  # mkForce was needed because this module hard-sets Secret as a plain
+  # coerced string — remember that if a key ever needs overriding again).
   # The three pins below are REDUNDANT today (upstream never writes these
   # keys, and they'd fall through default=gnome anyway) and kept on
   # purpose as the executable form of a hard rule: xdg-desktop-portal-kde's

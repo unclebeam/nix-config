@@ -1,11 +1,12 @@
 # modules/nautilus.nix — the SYSTEM half of Nautilus (the app itself lives
 # in home/nautilus.nix). Everything here is here because only NixOS — not
 # home-manager — can set it. (Replaced modules/dolphin.nix 2026-08 when the
-# file manager went back to GNOME. The keyring did NOT follow: ksecretd in
-# modules/kwallet.nix stays the org.freedesktop.secrets store, and gvfs's
-# "remember password" lands there via libsecret. The pre-Dolphin version of
-# this file in git history carries a gnome-keyring PAM line — do not
-# resurrect it; pam_kwallet on greetd is the unlock path now.)
+# file manager went back to GNOME; the keyring followed later that month —
+# gnome-keyring (modules/gnome-keyring.nix) owns org.freedesktop.secrets,
+# and gvfs's "remember password" lands there via libsecret. The pre-Dolphin
+# version of this file carried its own gnome-keyring PAM line — still do
+# not resurrect it here: keyring wiring lives in the keyring module, one
+# file per intent, not in the file manager's.)
 { config, lib, pkgs, ... }:
 
 {
@@ -18,9 +19,9 @@
   # daemons AND their D-Bus/systemd activation units — a bare package in
   # home.packages would put binaries on PATH that nothing ever activates.
   # (The default package is the full gnome build: SMB compiled in, and
-  # libsecret for saved share credentials — which flow to ksecretd,
-  # unlocked at login by pam_kwallet, so "remember password" survives
-  # relogin with no extra wiring.)
+  # libsecret for saved share credentials — which flow to gnome-keyring,
+  # unlocked at login by pam_gnome_keyring (modules/gnome-keyring.nix), so
+  # "remember password" survives relogin with no extra wiring.)
   services.gvfs.enable = true;
 
   # mDNS/DNS-SD discovery: Nautilus's "Other Locations" view lists SMB
