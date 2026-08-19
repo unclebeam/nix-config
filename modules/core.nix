@@ -150,7 +150,10 @@
     # xdph restore-token tuning is gone, so every re-share opens the picker
     # again).
     vesktop
-    libreoffice
+    # (Both office suites were removed 2026-08-19: LibreOffice from this list,
+    # and OnlyOffice with its whole home/onlyoffice.nix. Neither registered a
+    # mime handler, so nothing else had to be unwired — office documents now
+    # simply have no default application. Re-add either one on its own.)
     # DBeaver Community Edition. nixpkgs only carries the upstream binary
     # release (-bin); there is no from-source `dbeaver` attribute.
     dbeaver-bin

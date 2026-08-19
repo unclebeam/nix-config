@@ -27,8 +27,6 @@
     ./mpv.nix          # mpv: video player + default video handler (HDR parked — niri has no CM yet)
     ./obs.nix          # OBS Studio (screencast via the GNOME portal — niri's backend; audio via PipeWire)
     ./spotify.nix      # Spotify desktop client (unfree; allowUnfree in core.nix)
-    ./ticktick.nix     # TickTick task manager (unfree; allowUnfree in core.nix)
-    ./onlyoffice.nix   # OnlyOffice desktop editors (alongside LibreOffice in core.nix)
     ./freecad.nix      # parametric CAD modeller (authors the models the slicer below prints)
     ./orca-slicer.nix  # 3D slicer file associations (the app is a flatpak — see modules/orca-slicer.nix)
     ./mangohud.nix     # in-game FPS overlay (per-game: `mangohud %command%` in Steam)
