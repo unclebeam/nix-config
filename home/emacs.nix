@@ -1,161 +1,115 @@
 # home/emacs.nix — Doom Emacs: the emacs package + live-symlinked doom config.
+# Doom is managed the classic way (same "editor configs stay plain files"
+# rule as nvim): Nix ships the editor and CLI tools; Doom itself is a plain
+# git clone in ~/.config/emacs (automated below) that installs its own elisp
+# via `doom sync` — never nix-doom-emacs.
 #
-# Doom is managed the CLASSIC way, mirroring how nvim treats lazy.nvim:
-# Nix ships the editor and CLI tools; Doom itself (the framework) is a plain
-# git clone in ~/.config/emacs that installs its own elisp packages via
-# `doom sync` — never nix-doom-emacs or other Nix-generated equivalents
-# (same "editor configs stay plain files" rule as nvim, see CLAUDE.md).
+# Manual, once per machine on first login:
+#   doom install                       # builds Doom's packages (~minutes)
+#   doom doctor                        # sanity check (new shell for PATH)
+#   systemctl --user restart emacs.service  # daemon started bare pre-install
 #
-# The framework clone into ~/.config/emacs is AUTOMATIC (clone-doom-emacs
-# service below). What remains manual, once per machine on first login:
-#   doom install                       # builds Doom's packages (~minutes);
-#                                      # our tracked home/doom/ already exists,
-#                                      # so it skips generating a config
-#   doom doctor                        # sanity check (new shell for the PATH entry)
-#   systemctl --user restart emacs.service  # the daemon started BARE before
-#                                      # install; restart so it loads Doom
-#
-# Removing emacs = delete this file, home/doom/, the import line in
-# default.nix, symbola in modules/desktop.nix, and `rm -rf ~/.config/emacs
-# ~/.local/share/doom ~/.emacs.d` for the imperative runtime state.
-# (~/.emacs.d is just an eln-cache emacs sometimes recreates — but if it
-# exists, emacs prefers it over ~/.config/emacs and boots VANILLA, no Doom.)
+# Removing emacs = this file, home/doom/, the import line, symbola in
+# modules/desktop.nix, and `rm -rf ~/.config/emacs ~/.local/share/doom
+# ~/.emacs.d` (if ~/.emacs.d exists, emacs prefers it and boots vanilla).
 { config, lib, pkgs, ... }:
 
 let
-  # emacs-pgtk wrapped with the elisp packages whose NATIVE modules the editor
-  # must never build or download itself (the no-Mason rule): :term vterm and
-  # :term ghostel each need a dynamic module, and nixpkgs ships both prebuilt —
-  # vterm-module.so compiled from C, ghostel-module.so compiled from Zig source.
-  # Without this wrapper, first use would try `cmake` in-editor (vterm — fails,
-  # no toolchain on PATH) or download a prebuilt binary from GitHub releases
-  # (ghostel). ghostel finds its module as a sidecar next to ghostel.el, which
-  # is exactly where nixpkgs installs it, so the downloader never fires.
-  # Doom is told to use these copies via `:built-in t` in doom/packages.el —
-  # straight's `:built-in 'prefer` detection only sees Emacs-core built-ins,
-  # never Nix site packages, so the override there is load-bearing.
+  # emacs-pgtk wrapped with the elisp packages whose NATIVE modules the
+  # editor must never build or download itself (the no-Mason rule): vterm
+  # and ghostel each need a dynamic module, and nixpkgs ships both prebuilt.
+  # ghostel finds its module as a sidecar next to ghostel.el — exactly where
+  # nixpkgs installs it, so its GitHub downloader never fires. Doom is told
+  # to use these copies via `:built-in t` in doom/packages.el — load-bearing:
+  # straight's `:built-in 'prefer` only detects Emacs-core built-ins, never
+  # Nix site packages.
   emacsWithModules = (pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages
     (epkgs: [ epkgs.vterm epkgs.ghostel ]);
 in
 {
   home.packages = [
-    # Emacs 30 with the pure-GTK frontend — the build that renders natively
-    # on Wayland (the default build runs blurry under Xwayland).
-    # Includes native-comp; Doom compiles its packages with it on sync.
+    # The pure-GTK build — renders natively on Wayland (default build is
+    # blurry under Xwayland). Includes native-comp.
     emacsWithModules
     # Doom's other hard requirements — git, ripgrep, fd — are in core.nix.
 
     # ── Doom module tools as Nix packages, never editor-installed ──
-    # (same rule as nvim's no-Mason: `doom doctor` names what a module wants,
-    # and enabling a Doom module later = add its external tools HERE first.)
-    pkgs.shellcheck # :lang sh — shell script linting
-    pkgs.shfmt # :lang sh — shfmt, apheleia formats shell scripts with it
+    # (enabling a Doom module later = add its external tools here first;
+    # `doom doctor` names what a module wants.)
+    pkgs.shellcheck # :lang sh
+    pkgs.shfmt # :lang sh — apheleia formats shell scripts with it
     pkgs.multimarkdown # :lang markdown — compiler for markdown-preview
-    # Same server nvim uses (home/neovim.nix); listed here TOO because each
-    # editor's file declares its own tools (atomic removal — buildEnv dedupes).
-    pkgs.nil # :lang nix +lsp — Nix language server; lsp-mode finds it on PATH
-    # The RFC-style formatter is now the default `nixfmt` binary (the old
-    # `nixfmt-rfc-style` attr is a deprecated alias that eval-warns). Command
-    # name `nixfmt` — exactly what :lang nix's nix-format-buffer invokes.
-    pkgs.nixfmt # :lang nix — nixfmt formatter
-    # Same server + formatter nvim uses (home/neovim.nix); listed here TOO
-    # for the same reason as pkgs.nil above — each editor's file declares its
-    # own tools. The Lua surface these serve is home/nvim/* (the compositor
-    # config was Lua in the hyprland era; niri's is KDL, which needs no
-    # LSP — plain text plus `niri validate`).
-    # lsp-mode's lua client resolves the binary with `executable-find`, so
-    # being on PATH is the whole wiring — nothing to pin by hand the way
-    # tailwind's server-path is pinned in doom/config.el.
-    pkgs.lua-language-server # :lang (lua +lsp) — LuaLS
-    # apheleia maps lua-mode → `stylua -` out of the box, so :editor
-    # (format +onsave) formats lua the moment this is on PATH. It reads the
-    # nearest stylua.toml — home/nvim's (2 spaces) — so this reformats
-    # nothing.
-    pkgs.stylua # :lang lua — formatter
+    # nil/nixfmt/LuaLS/stylua are also in home/neovim.nix — each editor's
+    # file declares its own tools (atomic removal; buildEnv dedupes).
+    pkgs.nil # :lang nix +lsp
+    # The RFC-style formatter is now the default `nixfmt` binary; command
+    # name `nixfmt` is exactly what nix-format-buffer invokes.
+    pkgs.nixfmt # :lang nix
+    # lsp-mode resolves lua-language-server via executable-find, so being on
+    # PATH is the whole wiring.
+    pkgs.lua-language-server # :lang (lua +lsp)
+    # apheleia maps lua-mode → `stylua -` out of the box; reads the nearest
+    # stylua.toml (home/nvim's), so this reformats nothing.
+    pkgs.stylua # :lang lua
 
     # ── Next.js/TypeScript stack (:lang (javascript +lsp +tree-sitter)) ──
-    # lsp-mode's ts-ls client for js/ts/tsx modes — no elisp config needed,
-    # it just has to be on PATH. (nvim's LazyVim extra wants vtsls instead;
-    # different servers, so nothing to promote/share between the editors.)
+    # ts-ls just has to be on PATH. (nvim uses vtsls — different servers,
+    # nothing to share.)
     pkgs.typescript-language-server
-    # Fallback tsserver for the server above; real projects win — it prefers
-    # the workspace's own node_modules/typescript when one exists.
+    # Fallback tsserver; real projects win — it prefers the workspace's own
+    # node_modules/typescript.
     pkgs.typescript
-    # vscode-json-language-server for :lang (json +lsp)
-    # (package.json/tsconfig.json schema completion); the css/html/eslint
-    # servers ride along, css serving (web +lsp).
+    # json/css/html/eslint servers for :lang (json +lsp) and (web +lsp).
     pkgs.vscode-langservers-extracted
-    # Tailwind class completion in className= and css — lsp-mode's built-in
-    # Tailwind client runs it as an ADD-ON server alongside ts-ls/css-ls
-    # (doom/config.el points lsp-tailwindcss-server-path at this binary).
+    # Add-on Tailwind server alongside ts-ls/css-ls; doom/config.el pins
+    # lsp-tailwindcss-server-path at this binary.
     pkgs.tailwindcss-language-server
-    pkgs.prettier # :editor (format +onsave) — apheleia formats ts/tsx/css/json with it
+    pkgs.prettier # :editor (format +onsave) — ts/tsx/css/json
 
-    # :checkers (spell +flyspell) — Doom probes PATH for aspell → hunspell →
-    # enchant and prefers aspell (its config tunes it: --sug-mode=ultra, a
-    # personal dictionary under doom-data-dir). aspellWithDicts because the
-    # bare aspell package ships ZERO dictionaries — on PATH but dictionary-less
-    # it fails at first use instead of at startup, a quieter breakage than
-    # today's "Can't find ispell" warning.
+    # :checkers spell — Doom prefers aspell. aspellWithDicts because bare
+    # aspell ships ZERO dictionaries: on PATH but dictionary-less it fails at
+    # first use instead of at startup.
     (pkgs.aspellWithDicts (ds: with ds; [ en ]))
-    # :checkers grammar — langtool's detection order tries the
-    # `languagetool-commandline` binary FIRST (the branch is literally
-    # commented "for nixpkgs.languagetool" upstream), which is exactly what
-    # this package puts on PATH, JRE-wrapped so no Java setup needed.
-    # writegood-mode, the module's other half, needs no external tool.
+    # :checkers grammar — langtool's detection tries the
+    # `languagetool-commandline` binary first, which is exactly what this
+    # package puts on PATH (JRE-wrapped, no Java setup).
     pkgs.languagetool
   ];
 
-  # ── Emacs daemon + client workflow ──────────────────────────────────────
-  # The daemon pays Doom's startup cost once per session; every open after
-  # that is `emacsclient -c` popping a frame instantly. NB: the daemon loads
-  # the same ~/.config/emacs Doom clone — if the bootstrap above is missing,
-  # it silently starts as BARE emacs (same dangle mode as the doom symlink).
+  # Daemon + client: Doom's startup cost paid once per session; every open is
+  # an instant `emacsclient -c` frame. NB: if the Doom clone is missing the
+  # daemon silently starts as BARE emacs.
   services.emacs = {
     enable = true;
     package = emacsWithModules; # same build as home.packages — one Emacs
-    # Scope to the graphical session, not default.target: the pgtk build
-    # needs WAYLAND_DISPLAY to create frames, and that only exists (and is
-    # only imported into the systemd user environment) once niri is up.
-    # niri.service activates graphical-session.target only after importing
-    # the env (and niri-session.target BindsTo it — home/niri.nix), so the
-    # daemon starts with the session and stops at logout.
+    # Graphical scope, not default.target: pgtk needs WAYLAND_DISPLAY, which
+    # only exists in the user manager once niri is up.
     startWithUserSession = "graphical";
-    # Installs an "Emacs Client" launcher entry running emacsclient. The
-    # stock "Emacs" entry is hidden below — a plain `emacs` launch would
-    # silently spawn a SECOND full instance beside the daemon.
+    # "Emacs Client" launcher entry; the stock entry is hidden below.
     client.enable = true;
-    # -c: new frame per launch. Deliberately NO `-a ""` fallback: when the
-    # daemon is down, `-a ""` makes emacsclient spawn its OWN `emacs --daemon`
-    # outside systemd — a rogue that inherits the caller's env, survives
-    # session teardown, and keeps the server socket, so the real emacs.service
-    # then crash-loops with "Another instance of Emacs is running the server"
-    # (this exact collision broke first activation on 2026-07-18). The service
-    # auto-restarts on failure, so a down daemon should be a loud error here,
-    # not a silent second daemon.
+    # -c: new frame per launch. Deliberately NO `-a ""` fallback: with the
+    # daemon down it would spawn a rogue daemon outside systemd that keeps
+    # the server socket and crash-loops the real emacs.service ("Another
+    # instance of Emacs is running the server"). A down daemon should be a
+    # loud error, not a silent second daemon.
     client.arguments = [ "-c" ];
   };
 
-  # Shadow emacs-pgtk's own emacs.desktop so the app launcher shows only
-  # "Emacs Client" (xdg.desktopEntries installs with hiPrio precisely so it
-  # can override a package's entry). The `emacs` binary itself stays on PATH.
+  # Hide emacs-pgtk's own emacs.desktop so the launcher shows only "Emacs
+  # Client" — a plain `emacs` launch would spawn a second full instance
+  # beside the daemon. The binary stays on PATH.
   xdg.desktopEntries.emacs = {
     name = "Emacs";
     noDisplay = true;
   };
 
-  # Tree-sitter grammars as Nix-built .so's, NOT Doom's runtime auto-install.
-  # That auto-install cannot work here: tsx-ts-mode is registered with no
-  # fallback mode, and Doom's ensure-grammar logic short-circuits for such
-  # modes ("push forward anyway, even if a missing grammar results in a
-  # broken state" — tools/tree-sitter/config.el), so the tsx grammar is
-  # never installed and .tsx buffers open unhighlighted. Nix-built grammars
-  # also fit the no-Mason rule (native tools come from Nix, not the editor).
-  # The helper names each lib exactly as treesit dlopens it
-  # (lib/libtree-sitter-<lang>.so); doom/config.el points
-  # treesit-extra-load-path at this symlink, which exists so the plain-file
-  # elisp config never has to reference a store path. The four grammars are
-  # exactly what :lang (javascript +lsp +tree-sitter) registers.
+  # Tree-sitter grammars as Nix-built .so's, NOT Doom's runtime auto-install:
+  # tsx-ts-mode registers with no fallback mode and Doom's ensure-grammar
+  # short-circuits for such modes, so the tsx grammar would never install and
+  # .tsx buffers open unhighlighted. The helper names each lib exactly as
+  # treesit dlopens it; doom/config.el points treesit-extra-load-path at this
+  # symlink so the plain-file elisp never references a store path. Exactly
+  # the four grammars :lang (javascript +lsp +tree-sitter) registers.
   xdg.dataFile."emacs-tree-sitter-grammars".source =
     "${pkgs.emacsPackages.treesit-grammars.with-grammars (g: [
       g.tree-sitter-typescript
@@ -164,38 +118,24 @@ in
       g.tree-sitter-jsdoc
     ])}/lib";
 
-  # Doom's framework clone is the one bootstrap half a fresh install can't
-  # get from the repo (imperative state, like ~/nix-config itself — see
-  # modules/nix-config.nix for the system-level twin of this pattern). This
-  # oneshot clones it on the first login where it's missing;
-  # ConditionPathExists makes it a permanent no-op afterwards, so it can
-  # never touch a live install. If the clone fails (no network yet), git
-  # deletes the half-made dir, the condition stays true, and Restart
-  # retries every 15s until network is up — the same hardening as the
-  # nix-config clone (whose fail-once version burned a first boot,
-  # 2026-07-21; before 2026-08 this unit still had that gap and a
-  # networkless first login meant no Doom until the NEXT login).
-  # `doom install` stays MANUAL (header comment): it
-  # builds Doom's ~300 packages for minutes and is upstream's supported
-  # interactive path — an activation script is the wrong place for an
-  # interactive, minutes-long bootstrap. No sha pin, latest Doom at
-  # install time: Doom pins its
-  # own package commits, so only the framework itself drifts (same
-  # trade-off as the nix-config clone). %h is systemd for $HOME, and the
-  # absolute store path to git means no PATH dependence at all.
+  # Clone Doom's framework on the first login where it's missing (imperative
+  # state a fresh install can't get from the repo — system-level twin:
+  # modules/nix-config.nix). ConditionPathExists makes it a permanent no-op
+  # afterwards; a failed clone (no network) leaves the condition true and
+  # Restart retries every 15s. `doom install` stays manual: an interactive,
+  # minutes-long bootstrap doesn't belong in an activation script. No sha
+  # pin — Doom pins its own package commits, only the framework drifts. %h
+  # is systemd for $HOME.
   systemd.user.services.clone-doom-emacs = {
     Unit = {
       Description = "Clone Doom Emacs on first login (bootstrap target of doom install)";
       ConditionPathExists = "!%h/.config/emacs";
-      # No start-rate limit: may retry for as long as the machine sits
-      # without network (same reasoning as clone-nix-config).
+      # May retry for as long as the machine sits without network.
       StartLimitIntervalSec = 0;
     };
     Service = {
-      # `simple`, not `oneshot`, for the same reason as clone-nix-config:
-      # a oneshot's start job holds default.target (login startup) until
-      # the process exits — fine for one fast failure, minutes of blocked
-      # session once we retry. simple completes the job on spawn.
+      # `simple`, not `oneshot`: a oneshot's start job would hold login
+      # startup for minutes of retries; simple completes the job on spawn.
       Type = "simple";
       ExecStart = "${pkgs.git}/bin/git clone --depth 1 https://github.com/doomemacs/doomemacs %h/.config/emacs";
       Restart = "on-failure";
@@ -204,26 +144,18 @@ in
     Install.WantedBy = [ "default.target" ];
   };
 
-  # Doom's CLI lives inside the clone; put it on PATH so `doom sync`,
-  # `doom upgrade`, `doom doctor` work from any shell.
+  # Doom's CLI lives inside the clone; `doom sync/upgrade/doctor` from any
+  # shell.
   home.sessionPath = [ "${config.home.homeDirectory}/.config/emacs/bin" ];
 
-  # `doomreload` — the two-step ritual after editing home/doom/*.el, as one
-  # command. `doom sync` rebuilds Doom's autoloads and packages; the daemon
-  # must THEN be restarted or every `emacsclient -c` frame keeps serving the
-  # old state (home/doom is an out-of-store symlink, so the .el edits
-  # themselves are already live — it's the long-lived daemon that goes stale,
-  # which is exactly the "I changed config.el and nothing happened" trap).
-  #
-  # `; or return $status` is load-bearing, not sugar: a failed sync leaves Doom
-  # half-built, and restarting onto that swaps a working daemon for a broken
-  # one. Fish's `&&` only joins commands on ONE line, so this is its two-line
-  # equivalent — and it propagates sync's exit status out of the function.
-  #
-  # Lives HERE, not in home/fish.nix, because it exists because of Doom and so
-  # must die with Doom (the one-file-per-intent rule). programs.fish.functions
-  # merges across modules; fish itself is enabled in home/fish.nix. `doom`
-  # resolves via the sessionPath entry directly above.
+  # The two-step ritual after editing home/doom/*.el as one command: the .el
+  # edits are already live (out-of-store symlink), but the long-lived daemon
+  # goes stale until restarted — the "I changed config.el and nothing
+  # happened" trap. `; or return $status` is load-bearing: a failed sync
+  # leaves Doom half-built, and restarting onto that swaps a working daemon
+  # for a broken one (fish's && only joins one line; this is the two-line
+  # equivalent). Lives here, not fish.nix: it must die with Doom
+  # (one-file-per-intent; programs.fish.functions merges across modules).
   programs.fish.functions.doomreload = {
     description = "doom sync, then restart the emacs daemon";
     body = ''
@@ -232,13 +164,10 @@ in
     '';
   };
 
-  # Same out-of-store contract as nvim (see home/neovim.nix for the full
-  # story): the repo checkout lives at ~/nix-config on EVERY machine, and a
-  # wrong path dangles SILENTLY (emacs just starts with Doom's defaults…
-  # actually with nothing, since Doom refuses to run without a DOOMDIR).
-  # Out-of-store because Doom writes back into this dir (custom.el, and
-  # `doom install` generates the initial files) and the .el files get edited
-  # constantly — a store symlink would mean rebuild+switch per edit.
+  # Same out-of-store contract as nvim (see home/neovim.nix): wrong path
+  # dangles silently — Doom refuses to run without a DOOMDIR. Out-of-store
+  # because Doom writes back into this dir and the .el files are edited
+  # constantly.
   xdg.configFile."doom".source = config.lib.file.mkOutOfStoreSymlink
     "${config.home.homeDirectory}/nix-config/home/doom";
 

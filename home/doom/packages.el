@@ -54,11 +54,9 @@
 
 
 ;; ── :term vterm / :term ghostel — native modules come prebuilt from Nix ──
-;; (home/emacs.nix wraps emacs-pgtk with both packages.) `:built-in t' because
-;; straight's `:built-in 'prefer' detection only sees Emacs-core built-ins,
-;; never Nix site packages — without this straight clones its own copy and
-;; tries to compile the module in-editor (vterm — fails, no cmake on PATH) or
-;; download a prebuilt binary from GitHub (ghostel — no-Mason rule forbids it).
+;; (home/emacs.nix wraps emacs-pgtk with both.) `:built-in t' is load-bearing:
+;; straight's `:built-in 'prefer' only detects Emacs-core built-ins, never Nix
+;; site packages — without it straight compiles/downloads its own module.
 (package! vterm :built-in t)
 (package! ghostel :built-in t)
 ;; evil-ghostel is pure elisp and NOT in nixpkgs, so straight still installs

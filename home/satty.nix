@@ -1,17 +1,13 @@
 # home/satty.nix — screenshot annotator. Every screenshot flows through it:
 # the Print binds (home/niri/config.kdl) run the `screenshot-annotate`
-# wrapper below, which captures via DMS's built-in screenshot UI and hands
-# the image straight to satty. Nothing touches disk or clipboard until you
-# commit inside satty (Enter); Escape discards. A cancelled region select
-# never spawns satty at all. (Noctalia had a native pipe_to_command for
-# this — DMS doesn't, hence the wrapper, restored from the first DMS era.)
-# Owns everything satty: the package, config.toml, and the wrapper script.
+# wrapper, which captures via DMS's screenshot UI and hands the image to
+# satty. Nothing touches disk or clipboard until Enter commits inside satty;
+# Escape discards. Owns everything satty: package, config.toml, wrapper.
 { config, lib, pkgs, ... }:
 
 {
   home.packages = [
-    # Capture with DMS's screenshot UI, hand the result to satty. Mode
-    # passes through: `screenshot-annotate` = region (the default),
+    # Mode passes through: `screenshot-annotate` = region (default),
     # `… full` = focused output, `… window` = focused window.
     (pkgs.writeShellScriptBin "screenshot-annotate" ''
       # --no-file/--no-clipboard/--no-notify: satty is the ONLY output —
@@ -40,26 +36,21 @@
 
   programs.satty = {
     enable = true;
-    # Rendered to ~/.config/satty/config.toml.
     settings = {
       general = {
-        # A tiling compositor would squeeze satty into whatever gap is
-        # free — fullscreen it so there's actually room to annotate.
+        # A tiling compositor would squeeze satty into whatever gap is free.
         fullscreen = true;
         early-exit = true; # close after the first save/copy
-        copy-command = "wl-copy"; # wayland clipboard
-        # Copying ALSO writes the file below, so every screenshot lands on
-        # both the clipboard AND disk in one action.
+        copy-command = "wl-copy";
+        # Copying also writes the file below — clipboard AND disk in one.
         save-after-copy = true;
         initial-tool = "arrow";
-        # strftime placeholders expanded by satty. The "annotated-" prefix is
-        # just a readable marker on the saved filenames.
         output-filename = "${config.home.homeDirectory}/Pictures/Screenshots/annotated-%Y%m%d-%H%M%S.png";
         actions-on-enter = [ "save-to-clipboard" ]; # Enter = copy(+save)+exit
         actions-on-escape = [ "exit" ];
       };
-      # Toolbar quick-pick colors: satty's stock palette — annotation
-      # colors want to be legible on any screenshot, not to match a theme.
+      # Quick-pick colors stay satty's stock palette — annotation colors
+      # want to be legible on any screenshot, not to match a theme.
     };
   };
 }

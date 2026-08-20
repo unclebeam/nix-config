@@ -1,17 +1,12 @@
-# desktop.nix — compositor-agnostic desktop infrastructure: Wayland-wide
-# env, the GTK portal fallback, and fonts. Compositor-specific bits stay in
-# modules/niri.nix; the login greeter (DMS on greetd) lives in
-# modules/dms-greeter.nix. (This file was split out when hyprland first
-# ran alongside sway; it kept its role through every compositor era since —
-# nothing in here assumes a particular compositor.)
+# desktop.nix — compositor-agnostic desktop infrastructure: Wayland-wide env,
+# the GTK portal fallback, and fonts. Compositor-specific bits stay in
+# modules/niri.nix; the greeter in modules/dms-greeter.nix.
 { config, lib, pkgs, ... }:
 
 let
-  # TH Sarabun PSK — the 2006 DIP/SIPA font that Thai official documents
-  # require. Not in nixpkgs (pkgs.sarabun-font below is Google's newer,
-  # *different* "Sarabun" family — the two coexist because this one's
-  # internal family name is "TH SarabunPSK"), so the TTFs are vendored
-  # in-repo under fonts/th-sarabun-psk/ along with their license.
+  # TH Sarabun PSK — the DIP/SIPA font Thai official documents require. Not in
+  # nixpkgs (pkgs.sarabun-font is Google's different "Sarabun"; internal family
+  # names differ so both coexist), so the TTFs are vendored in-repo.
   th-sarabun-psk = pkgs.stdenvNoCC.mkDerivation {
     pname = "th-sarabun-psk";
     version = "1.0";
@@ -22,25 +17,11 @@ let
     '';
   };
 
-  # IBM Plex Mono UNPATCHED, and only that — the plain-text sibling of the
-  # BlexMono Nerd Font the editors now use (see fonts.packages below). Distinct
-  # fontconfig family names ("IBM Plex Mono" vs "BlexMono Nerd Font"), so the
-  # two coexist without the duplicate-faces problem described further down.
-  # nixpkgs has no split package: pkgs.ibm-plex
-  # is one ~287M bundle of Sans/Serif/Mono/Math, Condensed, and the Arabic,
-  # Devanagari, Hebrew, CJK and Thai scripts. We want the coding face alone, so
-  # copy the 16 Mono faces out (~1.4M) and leave the rest behind. Keeping the
-  # bundle out of the font set also keeps its two Thai families out of
-  # Chromium's fallback walk — see the rejectfont block below for why any new
-  # Thai-capable font is a hazard here.
-  # .otf and not .ttf: upstream ships the same 16 faces in both formats, and
-  # installing both would show fontconfig 32 faces for one family. OTF (CFF
-  # outlines) is IBM Plex's canonical format.
-  # NB: the glob must stay IBMPlexMono-* — a looser IBMPlex* would drag in
-  # IBMPlexMath-Regular.otf, which sits in the same directory.
-  # The full bundle is still fetched ONCE as a build input; it never enters the
-  # system closure (only this 1.4M subset does) and nix.gc in core.nix reclaims
-  # it like any other build-time dependency.
+  # IBM Plex Mono only — nixpkgs' pkgs.ibm-plex is one ~287M bundle whose Thai
+  # families would join Chromium's fallback walk (see rejectfont below), so
+  # copy out just the 16 Mono faces. OTF only (upstream ships both formats;
+  # installing both doubles the face count). The glob must stay IBMPlexMono-*:
+  # IBMPlex* would drag in IBMPlexMath from the same directory.
   ibm-plex-mono = pkgs.stdenvNoCC.mkDerivation {
     pname = "ibm-plex-mono";
     inherit (pkgs.ibm-plex) version;
@@ -52,74 +33,44 @@ let
   };
 in
 {
-  # Chromium-based apps (Brave) run native Wayland instead of XWayland when
-  # this is set. Electron apps honor it too. Session-agnostic.
+  # Chromium/Electron apps run native Wayland instead of XWayland.
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
-  # xdg-desktop-portal is how sandbox-ish desktop APIs work on Wayland:
-  # screen sharing, screenshots, file pickers. Since the 2026-08 Nautilus
-  # revert the GTK portal is a working member again, not just a fallback:
-  # upstream programs.niri routes Access and Notification straight to it,
-  # and it's the trailing entry in `default=gnome;gtk` for anything the
-  # GNOME portal doesn't implement (capture and file dialogs land on
-  # gnome — see modules/niri.nix). Kept here, not in niri.nix, so this
-  # file stays a working baseline for any compositor.
+  # Trailing entry in niri's `default=gnome;gtk` routing, and the direct
+  # target for Access/Notification. Kept here so this file stays a working
+  # baseline for any compositor.
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
   # ── Fonts ──────────────────────────────────────────────────────────────
-  # Mono fonts (JetBrainsMono for the Qt UI, BlexMono for the terminal AND
-  # Doom, Lilex and IosevkaTerm kept as revert targets, plain Plex Mono
-  # installed but unused), Sarabun for Thai text, Noto for everything else.
   fonts.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
-    # The coding font for BOTH alacritty (home/alacritty.nix) and Doom
-    # (home/doom/config.el) — family "BlexMono Nerd Font Mono" in each. On
-    # trial as of 2026-08-09, replacing Lilex in both.
-    # "BlexMono" is Nerd Fonts' patch of IBM Plex Mono: identical outlines,
-    # renamed only to stay clear of IBM's trademark. Patched rather than plain
-    # Plex (the derivation in the let block above) because starship's prompt
-    # and Doom's nerd-icons need those glyphs IN the font — nothing installs a
-    # nerd-symbols fallback rule into /etc/fonts/conf.d, so plain Plex would
-    # leave them to generic fontconfig glyph fallback at another font's metrics.
+    nerd-fonts.jetbrains-mono # Qt UI mono
+    # The coding font for both alacritty and Doom ("BlexMono Nerd Font Mono").
+    # Nerd-patched IBM Plex Mono, patched rather than plain because starship
+    # and nerd-icons need the glyphs IN the font — nothing installs a
+    # nerd-symbols fontconfig fallback.
     nerd-fonts.blex-mono
-    # No longer referenced by anything — kept ON PURPOSE as this trial's
-    # immediate revert target ("Lilex Nerd Font Mono", one string per config).
-    # Lilex is itself IBM Plex Mono plus ligatures, which is why the sizes in
-    # alacritty/Doom carried over to BlexMono untouched.
+    # Unreferenced revert targets for the coding font (one string per config
+    # to back out); drop once a font is settled.
     nerd-fonts.lilex
-    # The revert target one step further back, from before the Lilex trial.
-    # Same deal: kept so backing out stays a one-line edit per config with no
-    # package churn. Drop this line only once a coding font is settled.
     nerd-fonts.iosevka-term
-    # "Symbols Nerd Font Mono" — the default family of emacs' nerd-icons
-    # (doom-modeline/dired icons, home/emacs.nix). Without it Doom nags to run
-    # M-x nerd-icons-install-fonts, which drops an untracked font in ~/.local.
+    # Default family of emacs' nerd-icons; without it Doom nags to install an
+    # untracked font into ~/.local.
     nerd-fonts.symbols-only
-    # Emacs' last-resort glyph fallback (`doom doctor` warns without it) —
-    # missing obscure glyphs can slow emacs badly. Unfree (allowUnfree is on).
+    # Emacs' last-resort glyph fallback (`doom doctor` warns without it).
     symbola
-    # IBM Plex Mono, UNPATCHED — installed on purpose, used by NOTHING on
-    # purpose. The editors are on the Nerd-patched BlexMono above; this is the
-    # same design without the added glyphs, kept available for documents/GUI
-    # apps and as the fallback if the patched build ever misbehaves.
-    # (Definition + why it's a subset: the let block at the top of this file.)
+    # Installed but used by nothing on purpose: the unpatched sibling of
+    # BlexMono, for documents and as fallback if the patched build misbehaves.
     ibm-plex-mono
-    sarabun-font # Thai text font (the fontconfig rules below prefer it)
-    th-sarabun-psk # family "TH SarabunPSK" — for Thai official documents
+    sarabun-font # Thai text (fontconfig rules below prefer it)
+    th-sarabun-psk # family "TH SarabunPSK" — Thai official documents
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
   ];
 
-  # Prefer Sarabun whenever the text is Thai. Installing a font only makes
-  # it *available* — without these rules Thai renders in FreeSerif instead.
-  # Two rules because apps reach Thai glyphs by two different paths:
-  # lang-tagged queries (pango/harfbuzz, pages with lang="th") and raw
-  # per-character charset fallback (Chromium on pages without lang="th").
-  # NB: localConf becomes /etc/fonts/local.conf verbatim, so it must be a
-  # complete XML document — one <fontconfig> root. Multiple top-level
-  # elements are "junk after document element" and fontconfig silently
-  # drops the WHOLE file.
+  # Prefer Sarabun for Thai. NB: localConf becomes /etc/fonts/local.conf
+  # verbatim and must be ONE complete XML document — extra top-level elements
+  # make fontconfig silently drop the whole file.
   fonts.fontconfig.localConf = ''
     <?xml version="1.0"?>
     <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">

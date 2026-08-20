@@ -25,10 +25,8 @@
       font_size = 20;
       background_alpha = 0.4; # keep the game visible behind the box
 
-      # Colors stay at MangoHud's defaults. (The old melange overrides left
-      # with colors.nix in the DMS migration — an in-game overlay isn't a
-      # desktop surface, and the shell's dynamic colors can't reach it
-      # anyway.)
+      # Colors stay at MangoHud's defaults — an in-game overlay isn't a
+      # desktop surface, and the shell's dynamic colors can't reach it.
 
       # MangoHud's stock toggle bind, written out so it's discoverable here.
       toggle_hud = "Shift_R+F12";

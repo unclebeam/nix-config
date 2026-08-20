@@ -1,29 +1,19 @@
 # Declarative disk layout for unclebeam-pc, consumed by disko.
+# At INSTALL time nixos-anywhere runs disko with this spec to wipe, partition,
+# format and mount — THIS DESTROYS THE DISK'S CONTENTS. At run time disko
+# generates the fileSystems.* mounts from the same spec (so
+# hardware-configuration.nix declares none).
 #
-# Two jobs, one file:
-#   1. At INSTALL time, nixos-anywhere runs disko with this spec to wipe,
-#      partition, format and mount the disk. THIS DESTROYS THE DISK'S CONTENTS.
-#   2. At RUN time, disko generates the fileSystems.* mount entries from the
-#      same spec, so hardware-configuration.nix no longer declares them.
-#
-# This recreates exactly the layout installed by hand on 2026-07-03:
-# GPT → 512M vfat ESP on /boot → btrfs on the rest with @ and @home subvolumes.
-#
-# The secondary 465.8G disk is deliberately NOT declared here. disko only
-# touches disks listed under disko.devices.disk — anything else is left alone.
+# The secondary 465.8G disk is deliberately NOT declared: disko only touches
+# disks listed under disko.devices.disk.
 { ... }:
 
 let
-  # ── Target disk ─────────────────────────────────────────────────────────
-  # Use the stable /dev/disk/by-id/ path, not /dev/nvme0n1 — kernel device
-  # names can change between boots, by-id names never do.
-  #
-  # How to find it (run on the target machine, e.g. from the installer):
+  # Always the stable /dev/disk/by-id/ path, never /dev/nvme0n1 (kernel names
+  # can change between boots). To find it on the target machine:
   #   ls -l /dev/disk/by-id/ | grep nvme
-  # Pick the 931.5G disk's  nvme-<model>_<serial>  symlink:
-  #   - NOT the nvme-eui.* alias (same disk, opaque name)
-  #   - NO -part1/-part2 suffix (those are partitions, we want the whole disk)
-  #
+  # → the nvme-<model>_<serial> symlink for the whole disk (not the
+  #   nvme-eui.* alias, no -partN suffix).
   # The 931.5G Samsung 9100 PRO (verified from the by-id listing on the PC).
   targetDisk = "/dev/disk/by-id/nvme-Samsung_SSD_9100_PRO_1TB_S7YDNJ0Y613593X";
 in
@@ -32,41 +22,33 @@ in
     type = "disk";
     device = targetDisk;
     content = {
-      type = "gpt"; # GUID partition table — required for UEFI boot
+      type = "gpt";
 
       partitions = {
-        # ── Partition 1: EFI System Partition ──────────────────────────────
-        # Where systemd-boot and the kernels live. UEFI firmware can only
-        # read FAT, hence vfat.
         ESP = {
-          priority = 1; # lay this partition out FIRST on the disk
+          priority = 1; # first on disk
           size = "512M";
-          type = "EF00"; # GPT partition type: EFI System Partition
+          type = "EF00";
           content = {
             type = "filesystem";
             format = "vfat";
             mountpoint = "/boot";
-            # Same options as the hand-built install: without them, vfat
-            # (which has no Unix permissions) exposes everything as
-            # world-writable and NixOS warns about /boot perms.
+            # Without these, vfat (no Unix permissions) mounts world-writable
+            # and NixOS warns about /boot perms.
             mountOptions = [ "fmask=0022" "dmask=0022" ];
           };
         };
 
-        # ── Partition 2: btrfs with subvolumes ──────────────────────────────
-        # One big btrfs pool; subvolumes carve it into / and /home without
-        # fixed sizes, and are cheap to snapshot independently later.
+        # One btrfs pool; subvolumes carve / and /home without fixed sizes.
         root = {
-          size = "100%"; # everything the ESP didn't take
+          size = "100%";
           content = {
             type = "btrfs";
             extraArgs = [ "-f" ]; # force mkfs even over old FS signatures
             subvolumes = {
-              # "@" / "@home" is the common btrfs naming convention;
-              # the names are arbitrary, the mountpoints are what matter.
               "@" = {
                 mountpoint = "/";
-                mountOptions = [ "compress=zstd" ]; # transparent compression
+                mountOptions = [ "compress=zstd" ];
               };
               "@home" = {
                 mountpoint = "/home";

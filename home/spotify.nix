@@ -1,16 +1,6 @@
-# home/spotify.nix — Spotify desktop client.
-# One file per intent: everything that exists because of Spotify lives here.
-# Removing Spotify = delete this file + its import line in default.nix.
-#
-# Unfree package — covered by the allowUnfree set in modules/core.nix
-# (home-manager runs with useGlobalPkgs, so the system nixpkgs config
-# applies here too; no per-file allowUnfree needed).
-#
-# No mime handlers and no Qt block: Spotify is Electron-based (native
-# Wayland via NIXOS_OZONE_WL from modules/desktop.nix; the fallback would
-# be xwayland-satellite under niri) and doesn't own any file types worth
-# claiming. Login and playback settings live in ~/.config/spotify, managed
-# by the app itself, not Nix.
+# home/spotify.nix — Spotify desktop client. Unfree (allowUnfree applies to
+# user packages via useGlobalPkgs). No mime handlers or theme block; settings
+# are app-owned in ~/.config/spotify.
 { config, lib, pkgs, ... }:
 
 {

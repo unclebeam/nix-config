@@ -1,22 +1,9 @@
-# home/obs.nix — OBS Studio, screen recording / streaming.
-# One file per intent: everything that exists because of OBS lives here.
-# Removing OBS = delete this file + its import line in default.nix.
-#
-# No system-side (modules/) half needed: screen capture goes through
-# xdg-desktop-portal-gnome (pulled in by programs.niri.enable in
-# modules/niri.nix — niri implements org.gnome.Mutter.ScreenCast and the
-# GNOME portal is its only capture backend; the ScreenCast/Screenshot
-# routing lives there too), and audio capture rides the PipeWire stack
-# from modules/audio.nix. Both are already there for other reasons, so OBS
-# is a plain user package.
-#
-# Deliberately NOT included until actually needed:
-#   - virtual camera: needs the v4l2loopback kernel module (a system-level
-#     change in the host/module layer), so it can't be flipped on from here.
-#   - programs.obs-studio (home-manager module): only earns its keep for
-#     wrapping OBS with plugins; with zero plugins it's just indirection.
-# OBS's own settings live in ~/.config/obs-studio, managed by the app itself,
-# not Nix — same rule as the editor configs.
+# home/obs.nix — OBS Studio. No modules/ half needed: screen capture goes
+# through the GNOME portal (modules/niri.nix), audio rides PipeWire — so OBS
+# is a plain user package. Deliberately not included until needed: virtual
+# camera (needs the v4l2loopback kernel module, a system-level change) and
+# programs.obs-studio (only earns its keep for wrapping plugins). Settings
+# are app-owned in ~/.config/obs-studio.
 { config, lib, pkgs, ... }:
 
 {

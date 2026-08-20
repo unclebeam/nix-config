@@ -1,26 +1,20 @@
-# audio.nix — PipeWire, the one audio server to rule ALSA/Pulse/JACK.
+# audio.nix — PipeWire, the one audio server for ALSA/Pulse/JACK.
 { config, lib, pkgs, ... }:
 
 {
-  # rtkit hands out realtime scheduling priority to the audio server —
-  # without it you get crackling under load. The pipewire module
-  # integrates with it automatically when enabled.
+  # Realtime scheduling for the audio server; without it audio crackles
+  # under load.
   security.rtkit.enable = true;
 
   services.pipewire = {
     enable = true;
-    # Pretend to be ALSA for old apps talking straight to the kernel API…
     alsa.enable = true;
-    alsa.support32Bit = true; # …including 32-bit games under Steam/Proton
-    # …and pretend to be PulseAudio for everything built against Pulse
-    # (browsers, most desktop apps). pavucontrol etc. just work.
+    alsa.support32Bit = true; # 32-bit games under Steam/Proton
     pulse.enable = true;
-    # WirePlumber (the session manager) is enabled by default; JACK
-    # emulation is off by default — enable services.pipewire.jack.enable
-    # if you ever do pro audio.
+    # WirePlumber is on by default; JACK emulation off — enable
+    # services.pipewire.jack.enable for pro audio.
   };
 
-  # Lives here, not core.nix: pavucontrol only exists because of the audio
-  # stack, so removing this module removes the mixer GUI with it.
+  # Here, not core.nix: the mixer GUI should be removed with the audio stack.
   environment.systemPackages = [ pkgs.pavucontrol ];
 }

@@ -24,14 +24,10 @@
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 ;;
-;; IBM Plex Mono, matching alacritty's trial (home/alacritty.nix, since
-;; 2026-08-09; was "Lilex Nerd Font Mono" — revert to that one string to back
-;; it out, the package stays installed via modules/desktop.nix either way).
-;; "BlexMono" is Nerd Fonts' patch of Plex Mono: same outlines, renamed around
-;; IBM's trademark. The *Mono* variant deliberately, same as the terminal: its
-;; nerd glyphs are patched to one cell wide, so nerd-icons in the
-;; modeline/dired keep the grid aligned. Size unchanged from Lilex — Lilex is
-;; Plex Mono plus ligatures, so it's the same metrics either way.
+;; BlexMono = Nerd Fonts' patch of IBM Plex Mono, matching alacritty. The
+;; *Mono* variant deliberately: one-cell nerd glyphs keep the modeline/dired
+;; grid aligned. Revert target: "Lilex Nerd Font Mono" (package stays
+;; installed via modules/desktop.nix).
 (setq doom-font (font-spec :family "BlexMono Nerd Font Mono" :size 16))
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -51,15 +47,12 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
-;; Doom defaults org-agenda-files to (list org-directory), and org expands a
-;; directory entry NON-recursively — so files in the PARA subfolders
-;; (0. Inbox, 1. Projects, …) were invisible to the agenda. List every
-;; non-hidden subdirectory alongside ~/org itself: directory entries are
-;; re-scanned on every agenda build, so new FILES in these folders appear
-;; immediately; only a brand-new top-level FOLDER needs a daemon restart.
-;; The "^[^.]" filter also keeps Syncthing's .stfolder out. after! because
-;; Doom's default assignment runs when org loads — set any earlier and the
-;; list would exist before the subfolders' final state is interesting anyway.
+;; org expands a directory entry NON-recursively, so files in the PARA
+;; subfolders were invisible to the agenda — list every non-hidden
+;; subdirectory alongside ~/org. New FILES appear immediately (dirs re-scan
+;; per agenda build); a brand-new top-level FOLDER needs a daemon restart.
+;; "^[^.]" also keeps Syncthing's .stfolder out. after! because Doom's own
+;; default assignment runs when org loads.
 (after! org
   (setq org-agenda-files
         (cons org-directory
@@ -101,32 +94,26 @@
 (after! lsp-mode
   ;; no-Mason: servers come from Nix (home/emacs.nix), never editor-downloaded.
   (setq lsp-enable-suggest-server-download nil)
-  ;; lsp-mode's built-in Tailwind client (the old lsp-tailwindcss package,
-  ;; merged upstream) registers as an ADD-ON server (add-on-mode defaults to
-  ;; t), so it runs alongside ts-ls in .tsx buffers — className completion,
-  ;; the thing eglot could never do (one server per buffer; the reason this
-  ;; config switched to lsp-mode). Empty server-path would mean an
-  ;; lsp-managed download; point it at the Nix binary instead.
+  ;; The built-in Tailwind client runs as an ADD-ON server alongside ts-ls
+  ;; in .tsx buffers (the multi-server ability eglot lacks — why this config
+  ;; uses lsp-mode). Empty server-path would mean an lsp-managed download;
+  ;; point it at the Nix binary instead.
   (setq lsp-tailwindcss-server-path
         (executable-find "tailwindcss-language-server")))
 
-;; Tree-sitter grammars come from Nix (home/emacs.nix symlinks them to
-;; ~/.local/share/emacs-tree-sitter-grammars) — Doom's runtime auto-install
-;; can NEVER install the tsx grammar (its ensure logic short-circuits for
-;; ts-modes with no fallback mode, "even if a missing grammar results in a
-;; broken state"), and Nix-built .so's fit the no-Mason rule anyway.
-;; expand-file-name because treesit concatenates dir + libname for dlopen;
-;; after! treesit because the var is defined there, loaded when any ts-mode
-;; activates — before Doom's ensure wrapper calls treesit-ready-p.
+;; Tree-sitter grammars come from Nix (home/emacs.nix symlinks them here) —
+;; Doom's runtime auto-install can never install the tsx grammar (its ensure
+;; logic short-circuits for ts-modes with no fallback mode). expand-file-name
+;; because treesit concatenates dir + libname for dlopen; after! treesit
+;; because the var is defined there.
 (after! treesit
   (add-to-list 'treesit-extra-load-path
                (expand-file-name "~/.local/share/emacs-tree-sitter-grammars")))
 
-;; TRIAL: vterm vs ghostel run side-by-side (same tradition as the compositor
-;; trials — the loser gets deleted). Both Doom modules bind SPC o t / SPC o T,
-;; and vterm silently wins (defined later in +evil-bindings.el), so ghostel
-;; gets its own keys here. When the trial ends, delete this block and the
-;; losing module's line in init.el (+ its package! lines in packages.el).
+;; TRIAL: vterm vs ghostel side-by-side; the loser gets deleted. Both Doom
+;; modules bind SPC o t / SPC o T and vterm silently wins, so ghostel gets
+;; its own keys. When the trial ends: delete this block, the losing module's
+;; line in init.el, and its package! lines in packages.el.
 (map! :leader
       (:prefix-map ("o" . "open")
        :desc "Toggle ghostel popup" "g" #'+ghostel/toggle

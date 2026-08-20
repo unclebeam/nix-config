@@ -1,36 +1,24 @@
-# home/file-roller.nix — File Roller (GNOME's archive manager) + the CLI
-# backends it needs. One file per intent: everything that exists because of
-# archive handling (.zip / .7z / .rar extraction) lives here. Removing it =
-# delete this file + its import line in default.nix. (It replaced Ark with
-# the 2026-08 Dolphin→Nautilus migration — Ark's whole reason for being was
-# wiring Dolphin's context menus. Nautilus 42+ carries its own
-# Extract/Compress context entries via gnome-autoar; File Roller is the
-# double-click handler and the fallback for passworded/exotic archives via
-# the CLIs below.)
+# home/file-roller.nix — File Roller (archive manager) + the CLI backends it
+# needs. Nautilus carries its own Extract/Compress context entries via
+# gnome-autoar; File Roller is the double-click handler and the fallback for
+# passworded/exotic archives.
 { config, lib, pkgs, ... }:
 
 {
   home.packages = with pkgs; [
-    # zip and tar formats come built-in (libarchive), but like Ark before
-    # it, File Roller handles 7z and RAR by exec'ing external binaries found
-    # on PATH at runtime — without the two packages below those formats
-    # silently fail to open.
+    # zip/tar come built-in (libarchive); 7z and RAR are handled by exec'ing
+    # external binaries found on PATH at runtime — without the two packages
+    # below those formats silently fail to open.
     file-roller
 
-    # 7-Zip's official CLI (`7zz`), the -rar variant built with the unfree
-    # RAR codec (covered by allowUnfree in modules/core.nix). Backend for
-    # File Roller's .7z support, and a standalone terminal tool:
-    #   7zz x file.7z / file.zip / file.rar
+    # 7-Zip CLI (`7zz`), the -rar variant with the unfree RAR codec.
     _7zz-rar
 
-    # RarLab's unrar (unfree) — full RAR5 + passworded-archive support for
-    # File Roller's rar backend. CLI: `unrar x file.rar`.
+    # RarLab's unrar (unfree) — full RAR5 + passworded archives.
     unrar
   ];
 
-  # Make double-clicking an archive in Nautilus open File Roller. Merges with
-  # the inode/directory default in nautilus.nix (mimeApps is enabled in
-  # home/default.nix).
+  # xdg.mimeApps.enable lives in home/default.nix.
   xdg.mimeApps.defaultApplications = {
     "application/zip" = "org.gnome.FileRoller.desktop";
     "application/vnd.rar" = "org.gnome.FileRoller.desktop";

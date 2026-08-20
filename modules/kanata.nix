@@ -1,25 +1,18 @@
-# kanata.nix — key remapping at the evdev level, below the compositor.
-# Because kanata rewrites events before anything else sees them, the
-# remap works everywhere: niri, TTYs, even the greeter at login —
-# unlike an xkb option, which only applies inside the graphical session.
-#
-# Thinkpad-only since 2026-07-20: the PC types on a ZSA board, and its
-# firmware (flashed via Oryx) is the right place for remaps there — so the
-# PC dropped this import rather than carry a software copy of the same idea.
+# kanata.nix — key remapping at the evdev level, below the compositor, so it
+# works everywhere: niri, TTYs, the greeter. ThinkPad-only: the PC's ZSA
+# board carries its remaps in firmware.
 { config, lib, pkgs, ... }:
 
 {
   services.kanata = {
     enable = true;
     keyboards.default = {
-      # Empty list = grab every keyboard, so any external board plugged
-      # into the thinkpad behaves exactly like the internal one.
+      # Empty list = grab every keyboard, so an external board behaves like
+      # the internal one.
       devices = [ ];
-      # defsrc below only lists caps/f/j, so kanata would normally ignore
-      # every other key. But tap-hold needs to SEE those presses —
-      # "another key went down while caps is held" is exactly its signal
-      # to commit to the hold action. Without this line, chords would
-      # hang until the 200ms timeout.
+      # tap-hold must SEE unmapped presses ("another key went down while caps
+      # is held" is its commit signal) — without this, chords hang until the
+      # 200ms timeout.
       extraDefCfg = "process-unmapped-keys yes";
       config = ''
         (defsrc caps f j)
