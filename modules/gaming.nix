@@ -23,7 +23,9 @@
   # Steam's desktop UI is XWayland — under niri that means xwayland-satellite
   # (modules/niri.nix), which presents X11 clients unscaled. This env var
   # (the equivalent of Steam's `-forcedesktopscaling` launch flag) draws the
-  # UI at 1.5x to match the monitor scale in home/niri/hosts/unclebeam-pc.kdl.
+  # UI at 1.5x to match the monitor scale set for this machine in DMS
+  # (Settings → Displays; the panels are machine-local state, not repo
+  # config — see CLAUDE.md).
   # Only Steam reads it, so it's harmless session-wide; this module is
   # PC-only (the ThinkPad import is commented), so the hardcoded 1.5 always
   # matches this host. VERIFY on the first niri login: the hyprland-era

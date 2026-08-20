@@ -6,7 +6,7 @@
 {
   imports = [
     ./directories.nix # home skeleton: XDG dirs (Documents/Downloads/Pictures) + ~/org + ~/.ssh
-    ./niri.nix      # niri glue: symlinks niri/config.kdl + host.kdl + session target
+    ./niri.nix      # niri glue: symlinks niri/config.kdl + nix.kdl + session target
     ./dms.nix       # DMS user glue: adw-gtk3 + template placeholders (the shell itself: modules/dms.nix)
     ./wallpapers.nix # tracked wallpaper images -> ~/Pictures/Wallpapers (picked via SUPER+Y)
     ./satty.nix     # screenshot annotator (fed by the screenshot-annotate wrapper around `dms screenshot`)

@@ -9,36 +9,13 @@
 # exports the few values that must come from Nix.
 {
   config,
-  lib,
   pkgs,
-  osConfig,
   ...
 }:
 
 let
-  # WHICH machine this is, decided at EVAL time. `osConfig` is the NixOS
-  # config, handed to every home-manager module because home-manager is wired
-  # in as a NixOS module (flake.nix) — no extraSpecialArgs plumbing needed.
-  # The hostname is already known to Nix, so the per-machine split belongs
-  # here, not in the KDL (no /etc/hostname reads, no host branching).
-  hostName = osConfig.networking.hostName;
-  hostKdl = ./niri/hosts + "/${hostName}.kdl";
-
   cursor = config.home.pointerCursor;
 in
-# Fail LOUDLY at eval if this host has no display file. The failure this
-# prevents is the repo's classic footgun: a new file that wasn't `git add`ed
-# is invisible to the flake, the symlink below dangles, and niri's include
-# of a missing non-optional file fails the whole config — niri then falls
-# back to its BUILT-IN defaults (60 Hz auto-layout, stock binds), which
-# reads as "my config vanished" rather than "one file is missing".
-# `pathExists` resolves against the flake's source (git-tracked files
-# only), so this catches the un-added case too. It does not copy anything
-# to the store.
-assert lib.assertMsg (builtins.pathExists hostKdl) ''
-  home/niri/hosts/${hostName}.kdl does not exist in the flake source.
-  Either create it, or `git add` it — flakes only see git-tracked files.
-'';
 {
   # The compositor config. OUT-OF-STORE symlink (same rule and same
   # hardcoded ~/nix-config base path as home/neovim.nix — and the same
@@ -50,32 +27,19 @@ assert lib.assertMsg (builtins.pathExists hostKdl) ''
   # No rebuild, no reload command (hyprland needed `hyprctl reload`).
   #
   # Individual files are linked (not the whole niri/ dir) so ~/.config/niri
-  # stays a real, writable directory — DMS's matugen writes dms/colors.kdl
-  # under it imperatively on every wallpaper change (dir seeded by
-  # home/dms.nix), which a read-only dir symlink would block.
+  # stays a real, writable directory — DMS writes its whole dms/ fragment
+  # set under it imperatively (colors.kdl on every wallpaper change,
+  # outputs.kdl/layout.kdl/windowrules.kdl from its Settings GUI; dir seeded
+  # by home/dms.nix), which a read-only dir symlink would block.
   xdg.configFile."niri/config.kdl".source =
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nix-config/home/niri/config.kdl";
 
-  # THIS machine's displays (include "~/.config/niri/host.kdl" in
-  # config.kdl): output mode/scale/position/VRR. One TRACKED file per host
-  # in home/niri/hosts/, and the line below is the whole per-machine
-  # split — config.kdl never learns the hostname, and the other host's
-  # outputs are not merely skipped at runtime, they're never loaded.
-  #
-  # Tracking these is safe precisely BECAUSE Nix picks one — the thing the
-  # old gitignore protected against was a single shared file applying one
-  # machine's panels to the other, which per-host selection makes
-  # impossible. The upside is that a fresh nixos-anywhere install boots
-  # with the right layout instead of niri's auto-config, with no manual
-  # first-login step. (The contents are still HARDWARE FACTS: verified
-  # against `niri msg outputs` on the machine, never invented.)
-  #
-  # Out-of-store as always — and niri watches includes too, so edits to the
-  # host file also apply on save.
-  xdg.configFile."niri/host.kdl".source =
-    config.lib.file.mkOutOfStoreSymlink
-      "${config.home.homeDirectory}/nix-config/home/niri/hosts/${hostName}.kdl";
+  # (No display config here, and no per-host file to select: outputs are
+  # DMS's, written by its Settings GUI into the untracked, machine-local
+  # ~/.config/niri/dms/outputs.kdl. That's also why this module no longer
+  # takes `osConfig` — the hostname was only ever read to pick a display
+  # file. See the fragment block at the bottom of niri/config.kdl.)
 
   # The one Nix-GENERATED piece of niri config (include "~/.config/niri/
   # nix.kdl"): the cursor, mirrored from home.pointerCursor so the theme

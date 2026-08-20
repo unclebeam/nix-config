@@ -20,15 +20,25 @@
 # steps (idle defaults to 0 = never locks!), not repo state.
 #
 # ~/.config/niri/dms/ is DMS's fragment dir on niri — machine-local,
-# DO-NOT-EDIT, generated territory (matugen rewrites colors.kdl on every
-# wallpaper change), deliberately NOT tracked or symlinked. This is the
-# opposite of both prior eras on purpose: the hyprland-DMS era tracked its
-# Lua fragments (they carried keybinds), and noctalia's config dir was our
-# tracked TOML — but here every fragment we'd track is either generated
-# (colors) or unused (binds/layout/etc. — our keybinds live in the tracked
-# home/niri/config.kdl, stock-niri philosophy). The ONE consumed fragment,
-# colors.kdl, is pulled in by config.kdl's trailing `include optional=true`,
-# which tolerates absence natively.
+# DO-NOT-EDIT, generated territory, deliberately NOT tracked or symlinked.
+# This is the opposite of both prior eras on purpose: the hyprland-DMS era
+# tracked its Lua fragments (they carried keybinds), and noctalia's config
+# dir was our tracked TOML — but here every fragment is either generated
+# from the wallpaper (colors.kdl), owned by DMS's Settings GUI
+# (outputs.kdl = displays, layout.kdl = gaps/border/radius, windowrules.kdl)
+# or unused (binds.kdl — our keybinds live in the tracked
+# home/niri/config.kdl, stock-niri philosophy). Displays joined this list
+# in 2026-08 for the reason the whole dir exists: they're facts about the
+# panels plugged into ONE machine, and the tracked per-host files they
+# replaced rotted (an output name off by a comma silently pinned a 4K120
+# panel to 60 Hz for weeks).
+#
+# The consumed fragments are pulled in by config.kdl's trailing includes —
+# every one of them `optional=true`, which is load-bearing rather than
+# tidy: a missing NON-optional include fails the whole config, and on a
+# fresh install that's a deadlock (niri falls back to built-in defaults →
+# no spawn-at-startup → dms.service never starts → the fragments are never
+# written). Never wire a new fragment in without optional=true.
 #
 # Interaction happens through `dms ipc call <target> <fn>` — that's what
 # the keybinds in home/niri/config.kdl run (`dms ipc list` shows all).
@@ -36,7 +46,17 @@
 # FRESH INSTALL: no `dms setup` needed (the hyprland-era ritual is dead —
 # it existed to write compositor config we now keep in git). First-login
 # steps: pick a wallpaper (SUPER+Y) so matugen writes colors.kdl + the app
-# themes, then the Settings GUI pass (idle timeouts, Apply GTK/Qt Themes).
+# themes, then the Settings GUI pass (idle timeouts, Apply GTK/Qt Themes,
+# and the Displays tab — mode/scale/arrangement, since nothing in the repo
+# describes the panels any more).
+#
+# Careful with that Displays tab: like `dms setup`, its "fix include"
+# button writes THROUGH the out-of-store ~/.config/niri/config.kdl symlink
+# straight into the tracked repo file (and drops a config.kdl.backup<epoch>
+# beside it). The include it wants is already committed, so an unexplained
+# one in `git diff` means it decided ours did not match — check the exact
+# spelling before reverting.
+#
 # If colors.kdl never appears after a wallpaper pick, the safe fallback is
 # a one-time `dms setup colors` (it only writes files that are missing or
 # empty) and re-setting the wallpaper.
