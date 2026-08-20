@@ -3,10 +3,14 @@
 # them: the firewall holes that let a Bambu Lab printer be discovered on the
 # LAN, and the flatpak the slicer is installed from.
 #
-# ── WHY THIS ONE APP IS A FLATPAK ───────────────────────────────────────────
-# It is the ONLY flatpak in an otherwise entirely Nix-native config, and that
-# is not an oversight or a shortcut — nixpkgs' orca-slicer physically cannot
-# run on this machine. It was tried first (2026-08-11) and aborts ~2s into
+# ── WHY THIS APP IS A FLATPAK ───────────────────────────────────────────────
+# It was the FIRST flatpak in an otherwise Nix-native config, and for a while
+# the only one (RustDesk joined it 2026-08-20 — modules/rustdesk.nix — which is
+# why the service enable and the update timer now live in modules/flatpak.nix
+# instead of down there). The difference between the two is worth keeping
+# straight: RustDesk *chooses* flatpak for freshness and could go back to
+# nixpkgs in one line. This one has no choice — nixpkgs' orca-slicer physically
+# cannot run on this machine. It was tried first (2026-08-11) and aborts ~2s into
 # every launch, deterministically, the moment Bambu's proprietary network
 # plugin is on disk. The coredump says exactly why:
 #
@@ -32,10 +36,12 @@
 # build essentially every Linux + Bambu user runs. The trade accepted here:
 # the slicer's version is no longer pinned by flake.lock. That IS the point.
 #
-# So: if OrcaSlicer ever becomes a working Nix package again, deleting it
-# means deleting the flatpak service below AND the nix-flatpak flake input —
-# nothing else in this config uses flatpak. Equally, do NOT "tidy up" the
-# odd-one-out flatpak: that reintroduces a slicer that cannot start.
+# So: do NOT "tidy up" the odd-one-out flatpak — that reintroduces a slicer
+# that cannot start. And if OrcaSlicer ever becomes a working Nix package
+# again, deleting it does NOT mean deleting the nix-flatpak flake input any
+# more: RustDesk still needs it. Just remove the package line below (the
+# mechanism in modules/flatpak.nix stays, and only goes when its LAST consumer
+# does).
 #
 # ── WHY THE FIREWALL HOLES ARE NOT OPTIONAL ─────────────────────────────────
 # NixOS's firewall is on by default and this repo otherwise never touches it,
@@ -50,30 +56,21 @@
 # to it exactly as they did to the Nix build.
 #
 # Removing OrcaSlicer = delete this file + home/orca-slicer.nix + the three
-# import lines (both hosts and home/default.nix) + the nix-flatpak input.
+# import lines (both hosts and home/default.nix). The nix-flatpak input stays
+# as long as any flatpak remains.
 { config, lib, pkgs, ... }:
 
 {
   # ── The app ────────────────────────────────────────────────────────────────
-  # `packages`/`update` come from the nix-flatpak module (wired into mkHost in
-  # flake.nix); plain nixpkgs only offers `enable`. Flathub is already in the
+  # `packages` comes from the nix-flatpak module (wired into mkHost in
+  # flake.nix); plain nixpkgs only offers `enable`. Flathub is already in that
   # module's default remotes, so there is no remote to declare.
-  services.flatpak = {
-    enable = true;
-    packages = [ "com.orcaslicer.OrcaSlicer" ];
-
-    # Updates run on a systemd timer, NOT `update.onActivation`. Activation-time
-    # updates would make every `nixos-rebuild switch` reach out to Flathub, so a
-    # rebuild on a flaky connection — or on the train — could fail for reasons
-    # that have nothing to do with the change being applied. A rebuild must stay
-    # independent of the network.
-    update.auto = {
-      enable = true;
-      onCalendar = "weekly";
-    };
-    # uninstallUnmanaged stays at its default (false): flatpaks installed by
-    # hand are not this module's business to remove.
-  };
+  #
+  # The service enable and the weekly update timer are NOT here — they are
+  # flatpak-wide policy and live in modules/flatpak.nix, which both hosts also
+  # import. `packages` is a merging list option, so this definition sits
+  # alongside RustDesk's rather than replacing it.
+  services.flatpak.packages = [ "com.orcaslicer.OrcaSlicer" ];
 
   # ── LAN discovery ──────────────────────────────────────────────────────────
   networking.firewall = {

@@ -27,7 +27,9 @@
     ../../modules/printing.nix   # CUPS + SANE, driverless network printing/scanning
     ../../modules/localsend.nix  # LAN file sharing (AirDrop-style) + firewall port
     ../../modules/syncthing.nix  # continuous file sync between machines (P2P; GUI-owned config)
+    ../../modules/flatpak.nix    # flatpak service + weekly update timer (the apps below declare their own packages)
     ../../modules/orca-slicer.nix # OrcaSlicer (flatpak — the Nix build can't run) + Bambu X1C LAN discovery firewall holes
+    ../../modules/rustdesk.nix   # RustDesk remote desktop (flatpak — CLIENT ONLY; niri can't be hosted, see the module)
     ../../modules/solaar.nix     # Logitech mouse/keyboard manager (udev rules + GUI)
     ../../modules/zsa.nix        # ZSA keyboard udev rules (flash via Oryx in browser)
     # ../../modules/gaming.nix   # uncomment to get Steam on the laptop too

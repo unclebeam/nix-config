@@ -68,21 +68,25 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # nix-flatpak — declarative flatpak remotes + apps. This input exists for
-    # exactly ONE app: OrcaSlicer, which cannot be a Nix package here because
-    # the nixpkgs build aborts the moment Bambu's proprietary network plugin
-    # loads (two libstdc++ copies in one process — the whole story, with the
-    # backtrace, is in modules/orca-slicer.nix). The Flathub build is fine.
+    # nix-flatpak — declarative flatpak remotes + apps. Everything else on these
+    # machines is a Nix package; two apps are deliberately not, for different
+    # reasons (both spelled out in modules/flatpak.nix, which is the module that
+    # enables the service):
+    #   • OrcaSlicer  — CANNOT be a Nix package here; the nixpkgs build aborts
+    #     the moment Bambu's proprietary network plugin loads (two libstdc++
+    #     copies in one process — backtrace in modules/orca-slicer.nix).
+    #   • RustDesk    — CHOOSES not to be; nixpkgs works, Flathub is just newer
+    #     and is upstream's own build (modules/rustdesk.nix).
     #
     # It is needed because nixpkgs' own `services.flatpak` has ONLY `enable` —
     # no way to declare a remote or an app — which would have made installing
-    # the slicer a manual step on each machine. This input extends that same
+    # each of them a manual step on each machine. This input extends that same
     # `services.flatpak` namespace with `remotes`/`packages`/`update`.
     #
     # Pinned to a release tag rather than a moving branch: it runs privileged
     # activation-time commands, so it should only move when we say so.
-    # If OrcaSlicer ever goes back to being a Nix package, this input and the
-    # flatpak service in modules/orca-slicer.nix are deleted together.
+    # This input goes away only when the LAST flatpak does — i.e. together with
+    # modules/flatpak.nix.
     nix-flatpak = {
       url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     };
@@ -139,8 +143,8 @@
 
             # nix-flatpak's NixOS module. Same deal again: loading it only
             # extends `services.flatpak` with declarative remotes/packages.
-            # modules/orca-slicer.nix is the one place that enables it — and
-            # the only reason flatpak exists in this config at all.
+            # modules/flatpak.nix is the one place that enables it; the app
+            # modules (orca-slicer.nix, rustdesk.nix) only add packages.
             nix-flatpak.nixosModules.nix-flatpak
 
             # Wire home-manager in as a NixOS module: `nixos-rebuild switch`
